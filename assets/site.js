@@ -96,6 +96,8 @@
       <a class="brand" href="${ROOT}">Hyeonwoo <em>Yang</em></a>
       <nav class="nav" aria-label="주 메뉴"><a href="${CFG.research}">Research</a><a href="${ROOT}training/">Training</a></nav></div></header>`));
     document.body.append(el(`<footer class="foot"><div class="wrap">© 2026 Hyeonwoo Yang · KAIST</div></footer>`));
+    // fetch the other tabs ahead of time, so the first visit to each is as quick as a return visit
+    ['', 'plan.html', 'log.html', 'records.html'].forEach((f) => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = `${ROOT}training/${f}`; document.head.append(l); });
     if (!sub) return;
     const dlg = el(`<dialog id="keyDlg"><h3>입력 설정</h3>
       <p class="note">이 사이트는 누구나 볼 수 있지만, 기록을 저장하려면 본인 확인용 GitHub 토큰이 필요해요. 토큰은 이 브라우저에만 저장돼요.</p>
