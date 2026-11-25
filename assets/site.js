@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1126v';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1126w';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -290,7 +290,7 @@
     if (it.k === 'hyrox') return HX[parse(d).getDay()] || 'Functional Training';
     if (it.k === 'commute') return 'Run commute';
     if (it.k === 'weights') return 'Weight Training~Upper Body';
-    if (it.k === 'run') return /기록 측정/.test(it.t) ? 'Time trial' : /조깅/.test(it.t) && !/세트/.test(it.t) ? 'Jogging' : /연속/.test(it.t) ? 'Tempo run' : 'Interval run';
+    if (it.k === 'run') return /기록 측정/.test(it.t) ? 'Time trial' : /지속주|연속/.test(it.t) ? 'Tempo run' : /×|세트/.test(it.t) ? 'Interval run' : /조깅/.test(it.t) ? 'Jogging' : 'Interval run';
     return '';
   }
 
@@ -435,8 +435,8 @@
     const nowNo = Math.round((monday(NOW) - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
     $('#weekTotal').textContent = `대회 주까지 총 ${totalWeeks}주${nowNo >= 1 && nowNo <= totalWeeks ? ` · 지금 ${nowNo}주차` : ''}`;
     $('#weeks').innerHTML = plan.weeks.map((w, wi) => { const mon = parse(w.start);
-      const tone = (it) => (it.k === 'hyrox' ? (/Functional/.test(it.t) ? 'fx' : /Double/.test(it.t) ? 'db' : /Single/.test(it.t) ? 'sg' : 'iv') : it.k === 'commute' || it.k === 'run' ? 'run' : it.k === 'weights' ? 'wt' : it.k);
-      const li = (it, d) => `<li${it.k === 'free' || it.k === 'rest' ? ' class="quiet"' : ''}><b class="tone-${tone(it)}">${esc(it.t)}</b>${it.d ? ` <span class="why">(${esc(it.d)})</span>` : ''}${it.first ? ' <span class="chip w">첫 Hyrox Training</span>' : ''}${it.key ? ' <span class="chip a">핵심</span>' : ''}${isDone(it, d, log) ? ` ${doneChip}` : ''}</li>`;
+      const tone = (it) => (it.k === 'commute' ? 'run' : it.k);     // bullet colour: the same three kinds as the charts
+      const li = (it, d) => `<li class="${it.k === 'free' || it.k === 'rest' ? 'quiet' : `k-${tone(it)}`}"><b>${esc(it.t)}</b>${it.d ? ` <span class="why">(${esc(it.d)})</span>` : ''}${it.first ? ' <span class="chip w">첫 Hyrox Training</span>' : ''}${it.key ? ' <span class="chip a">핵심</span>' : ''}${isDone(it, d, log) ? ` ${doneChip}` : ''}</li>`;
       const rows = [0, 1, 2, 3, 4, 5, 6].map((i) => { const dt = addDays(mon, i), d = iso(dt), day = plan.days[d];
         return `<tr><td class="num dcol"><b>${KO[dt.getDay()]}</b> <span class="muted">${md(dt)}</span></td><td><ul class="plan-items">${day.items.map((it) => li(it, d)).join('')}</ul><div class="m-nut num">${n0(day.kcal)}kcal · 탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}</div></td><td class="r num d-only" style="white-space:nowrap">${n0(day.kcal)}kcal<br><span class="small muted">탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}</span></td></tr>`; }).join('');
       return `<section class="plate plan-week${w.start === thisMon ? ' now' : ''}" id="w-${w.start}"><div class="hd"><h3>${esc(w.label)}</h3><span class="chip dark num">${wi + 1}주차</span><span class="muted small num">${md(mon)}–${md(addDays(mon, 6))}</span>${w.recovery ? '<span class="chip w">회복 주</span>' : ''}${w.start === thisMon ? '<span class="chip a">이번 주</span>' : ''}
@@ -454,9 +454,9 @@
     const row = (name, v, lapv, how) => `<tr><td><b>${name}</b></td><td class="num">${esc(v)}${/초/.test(v) ? '' : ' /km'}</td><td class="num">${lapv || '–'}</td><td>${how}</td></tr>`;
     $('#paceSide').textContent = `${when(cur.date)} 적용 · ${cur.basis}`;
     $('#paces').innerHTML = `<div class="scroll-x"><table class="t"><thead><tr><th>구분</th><th>페이스</th><th>400m 한 바퀴</th><th>어떻게</th></tr></thead><tbody>
-      ${row('조깅 · 왕복 러닝', cur.easy, '', '심박 150 이하가 우선')}${row('템포런', cur.tempo, lap(cur.tempo), '20–25분 연속, 끝까지 같은 페이스')}${row('역치', cur.threshold, lap(cur.threshold), '말이 한두 마디 나오는 강도')}
-      ${row('1km 인터벌', cur.rep1k, lap(cur.rep1k), '세트 사이 400m 조깅')}${row('300m 인터벌', cur.rep300, '', '100m 조깅으로 이어가기')}</tbody></table></div>
-      <p class="note" style="margin-top:12px">마지막 세트까지 여유 있으면 다음 주에 km당 5초 빠르게, 못 지켰으면 5초 느리게.</p>
+      ${row('조깅 · 왕복 러닝', cur.easy, '', '심박 150 이하가 우선')}${row('템포 지속주', cur.tempo, lap(cur.tempo), '7km 안팎을 쉬지 않고, 끝까지 같은 페이스')}${row('역치 지속주', cur.threshold, lap(cur.threshold), '5–6km를 쉬지 않고 · 말이 한두 마디 나오는 강도')}
+      ${row('1km 인터벌', cur.rep1k, lap(cur.rep1k), '세트 사이 400m 조깅')}${row('300m 인터벌', cur.rep300, '', '100m 조깅으로 이어가기')}${row('200m 빠르게', '44–46초', '', '전력 아님 · 사이는 걸어서 회복')}</tbody></table></div>
+      <p class="note" style="margin-top:12px">끝까지 페이스를 지키고 여유가 있으면 다음 주에 km당 5초 빠르게, 못 지켰으면 5초 느리게. 쉬는 구간은 1km·300m 인터벌처럼 지속주로는 낼 수 없는 페이스에만 둬요.</p>
       <details class="more"><summary>이전 페이스와 변화 보기 <span class="muted num">· 기록 ${P.length}개</span></summary>
         ${P.length > 1 ? '<h3 style="font-size:.95rem;color:var(--ink);margin-top:16px">Threshold · 역치 페이스 변화</h3><div class="chart" id="paceChart" style="max-width:560px"></div><p class="note">아래로 내려갈수록 빨라진 거예요.</p>' : '<p class="note" style="margin-top:12px">아직 첫 기록뿐이에요. 12월 첫째 주 5km 기록을 재고 나면 두 번째 줄이 생기고, 그때부터 변화 그래프가 보여요.</p>'}
         <div class="scroll-x" style="margin-top:12px"><table class="t"><thead><tr><th>적용일</th><th>근거</th><th>조깅</th><th>템포</th><th>역치</th><th>1km</th><th>300m</th></tr></thead><tbody>

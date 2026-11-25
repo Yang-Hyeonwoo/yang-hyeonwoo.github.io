@@ -23,37 +23,42 @@ HOLIDAYS = {D(2026, 12, 25): "성탄절", D(2027, 1, 1): "신정"}
 MAINTENANCE = (D(2026, 12, 24), D(2027, 1, 1))   # year-end week: no deficit
 
 # monday: (gym round-trip run weekdays, bonus gym round-trip run weekdays, Wednesday run, Wednesday detail, recovery week?)
+# Wednesday runs are written the way the user plans them: pace + distance, run straight through ("4:35 5km 지속주").
+# Breaks only where the pace is faster than can be held for the whole distance (1 km / 300 m reps); those carry the
+# user's interval notation and the distance of the fast part. Every detail ends with the day's total distance.
+STRIDES = "200m 빠르게 4번"
+STRIDE_HOW = "200m는 44–46초 · 전력 아님 · 사이는 걸어서 회복"
 WEEKS = {
-    D(2026, 11, 23): ([3], [], "조깅 8km + 100m 빠르게 4번", "심박 150 이하 · 페이스는 보지 않기", False),
-    D(2026, 11, 30): ([0, 3], [], "5km 기록 측정", "트랙 12.5바퀴 · 이 기록으로 모든 페이스를 다시 맞춰요", False),
-    D(2026, 12, 7): ([0, 3], [], "4:35/km × 5분 × 4세트", "세트 사이 1분 조깅 · 페이스는 5km 기록으로 확정", False),
-    D(2026, 12, 14): ([0, 3], [1], "4:35/km × 5분 × 5세트 + 100m 빠르게 4번", "세트 사이 1분 조깅", False),
-    D(2026, 12, 21): ([0], [], "조깅 30분 + 100m 빠르게 6번", "회복 주 · 가볍게", True),
-    D(2026, 12, 28): ([0, 3], [1], "4:40–4:45/km × 20분 연속", "템포런 · 끝까지 같은 페이스", False),
-    D(2027, 1, 4): ([0, 3], [1], "300m 72–75초 + 100m 조깅 × 10–12세트", "인터벌 · 300/100", False),
-    D(2027, 1, 11): ([0, 3], [1], "4:30/km × 8분 × 3세트", "세트 사이 2분 조깅", False),
-    D(2027, 1, 18): ([0, 3], [1], "4:10/km × 1km × 5세트", "세트 사이 400m 조깅", False),
-    D(2027, 1, 25): ([0, 3], [], "5km 기록 측정 (재측정)", "회복 주 · 10km 목표 시기를 여기서 판단", True),
+    D(2026, 11, 23): ([3], [], "조깅 8km + " + STRIDES, "심박 150 이하 · " + STRIDE_HOW + " · 총 10km", False),
+    D(2026, 11, 30): ([0, 3], [], "5km 기록 측정", "트랙 12.5바퀴 · 앞뒤 조깅 2km씩 · 총 9km · 이 기록으로 모든 페이스를 다시 맞춰요", False),
+    D(2026, 12, 7): ([0, 3], [], "4:35 5km 지속주", "앞뒤 조깅 2km씩 · 총 9km · 페이스는 5km 기록으로 확정", False),
+    D(2026, 12, 14): ([0, 3], [1], "4:35 6km 지속주 + " + STRIDES, "앞 조깅 2km · 뒤 조깅 1km · 총 11km", False),
+    D(2026, 12, 21): ([0], [], "조깅 5km + " + STRIDES, "회복 주 · 가볍게 · 총 7km", True),
+    D(2026, 12, 28): ([0, 3], [1], "4:40 7km 지속주", "앞뒤 조깅 1km씩 · 총 9km · 끝까지 같은 페이스", False),
+    D(2027, 1, 4): ([0, 3], [1], '300/100(72–75"/40") × 10 · 4:00–4:10/6:40', "빠르게 총 3km · 회복은 100m 조깅 · 앞뒤 조깅 2km씩 · 총 8km", False),
+    D(2027, 1, 11): ([0, 3], [1], "4:30 6km 지속주", "앞뒤 조깅 1.5km씩 · 총 9km", False),
+    D(2027, 1, 18): ([0, 3], [1], "1000/400(4'10\"/2'30\") × 5 · 4:10/6:15", "빠르게 총 5km · 회복은 400m 조깅 · 앞뒤 조깅 1.5km씩 · 총 10km", False),
+    D(2027, 1, 25): ([0, 3], [], "5km 기록 측정 (재측정)", "회복 주 · 앞뒤 조깅 2km씩 · 총 9km · 10km 목표 시기를 여기서 판단", True),
 }
-WED_KM = {D(2026, 11, 23): 8, D(2026, 11, 30): 9, D(2026, 12, 7): 9, D(2026, 12, 14): 10, D(2026, 12, 21): 6,
-          D(2026, 12, 28): 9, D(2027, 1, 4): 9, D(2027, 1, 11): 9, D(2027, 1, 18): 10, D(2027, 1, 25): 9}
+WED_KM = {D(2026, 11, 23): 10, D(2026, 11, 30): 9, D(2026, 12, 7): 9, D(2026, 12, 14): 11, D(2026, 12, 21): 7,
+          D(2026, 12, 28): 9, D(2027, 1, 4): 8, D(2027, 1, 11): 9, D(2027, 1, 18): 10, D(2027, 1, 25): 9}
 
 # Running paces, oldest first. Add a row whenever they are re-set (5 km test, a race, a clear change in feel).
 PACES = [
     {"date": "2026-11-25", "basis": "시작 추정값 · 11월 러닝 기록 기준",
-     "easy": "5:50–6:15", "tempo": "4:40–4:45", "threshold": "4:35", "rep1k": "4:10", "rep300": "72–75초"},
+     "easy": "5:50–6:15", "tempo": "4:40", "threshold": "4:35", "rep1k": "4:10", "rep300": "72–75초"},
 ]
 
 # What each week is for, in one line (shown beside the week's name).
 CONCEPT = {
     D(2026, 11, 23): "고강도 Hyrox Training 적응 · 러닝 마일리지 다시 쌓기 시작",
     D(2026, 11, 30): "5km 기록 측정으로 기준 페이스 잡기 · 왕복 러닝 주 2회 자리 잡기",
-    D(2026, 12, 7): "역치 러닝 시작 · 프로 무게에 익숙해지기",
-    D(2026, 12, 14): "역치 러닝 한 세트 더 · 주간 러닝 30km 채우기",
+    D(2026, 12, 7): "역치 지속주 시작 (4:35 5km) · 프로 무게에 익숙해지기",
+    D(2026, 12, 14): "지속주 6km로 늘리기 · 주간 러닝 30km 채우기",
     D(2026, 12, 21): "회복 주 · 양을 줄이고 연말 컨디션 지키기",
-    D(2026, 12, 28): "템포런 20분으로 오래 버티는 힘 기르기",
+    D(2026, 12, 28): "템포 지속주 7km로 오래 버티는 힘 기르기",
     D(2027, 1, 4): "300m 인터벌로 스피드 자극 · 거리는 유지",
-    D(2027, 1, 11): "역치 구간 늘리기 (8분 × 3세트)",
+    D(2027, 1, 11): "4:30 지속주 6km · 하프 페이스 감각",
     D(2027, 1, 18): "1km 인터벌로 10K 페이스 감각 만들기",
     D(2027, 1, 25): "회복 주 · 5km 재측정으로 두 달 점검",
 }
@@ -81,7 +86,7 @@ for monday, (commute, bonus, wed_run, wed_detail, recovery) in sorted(WEEKS.item
                 items[-1]["first"] = True
             kcal, carb = 2300, 270
             if wd in commute:
-                items.append({"k": "commute", "t": "체육관 왕복 러닝 10km", "d": "심박 150 이하" + (" · 끝에 100m 빠르게 4번" if wd == 0 else "")})
+                items.append({"k": "commute", "t": "체육관 왕복 러닝 10km", "d": "심박 150 이하" + (" · 끝에 " + STRIDES if wd == 0 else "")})
                 kcal, carb = 2500, 320
             elif wd in bonus:
                 items.append({"k": "commute", "t": "체육관 왕복 러닝 10km", "d": "보너스 · 컨디션 좋은 날만, 아니면 자전거", "opt": True})
@@ -92,7 +97,7 @@ for monday, (commute, bonus, wed_run, wed_detail, recovery) in sorted(WEEKS.item
             items.append({"k": "weights", "t": "상체 웨이트 45분", "d": "22:30 헬스장 · 23:30까지"})
             kcal, carb = 2500, 320
         else:
-            items.append({"k": "free", "t": "자유", "d": "뛰고 싶은 날만 조깅 · 한 달에 두 번쯤 롱런 60–70분", "opt": True})
+            items.append({"k": "free", "t": "자유", "d": "뛰고 싶은 날만 조깅 · 한 달에 두 번쯤 롱런 10–12km", "opt": True})
         if MAINTENANCE[0] <= d <= MAINTENANCE[1]:
             kcal += 200
             carb += 50

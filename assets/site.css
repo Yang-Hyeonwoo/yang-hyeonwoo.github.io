@@ -422,8 +422,9 @@ table.days td.num { padding-left: 5px; padding-right: 5px; }
 /* ---- log entries: date and session name on one line; plan colours per kind of training; this week's aim on the D-day card ---- */
 .entry .when { padding-top: 1px; line-height: 1.5; } .entry .when b { line-height: 30px; }
 .entry .top { min-height: 30px; }
-.tone-fx { color: #2b59c3; } .tone-db { color: #0e7c86; } .tone-iv { color: #6b4fc8; } .tone-sg { color: #c2410c; }
-.tone-run { color: #1a7f4b; } .tone-wt { color: #8a5a00; } .tone-core { color: var(--ink); }
+/* plan items: the text stays ink; only the bullet tells the kind, in the chart colours (Hyrox / Running / Weight) */
+.plan-items li.k-hyrox::marker { color: #2b59c3; } .plan-items li.k-run::marker { color: #2a9d8f; } .plan-items li.k-weights::marker { color: #d9731a; }
+.plan-items li.k-core::marker { color: var(--faint); }
 .dday .count .r .lbl { display: block; margin-bottom: 2px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.62); }
 .recap .lead { line-height: 1.8; }
 

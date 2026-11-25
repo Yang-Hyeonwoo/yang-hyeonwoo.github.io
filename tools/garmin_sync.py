@@ -108,8 +108,8 @@ def session_for(day):
         if it.get('k') == 'commute':
             return 'Run commute'
         if it.get('k') == 'run':
-            return ('Time trial' if '기록 측정' in t else 'Jogging' if '조깅' in t and '세트' not in t
-                    else 'Tempo run' if '연속' in t else 'Interval run')
+            return ('Time trial' if '기록 측정' in t else 'Tempo run' if '지속주' in t or '연속' in t
+                    else 'Interval run' if '×' in t or '세트' in t else 'Jogging' if '조깅' in t else 'Interval run')
     return ''
 
 
