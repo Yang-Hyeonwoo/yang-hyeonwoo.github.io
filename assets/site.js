@@ -40,25 +40,39 @@
     const j = await r.json();
     return { sha: j.sha, data: JSON.parse(dec(j.content)) };
   }
-  async function load(name) {
+  async function fresh(name) {
     if (token()) { try { return (await remote(name)).data; } catch (e) { console.warn('fresh read failed, using published copy', e); } }
     if (LOCAL) { try { const l = localStorage.getItem('preview.' + name); if (l) return JSON.parse(l); } catch { /* ignore */ } }
     const r = await fetch(`${ROOT}data/${name}.json?v=${Date.now()}`);
     if (!r.ok) throw new Error(`${name}.json ${r.status}`);
     return r.json();
   }
+  // Pages draw from the copy this browser kept from last time, so a tab appears at once. The fresh copy is
+  // fetched meanwhile; if it turns out different, the page is drawn again with it (see the end of this file).
+  const CACHE = 'cache.v1.'; const pending = []; let settled = false;
+  const cacheGet = (name) => { try { const t = localStorage.getItem(CACHE + name); return t ? JSON.parse(t) : null; } catch { return null; } };
+  const cachePut = (name, data) => { try { localStorage.setItem(CACHE + name, JSON.stringify(data)); } catch { /* storage full or blocked: just slower */ } };
+  async function load(name) {
+    const kept = cacheGet(name);
+    if (kept && settled) return kept;
+    if (kept) {
+      pending.push(fresh(name).then((d) => { const changed = JSON.stringify(d) !== JSON.stringify(kept); if (changed) cachePut(name, d); return changed; }).catch(() => false));
+      return kept;
+    }
+    const d = await fresh(name); cachePut(name, d); return d;
+  }
   async function save(name, mutate, message) {
     if (!token()) {
       if (!LOCAL) throw new Error('입력 설정에서 토큰을 먼저 넣어주세요.');
       const cur = await load(name); const next = mutate(cur) || cur;
-      localStorage.setItem('preview.' + name, JSON.stringify(next)); return next;
+      localStorage.setItem('preview.' + name, JSON.stringify(next)); cachePut(name, next); return next;
     }
     for (let attempt = 0; attempt < 3; attempt++) {
       const { sha, data } = await remote(name);
       const next = mutate(data) || data;
       const r = await fetch(api(name), { method: 'PUT', headers: { Authorization: `Bearer ${token()}`, Accept: 'application/vnd.github+json' },
         body: JSON.stringify({ message, branch: CFG.branch, sha, content: enc(JSON.stringify(next, null, 1) + '\n') }) });
-      if (r.ok) return next;
+      if (r.ok) { cachePut(name, next); return next; }
       if (r.status !== 409) throw new Error(r.status === 401 || r.status === 403 ? '토큰이 맞지 않거나 권한이 없어요.' : `저장 실패 (GitHub ${r.status})`);
     }
     throw new Error('저장이 겹쳤어요. 다시 시도해주세요.');
@@ -328,25 +342,13 @@
       b.disabled = true;
       try { log = live(await save('log', (arr) => { arr.push(e); arr.sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0)); return arr; }, `log: ${e.date} ${e.session}`)); paint(); }
       catch (err) { alert(err.message); b.disabled = false; } };
-    // ---- Trends: totals since the first record, then Training / Nutrition / Recovery ----
+    // ---- Training / Nutrition / Recovery charts ----
     // The four weekly charts share one x-axis: the same weeks, in the same positions, with the same labels.
     const C = { weight: '#2b59c3', sleep: '#6b4fc8', kcal: '#d9731a', run: '#2a9d8f' };
     const firstDay = daily.length ? daily[0].date : TODAY; const firstMon = monday(parse(firstDay));
     const allWeeks = Math.round((mon - firstMon) / (7 * 864e5)) + 1;
-    const totals = () => {
-      const ix = dayIndex(daily, log); const days = Object.values(ix).filter((x) => x.any).length; const run = runSum(log, '0000', TODAY);
-      const wts = daily.filter((r) => r.weight != null); const head = wts.slice(0, 7).map((r) => r.weight), tail = wts.slice(-7).map((r) => r.weight);
-      const dw = head.length && tail.length ? avgOf(tail) - avgOf(head) : null; const since = parse(firstDay);
-      const t = (l, v, u, sub) => `<div class="total"><div class="l">${l}</div><div class="v num">${v}<small>${u}</small></div><div class="s num">${sub}</div></div>`;
-      $('#totals').innerHTML = t('Training Days · 운동한 날', days, '일', `${since.getFullYear()}.${since.getMonth() + 1}.${since.getDate()}부터 ${allWeeks}주`)
-        + t('Hyrox', hyroxCount(log, '0000', TODAY), '회', 'Hyrox Training · 대회')
-        + t('Running', run.km.toFixed(0), 'km', `${run.n}회`)
-        + t('Weight', log.filter((e) => e.session === 'Weight Training').length, '회', '웨이트 트레이닝')
-        + t('Body · 체중', dw == null ? '–' : `${dw > 0 ? '+' : '−'}${Math.abs(dw).toFixed(1)}`, 'kg', dw == null ? '' : `${avgOf(head).toFixed(1)} → ${avgOf(tail).toFixed(1)}kg`);
-      return ix;
-    };
     const draw = (nw) => {
-      const ix = totals(); const n = nw || allWeeks; const start = addDays(mon, -7 * (n - 1)); const wk = [];
+      const ix = dayIndex(daily, log); const n = nw || allWeeks; const start = addDays(mon, -7 * (n - 1)); const wk = [];
       for (let i = 0; i < n; i++) { const m = addDays(start, 7 * i); const a = { m, w: [], s: [], k: [], tip: `${weekLabel(m)} (${md(m)}–${md(addDays(m, 6))})` };
         for (let j = 0; j < 7; j++) { const r = (ix[iso(addDays(m, j))] || {}).rec; if (!r) continue; if (r.weight != null) a.w.push(r.weight); const sm = mins(r.sleep); if (sm != null) a.s.push(sm / 60); if (r.kcal != null) a.k.push(r.kcal); }
         wk.push(a); }
@@ -561,5 +563,7 @@
 
   chrome();
   const run = { hub, training, plan: planPage, log: logPage, records: recordsPage }[PAGE];
-  if (run) run().catch((e) => { console.error(e); const m = $('main'); if (m) m.prepend(el(`<div class="wrap"><div class="banner" style="margin-top:16px">기록을 불러오지 못했어요. 잠시 뒤 새로고침해 주세요. (${esc(e.message)})</div></div>`)); });
+  const fail = (e) => { console.error(e); const m = $('main'); if (m) m.prepend(el(`<div class="wrap"><div class="banner" style="margin-top:16px">기록을 불러오지 못했어요. 잠시 뒤 새로고침해 주세요. (${esc(e.message)})</div></div>`)); };
+  const typing = () => !!document.querySelector('#logFormWrap:not([hidden]), #dayFormWrap:not([hidden]), dialog[open]') || /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || '');
+  if (run) run().then(() => { performance.mark('site-drawn'); return Promise.all(pending.splice(0)); }).then((changed) => { settled = true; if (changed.some(Boolean) && !typing()) return run(); return null; }).catch(fail);
 })();

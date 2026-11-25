@@ -7,7 +7,12 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Training · Hyeonwoo Yang</title>
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="../assets/site.css?v=1126b">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&amp;family=Noto+Serif+KR:wght@600;700&amp;display=swap">
+<link rel="stylesheet" href="../assets/site.css?v=1126e">
 </head>
 <body data-root="../" data-page="training">
 <main>
@@ -30,28 +35,29 @@
     </section>
 
     <section class="sec">
-      <div class="sec-head"><span class="sec-no">03</span><h2>Progress</h2><span class="ko">쌓아온 기록</span>
+      <div class="sec-head"><span class="sec-no">03</span><h2>Training</h2><span class="ko">운동</span>
         <span class="side"><span class="chips" id="range" role="group" aria-label="주간 그래프 기간">
           <button type="button" data-w="0" class="on" aria-pressed="true">전체</button>
           <button type="button" data-w="24" aria-pressed="false">24주</button>
           <button type="button" data-w="12" aria-pressed="false">12주</button>
         </span></span></div>
-      <div class="totals" id="totals"></div>
-
-      <h3 class="cat">Training <span>운동</span></h3>
       <div class="grid g2">
         <div class="plate chart-card"><h3>Training Days · 월별 운동한 날</h3><div class="now num" id="nowMD"></div><div class="chart" id="chMD"></div></div>
         <div class="plate chart-card"><h3>Running · 주간 러닝 거리</h3><div class="now num" id="nowR"></div><div class="chart" id="chR"></div>
           <p class="note" style="margin-top:6px">막대는 실제 거리, 검은 가로선은 그 주 기본 계획이에요.</p></div>
       </div>
+    </section>
 
-      <h3 class="cat">Nutrition <span>영양</span></h3>
+    <section class="sec">
+      <div class="sec-head"><span class="sec-no">04</span><h2>Nutrition</h2><span class="ko">영양</span></div>
       <div class="grid g2">
         <div class="plate chart-card"><h3>Intake · 주 평균 섭취 칼로리</h3><div class="now num" id="nowK"></div><div class="chart" id="chK"></div></div>
         <div class="plate chart-card"><h3>Weight · 주 평균 체중</h3><div class="now num" id="nowW"></div><div class="chart" id="chW"></div></div>
       </div>
+    </section>
 
-      <h3 class="cat">Recovery <span>회복</span></h3>
+    <section class="sec">
+      <div class="sec-head"><span class="sec-no">05</span><h2>Recovery</h2><span class="ko">회복</span></div>
       <div class="grid g2">
         <div class="plate chart-card"><h3>Sleep · 주 평균 수면</h3><div class="now num" id="nowS"></div><div class="chart" id="chS"></div></div>
         <div class="soft"><h3 style="font-size:.95rem;color:var(--ink);margin-bottom:12px">Last 4 Weeks <span class="muted" style="font-weight:500">· 최근 4주</span></h3>
@@ -60,11 +66,11 @@
     </section>
 
     <section class="sec">
-      <div class="sec-head"><span class="sec-no">04</span><h2>Races</h2><span class="ko">대회 기록</span></div>
+      <div class="sec-head"><span class="sec-no">06</span><h2>Races</h2><span class="ko">대회 기록</span></div>
       <div class="plate" id="races"></div>
     </section>
   </div>
 </main>
-<script src="../assets/site.js?v=1126b"></script>
+<script src="../assets/site.js?v=1126e"></script>
 </body>
 </html>
