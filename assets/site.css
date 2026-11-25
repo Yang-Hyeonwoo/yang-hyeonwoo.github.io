@@ -397,6 +397,15 @@ table.days td.num { padding-left: 5px; padding-right: 5px; }
 .plan-items li::marker { color: var(--accent); }
 .plan-items li b { font-weight: 600; }
 .plan-items .why { color: var(--muted); font-size: 0.86em; }
-.plan-items li.soft b { font-weight: 500; color: var(--muted); } .plan-items li.soft::marker { color: var(--faint); }
+.plan-items li.quiet b { font-weight: 500; color: var(--muted); } .plan-items li.quiet::marker { color: var(--faint); }
 .plan-week .concept { margin: -2px 0 14px; font-size: 0.98rem; font-weight: 600; color: var(--accent-strong); }
 @media (max-width: 640px) { .site-head.sub .nav a { font-size: 0.8rem; padding-left: 0.45rem; padding-right: 0.45rem; } }
+
+/* ---- weight training page: split bars; five tabs scroll sideways on a phone ---- */
+.hbar { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr) 2rem; align-items: center; gap: 10px; margin: 7px 0; font-size: 0.86rem; }
+.hbar i { height: 12px; border-radius: 4px; background: #d9731a; }
+.hbar b { text-align: right; color: var(--ink); }
+@media (max-width: 640px) {
+  .site-head.sub .nav { justify-content: flex-start; overflow-x: auto; }
+  .site-head.sub .nav a { flex: none; font-size: 0.82rem; padding-left: 0.7rem; padding-right: 0.7rem; }
+}

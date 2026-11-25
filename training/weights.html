@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex, nofollow">
+<title>Weight Training · Hyeonwoo Yang</title>
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&amp;family=Noto+Serif+KR:wght@600;700&amp;display=swap">
+<link rel="stylesheet" href="../assets/site.css?v=1126j">
+</head>
+<body data-root="../" data-page="weights">
+<main>
+  <div class="wrap">
+    <section class="hero" style="padding-bottom:8px">
+      <p class="eyebrow">2026 · Weight Training</p>
+      <h1>웨이트로 채운 <em>2026</em></h1>
+      <p class="lead">2026년의 운동 콘셉트는 웨이트였습니다. 몸을 더 만들고, 더 무거운 무게를 들고, 근육량을 늘리는 것이 목표였습니다. 이 페이지는 그 한 해를 숫자로 돌아본 기록입니다. 2027년은 Hyrox Pro Single 출전을 목표로 방향을 바꿉니다.</p>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head"><span class="sec-no">01</span><h2>The Year</h2><span class="ko">한 해의 숫자</span><span class="side">기록을 시작한 날부터 센 값</span></div>
+      <div class="totals" id="wtTiles"></div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head"><span class="sec-no">02</span><h2>Consistency</h2><span class="ko">꾸준함</span></div>
+      <div class="grid g2">
+        <div class="plate chart-card"><h3>Sessions · 월별 웨이트 일수</h3><div class="now num" id="wtMonthsNow"></div><div class="chart" id="wtMonths"></div></div>
+        <div class="plate chart-card"><h3>Split · 무엇을 얼마나</h3><p class="note" style="margin:2px 0 14px">운동 부위별로 한 날 수예요.</p><div id="wtSplit"></div></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head"><span class="sec-no">03</span><h2>Strength</h2><span class="ko">주요 종목의 변화</span><span class="side">달마다 든 가장 무거운 무게 · 풀업은 한 세트 최고 횟수</span></div>
+      <div class="grid g2" id="wtLifts"></div>
+      <p class="note" style="margin-top:12px">앞쪽 기록 일부는 엑셀에 날짜가 없어서 순서로 날짜를 맞췄어요. 무게와 횟수는 적어둔 그대로예요.</p>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head"><span class="sec-no">04</span><h2>Body</h2><span class="ko">인바디</span><span class="side num" id="wtBodyNote"></span></div>
+      <div class="plate" id="wtBody"></div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head"><span class="sec-no">05</span><h2>Discipline</h2><span class="ko">수면과 식단 관리</span></div>
+      <div class="soft"><div class="kv" id="wtCare"></div>
+        <p class="note" style="margin-top:12px">하루하루의 기록은 <a href="records.html">Daily Records</a>에 전부 있어요.</p></div>
+    </section>
+  </div>
+</main>
+<script src="../assets/site.js?v=1126j"></script>
+</body>
+</html>
