@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex, nofollow">
+<title>Records · Hyeonwoo Yang</title>
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css?v=1126b">
+</head>
+<body data-root="../" data-page="records">
+<main>
+  <div class="wrap">
+    <section class="hero" style="padding-bottom:8px">
+      <p class="eyebrow">Daily Records</p>
+      <h1>전체 <em>기록</em></h1>
+      <p class="lead">수면, 운동, 체중, 식단을 하루 한 줄로 모았습니다. 첫 기록부터 오늘까지 전부 보여줍니다.</p>
+    </section>
+
+    <section class="sec" id="daily" style="padding-top:16px">
+      <div class="form-foot" style="margin:0 0 16px">
+        <span class="note num" id="dayCount"></span>
+        <button class="btn" id="dayNew" type="button" style="margin-left:auto">식단 · 체중 기록</button>
+        <span class="note" id="dayHint" hidden style="margin-left:auto">기록을 쓰려면 오른쪽 위 열쇠 버튼에서 입력 설정을 해주세요.</span>
+      </div>
+      <div class="banner" id="dayPreview" hidden>미리보기 중이에요. 여기서 저장한 내용은 이 기기에만 남아요.</div>
+      <div class="plate" id="dayFormWrap" hidden style="margin-bottom:24px">
+        <form id="dayForm" autocomplete="off">
+          <div class="form">
+            <div class="c2"><label for="df-date">Date · 날짜</label><input class="in" id="df-date" name="date" type="date" required></div>
+            <div class="c2"><label for="df-bed">Bed · 잠든 시각</label><input class="in" id="df-bed" name="bed" placeholder="1:30"></div>
+            <div class="c2"><label for="df-wake">Wake · 일어난 시각</label><input class="in" id="df-wake" name="wake" placeholder="9:00"></div>
+            <div class="c2"><label for="df-weight">Weight · kg</label><input class="in" id="df-weight" name="weight" type="number" inputmode="decimal" step="0.01" min="0"></div>
+            <div class="c1"><label for="df-kcal">kcal</label><input class="in" id="df-kcal" name="kcal" type="number" inputmode="numeric" min="0"></div>
+            <div class="c1"><label for="df-carb">탄수 g</label><input class="in" id="df-carb" name="carb" type="number" inputmode="numeric" min="0"></div>
+            <div class="c1"><label for="df-prot">단백 g</label><input class="in" id="df-prot" name="prot" type="number" inputmode="numeric" min="0"></div>
+            <div class="c1"><label for="df-fat">지방 g</label><input class="in" id="df-fat" name="fat" type="number" inputmode="numeric" min="0"></div>
+            <div class="c3"><label for="df-b">아침</label><input class="in" id="df-b" name="breakfast"></div>
+            <div class="c3"><label for="df-l">점심</label><input class="in" id="df-l" name="lunch"></div>
+            <div class="c2"><label for="df-s">간식</label><input class="in" id="df-s" name="snack"></div>
+            <div class="c2"><label for="df-d">저녁</label><input class="in" id="df-d" name="dinner"></div>
+            <div class="c2"><label for="df-n">야식 · 단백질 간식</label><input class="in" id="df-n" name="late"></div>
+            <div class="c6"><label for="df-note">Note · 메모</label><input class="in" id="df-note" name="note" placeholder="컨디션, 약속, 특이사항"></div>
+          </div>
+          <div class="form-foot"><button class="btn" id="daySave" type="submit">저장</button><button class="btn line" id="dayCancel" type="button">닫기</button><span class="note num" id="dayTarget"></span></div>
+          <p class="note" id="dayMsg" role="status" style="margin-top:8px"></p>
+        </form>
+      </div>
+      <div class="plate" id="dayList"></div>
+      <p class="note" style="margin-top:12px">하늘색 막대는 수면 목표 7시간 30분 대비, 회색 막대는 그날 목표 대비예요. 칼로리가 목표를 넘으면 <b class="over1">주황</b>, 200kcal 넘게 넘으면 <b class="over2">빨강</b>으로 보여요. 운동 칸은 Log의 운동 기록에서 가져와요. 줄을 누르면 그날 내용이 전부 펼쳐지고, 날짜를 누르면 고칠 수 있어요.</p>
+    </section>
+  </div>
+</main>
+<script src="../assets/site.js?v=1126b"></script>
+</body>
+</html>

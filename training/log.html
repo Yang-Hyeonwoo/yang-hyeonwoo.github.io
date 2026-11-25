@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex, nofollow">
+<title>Training Log · Hyeonwoo Yang</title>
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css?v=1126b">
+</head>
+<body data-root="../" data-page="log">
+<main>
+  <div class="wrap">
+    <section class="hero" style="padding-bottom:8px">
+      <p class="eyebrow">Training Log</p>
+      <h1>훈련 <em>일지</em></h1>
+      <p class="lead">Hyrox Training, 러닝, 웨이트를 한곳에 적습니다. 기록하면 그날 계획에 완료가 표시됩니다.</p>
+    </section>
+
+    <section class="sec" style="padding-top:8px">
+      <div class="banner" id="logPreview" hidden>미리보기 중이에요. 여기서 저장한 내용은 이 기기에만 남아요.</div>
+      <div class="form-foot" style="margin:0 0 16px">
+        <div class="chips" id="logFilter" role="group" aria-label="종류">
+          <button type="button" class="on" data-f="all" aria-pressed="true">전체</button>
+          <button type="button" data-f="hyrox" aria-pressed="false">Hyrox</button>
+          <button type="button" data-f="run" aria-pressed="false">Running</button>
+          <button type="button" data-f="weights" aria-pressed="false">Weight</button>
+        </div>
+        <span class="note num" id="logCount"></span>
+        <button class="btn" id="logNew" type="button" style="margin-left:auto">운동 기록</button>
+        <span class="note" id="logHint" hidden style="margin-left:auto">기록을 쓰려면 오른쪽 위 열쇠 버튼에서 입력 설정을 해주세요.</span>
+      </div>
+
+      <div class="plate" id="logFormWrap" hidden style="margin-bottom:24px">
+        <h3 id="logFormTitle" style="font-size:1.15rem;font-weight:700;color:var(--ink);margin-bottom:16px">운동 기록</h3>
+        <form id="logForm" autocomplete="off">
+          <div class="form" id="lfMain">
+            <div class="c2"><label for="lf-date">Date · 날짜</label><input class="in" id="lf-date" name="date" type="date" required></div>
+            <div class="c2"><label for="lf-session">Session · 종목</label><select class="in" id="lf-session" name="session"></select></div>
+            <div class="c2" data-k="hyrox weights other"><label for="lf-format">Format</label><select class="in" id="lf-format" name="format"></select></div>
+            <div class="c1" data-k="run"><label for="lf-km">거리 · km</label><input class="in" id="lf-km" name="km" type="number" inputmode="decimal" step="any" min="0"></div>
+            <div class="c1"><label for="lf-min">시간 · 분:초</label><input class="in" id="lf-min" name="minutes" inputmode="text" placeholder="37:54"></div>
+            <div class="c1" data-k="run"><label for="lf-pace">페이스</label><input class="in" id="lf-pace" name="pace" placeholder="자동"></div>
+            <div class="c1"><label for="lf-rpe">RPE · 강도</label><input class="in" id="lf-rpe" name="rpe" type="number" inputmode="decimal" step="0.5" min="1" max="10" placeholder="1–10"></div>
+            <div class="c3" id="lfWorkout"><label for="lf-workout" id="lfWorkoutLabel">Workout · 운동 내용</label><textarea class="in" id="lf-workout" name="workout" placeholder="8 min × 3 sets&#10;#1 1000m Run + Max Sled Push"></textarea></div>
+            <div class="c3" id="lfResult" data-k="hyrox other"><label for="lf-result">Result · 무게와 결과</label><textarea class="in" id="lf-result" name="result" placeholder="Wall ball 9kg · 3R+27"></textarea></div>
+            <div class="c6"><label for="lf-notes">Notes · 느낀 점</label><textarea class="in" id="lf-notes" name="notes" style="min-height:76px" placeholder="컨디션, 힘들었던 구간, 통증"></textarea></div>
+          </div>
+          <details class="more" id="lfMore"><summary>심박 · 세부 내용 더 적기</summary>
+            <div class="form" id="lfMoreGrid" style="margin-top:12px">
+              <div class="c1"><label for="lf-avg">Avg HR</label><input class="in" id="lf-avg" name="avg_hr" type="number" inputmode="numeric" min="0"></div>
+              <div class="c1"><label for="lf-max">Max HR</label><input class="in" id="lf-max" name="max_hr" type="number" inputmode="numeric" min="0"></div>
+            </div>
+          </details>
+          <div class="form-foot"><button class="btn" id="logSave" type="submit">저장</button><button class="btn line" id="logCancel" type="button">닫기</button></div>
+        </form>
+      </div>
+      <p class="note" id="logMsg" role="status"></p>
+      <div id="logList"></div>
+      <div id="logTrash" style="margin-top:32px"></div>
+    </section>
+  </div>
+</main>
+<script src="../assets/site.js?v=1126b"></script>
+</body>
+</html>

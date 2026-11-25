@@ -1,0 +1,1417 @@
+[
+ {
+  "date": "2026-04-28",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 55kg × 8, 8, 8, 8\nIncline Chest Press · 40kg × 10, 8, 8\nDumbbell OHP · 19kg × 8, 11, 9\nDumbbell Lateral Raise · 5kg × 25, 14, 15\nCable Push Down · 6kg × 16, 12, 12",
+  "notes": "Bench Press: 57.5 증량\nIncline Chest Press: 유지\nDumbbell OHP: 유지\nDumbbell Lateral Raise: 유지\nCable Push Down: 유지",
+  "approx": true,
+  "id": "m0001"
+ },
+ {
+  "date": "2026-04-28",
+  "session": "Cardio",
+  "workout": "Stair level 3 15min",
+  "id": "m0002"
+ },
+ {
+  "date": "2026-04-29",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 맨몸 × 6, 5, 5\nBarbell Row · 55kg × 10, 10, 8\nHigh Pull Down · 70kg × 12, 11, 10\nRear Fly · 40kg × 17, 14\nBarbell Curl · 20kg × 12, 9, 7\nHammer Curl · 7kg × 14, 12",
+  "notes": "Barbell Row: 57.5 증량\nHigh Pull Down: 72.5 증량\nRear Fly: 유지\nBarbell Curl: 유지\nHammer Curl: 유지",
+  "approx": true,
+  "id": "m0003"
+ },
+ {
+  "date": "2026-04-29",
+  "session": "Cardio",
+  "workout": "Stair level 4 13min",
+  "id": "m0004"
+ },
+ {
+  "date": "2026-04-30",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "workout": "Romanian Deadlift · 65kg × 10, 10, 10, 10\nReverse V Squat · 100kg × 12, 12\nHip Thrust · 30kg × 15, 15, 15\nSeated Leg Curl · 30kg × 20, 16, 12",
+  "notes": "Romanian Deadlift: 70증량\nReverse V Squat: 110증량\nHip Thrust: 35증량\nSeated Leg Curl: 유지",
+  "approx": true,
+  "id": "m0005"
+ },
+ {
+  "date": "2026-04-30",
+  "session": "Cardio",
+  "workout": "Stair level 4 15min",
+  "id": "m0006"
+ },
+ {
+  "date": "2026-05-02",
+  "session": "Weight Training",
+  "format": "Upper",
+  "workout": "Bench Press · 55kg × 10, 10, 9\nOHP Machine · 35kg × 12, 12, 10\nLat Pull Down · 45kg × 12, 9, 9\nRow Machine · 115lb × 10, 10, 10\nDumbbell Lateral Raise · 5kg × 26, 15, 14\nLying Triceps Extension · 15kg × 12, 12\nDumbbell Curl · 9kg × 15, 12",
+  "notes": "Bench Press: 유지\nOHP Machine: 37.5증량\nLat Pull Down: 유지\nRow Machine: 130증량\nDumbbell Lateral Raise: 유지\nLying Triceps Extension: 증량\nDumbbell Curl: 유지",
+  "approx": true,
+  "id": "m0007"
+ },
+ {
+  "date": "2026-05-02",
+  "session": "Cardio",
+  "workout": "Stair level 4 15min",
+  "id": "m0008"
+ },
+ {
+  "date": "2026-05-03",
+  "session": "Weight Training",
+  "format": "Lower front",
+  "workout": "Squat · 70kg × 10, 10, 10, 9\nHack Squat (Cybex) · 80kg × 8, 7, 7\nLying Leg Curl · 25kg × 18, 12\nLeg Extension · 25kg × 16, 14, 12",
+  "notes": "Squat: 75증량\nHack Squat (Cybex): 유지",
+  "approx": true,
+  "id": "m0009"
+ },
+ {
+  "date": "2026-05-05",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 57.5kg × 8, 8, 8, 8\nIncline Chest Press · 40kg × 12, 10, 9\nDumbbell OHP · 19kg × 12, 10, 10\nDumbbell Lateral Raise · 5kg × 25, 17, 16\nCable Push Down · 6kg × 20, 16, 12",
+  "notes": "Bench Press: 60증량\nIncline Chest Press: 유지\nDumbbell Lateral Raise: 유지",
+  "approx": true,
+  "id": "m0010"
+ },
+ {
+  "date": "2026-05-05",
+  "session": "Cardio",
+  "workout": "Stair level 4 15min",
+  "id": "m0011"
+ },
+ {
+  "date": "2026-05-06",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 맨몸 × 9, 6, 5\nBarbell Row · 57.5kg × 10, 9, 9\nHigh Pull Down · 72.5kg × 11, 7, 7\nRear Fly · 40kg × 20, 20\nBarbell Curl · 20kg × 12, 10, 7\nHammer Curl · 7kg × 12, 13",
+  "notes": "Pull-Up: RPE 9.5\nBarbell Row: 유지, 자세\nHigh Pull Down: 70회귀\nBarbell Curl: RPE10\nHammer Curl: 유지",
+  "approx": true,
+  "id": "m0012"
+ },
+ {
+  "date": "2026-05-07",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "workout": "Romanian Deadlift · 70kg × 10, 10, 10, 10\nReverse V Squat · 110kg × 10, 12\nHip Thrust · 35kg × 15, 15, 15\nSeated Leg Curl · 30kg × 20, 20, 20",
+  "notes": "Romanian Deadlift: 75증량\nReverse V Squat: 115 증량\nHip Thrust: 40증량\nSeated Leg Curl: 35증량",
+  "approx": true,
+  "id": "m0013"
+ },
+ {
+  "date": "2026-05-09",
+  "session": "Weight Training",
+  "format": "Upper",
+  "workout": "Bench Press · 55kg × 12, 10, 8\nOHP Machine · 37.5kg × 12, 12, 9\nLat Pull Down · 45kg × 12, 12, 8\nRow Machine · 130lb × 10, 10, 9\nDumbbell Lateral Raise · 5kg × 25, 17, 19\nLying Triceps Extension · 20kg × 12, 10\nDumbbell Curl · 9kg × 15, 14",
+  "notes": "Bench Press: 유지\nOHP Machine: 유지\nLat Pull Down: 유지\nRow Machine: 증량\nDumbbell Lateral Raise: 유지\nLying Triceps Extension: 유지\nDumbbell Curl: 증량",
+  "approx": true,
+  "id": "m0014"
+ },
+ {
+  "date": "2026-05-10",
+  "session": "Weight Training",
+  "format": "Lower front",
+  "workout": "Squat · 75kg × 10, 9, 7, 5\nHack Squat (Cybex) · 80kg × 10, 10, 10\nLying Leg Curl · 25kg × 20, 9\nLeg Extension · 25kg × 20, 17, 15",
+  "notes": "Squat: RPE10\nLying Leg Curl: 유지",
+  "approx": true,
+  "id": "m0015"
+ },
+ {
+  "date": "2026-05-12",
+  "session": "Weight Training",
+  "format": "Push",
+  "id": "m0016"
+ },
+ {
+  "date": "2026-05-13",
+  "session": "Weight Training",
+  "format": "Pull",
+  "id": "m0017"
+ },
+ {
+  "date": "2026-05-14",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "id": "m0018"
+ },
+ {
+  "date": "2026-05-15",
+  "session": "Weight Training",
+  "format": "Upper",
+  "id": "m0019"
+ },
+ {
+  "date": "2026-05-17",
+  "session": "Tempo run",
+  "km": 8.0,
+  "pace": "5:36",
+  "minutes": 44.8,
+  "avg_hr": 179,
+  "max_hr": 193,
+  "rpe": 9.5,
+  "workout": "8km 5:30",
+  "notes": "6개월만에 처음 뛰었는데, 생각보다 너무 힘들었음. 숨이 턱 끝까지 찼지만 끝까지 버틴다는 느낌으로 완주함",
+  "shoes": "Puma DNE3",
+  "brief": "6개월 만의 러닝, 숨찼지만 완주",
+  "id": "m0020"
+ },
+ {
+  "date": "2026-05-19",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 60kg × 8, 8, 8, 8\nIncline Chest Press · 40kg × 12, 12, 8\nDumbbell OHP · 19kg × 12, 12, 12\nDumbbell Lateral Raise · 5kg × 20, 20, 17\nCable Push Down · 6kg × 20, 18",
+  "notes": "Bench Press: 62.5증량\nIncline Chest Press: 유지\nDumbbell OHP: 21증량\nDumbbell Lateral Raise: 6증량",
+  "approx": true,
+  "id": "m0021"
+ },
+ {
+  "date": "2026-05-20",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 맨몸 × 10, 6, 6\nBarbell Row · 57.5kg × 10, 10, 10\nHigh Pull Down · 70kg × 12, 12, 10\nRear Fly · 55kg × 16, 14\nBarbell Curl · 20kg × 12, 12, 7\nHammer Curl · 7kg × 15, 15",
+  "notes": "Barbell Row: 60증량\nHammer Curl: 유지",
+  "approx": true,
+  "id": "m0022"
+ },
+ {
+  "date": "2026-05-21",
+  "session": "Easy run",
+  "km": 8.0,
+  "pace": "5:47",
+  "minutes": 46.2,
+  "avg_hr": 164,
+  "max_hr": 197,
+  "rpe": 7,
+  "workout": "7km 6:00, 1km sprint (4:10~4:40)",
+  "notes": "6:00으로 조깅하다가 마지막 1km는 참지 못하고 질주했는데 생각보다 몸이 가볍고 달리는 느낌 자체가 너무 좋고 짜릿했음",
+  "shoes": "Puma DNE3",
+  "brief": "조깅 7km + 마지막 1km 질주, 몸 가벼움",
+  "id": "m0023"
+ },
+ {
+  "date": "2026-05-21",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "workout": "Romanian Deadlift · 75kg × 10, 10, 10, 8\nReverse V Squat · 115kg × 12, 12\nHip Thrust · 40kg × 15, 15, 15\nSeated Leg Curl · 35kg × 15, 15, 15",
+  "notes": "Romanian Deadlift: 80증량\nReverse V Squat: 120증량\nHip Thrust: 45증량\nSeated Leg Curl: 40증량",
+  "approx": true,
+  "id": "m0024"
+ },
+ {
+  "date": "2026-05-23",
+  "session": "Weight Training",
+  "format": "Upper",
+  "workout": "Bench Press · 55kg × 12, 12, 10\nOHP Machine · 40kg × 12, 12, 12\nLat Pull Down · 45kg × 12, 11, 10\nRow Machine · 145lb × 8, 7, 7\nDumbbell Lateral Raise · 6kg × 20, 17, 13\nLying Triceps Extension · 20kg × 12, 12\nDumbbell Curl · 11kg × 12, 10",
+  "notes": "Bench Press: 57.5증량\nOHP Machine: 42.5증량\nLying Triceps Extension: 25증량",
+  "approx": true,
+  "id": "m0025"
+ },
+ {
+  "date": "2026-05-24",
+  "session": "Interval run",
+  "km": 3.2,
+  "pace": "5:15",
+  "minutes": 16.0,
+  "avg_hr": 172,
+  "max_hr": 188,
+  "rpe": 10,
+  "workout": "Interval 200(47\"), 200(83\") 4set and cramped",
+  "notes": "시작 전에 100m 기록 잴 때 이미 쥐가 올라왔기도 했고, 하체하고 3시간 뒤에 바로 인터벌은 확실히 무리였음, 바로 쥐나서 고생함",
+  "shoes": "Puma DNE3",
+  "brief": "200m 인터벌 4세트, 하체 운동 뒤라 쥐",
+  "id": "m0026"
+ },
+ {
+  "date": "2026-05-24",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "id": "m0027"
+ },
+ {
+  "date": "2026-05-25",
+  "session": "Easy run",
+  "km": 8.0,
+  "pace": "5:58",
+  "minutes": 48.1,
+  "avg_hr": 159,
+  "max_hr": 177,
+  "rpe": 8,
+  "workout": "6km 6:05, 2km 5:40",
+  "notes": "심박이 그리 높진 않았지만 다리 피로도 때문에(전날 lower front, 인터벌) 쉽지만은 않았음. 살짝 버겁지만 가능한 느낌.",
+  "shoes": "Puma DNE3",
+  "brief": "다리 피로 속 조깅, 버겁지만 가능",
+  "id": "m0028"
+ },
+ {
+  "date": "2026-05-26",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 62.5kg × 8, 8, 8, 8\nIncline Chest Press · 40kg × 12, 12, 12\nDumbbell OHP · 21kg × 10, 9, 9\nDumbbell Lateral Raise · 6kg × 20, 20, 13\nCable Push Down · 7kg × 20, 15, 12",
+  "notes": "Bench Press: 65증량\nIncline Chest Press: 42.5증량",
+  "approx": true,
+  "id": "m0029"
+ },
+ {
+  "date": "2026-05-27",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 9, 7, 6\nBarbell Row · 60kg × 10, 10, 10\nHigh Pull Down · 75kg × 12, 10, 8\nRear Fly · 55kg × 18, 15\nBarbell Curl · 20kg × 12, 10, 7\nHammer Curl · 7kg × 15, 15",
+  "notes": "Hammer Curl: 9증량",
+  "approx": true,
+  "id": "m0030"
+ },
+ {
+  "date": "2026-05-28",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "workout": "Romanian Deadlift · 80kg × 10, 10, 10, 8\nReverse V Squat · 120kg × 12, 12\nHip Thrust · 45kg × 15, 15, 15\nSeated Leg Curl · 40kg × 15, 12, 9",
+  "notes": "Romanian Deadlift: 85증량\nReverse V Squat: 125증량\nHip Thrust: 50증량\nSeated Leg Curl: 유지",
+  "approx": true,
+  "id": "m0031"
+ },
+ {
+  "date": "2026-05-29",
+  "session": "Easy run",
+  "km": 7.58,
+  "pace": "5:28",
+  "minutes": 41.4,
+  "avg_hr": 164,
+  "max_hr": 180,
+  "rpe": 8,
+  "workout": "2km 6:00, 5.5km 5:25, 400m sprint",
+  "shoes": "Puma DNE3",
+  "brief": "5.5km 5:25 + 400m 질주",
+  "id": "m0032"
+ },
+ {
+  "date": "2026-06-02",
+  "session": "Weight Training",
+  "format": "Push",
+  "id": "m0033"
+ },
+ {
+  "date": "2026-06-04",
+  "session": "Weight Training",
+  "format": "Pull",
+  "id": "m0034"
+ },
+ {
+  "date": "2026-06-06",
+  "session": "Weight Training",
+  "format": "Upper",
+  "workout": "Bench Press · 57.5kg × 12, 10, 8\nOHP Machine · 42.5kg × 12, 12, 12\nLat Pull Down · 45kg × 12, 9, 8\nRow Machine · 145kg × 10, 8, 8\nDumbbell Lateral Raise · 6kg × 20, 20, 15\nLying Triceps Extension · 25kg × 12, 9\nDumbbell Curl · 11kg × 15, 11",
+  "notes": "Bench Press: 유지\nOHP Machine: 45증량\nLat Pull Down: 유지\nRow Machine: 유지\nDumbbell Lateral Raise: 유지\nLying Triceps Extension: 유지\nDumbbell Curl: 유지",
+  "approx": true,
+  "id": "m0035"
+ },
+ {
+  "date": "2026-06-07",
+  "session": "Easy run",
+  "km": 6.0,
+  "pace": "4:59",
+  "minutes": 30.1,
+  "avg_hr": 176,
+  "max_hr": 190,
+  "rpe": 8.5,
+  "workout": "6km 5:00 지속주",
+  "notes": "하체 운동을 하고 나서 러닝해서 그런지 계속 쥐가 남. 3km 에서 한번 쉬었다가 10분 쉬고 다시 2.km 쉬고 또 쥐가 올라와서 쉬고 1km 완주함",
+  "shoes": "Puma DNE3",
+  "brief": "5:00 지속주, 쥐가 나서 세 번 쉼",
+  "id": "m0036"
+ },
+ {
+  "date": "2026-06-07",
+  "session": "Weight Training",
+  "format": "Lower front",
+  "workout": "Squat · 75kg × 10, 10, 10, 10\nHack Squat (Cybex) · 85kg × 10, 10, 9\nLying Leg Curl · 30kg × 13, 10\nLeg Extension · 25kg × 15, 15, 15",
+  "notes": "Squat: 80증량\nHack Squat (Cybex): 90증량\nLeg Extension: 30증량",
+  "approx": true,
+  "id": "m0037"
+ },
+ {
+  "date": "2026-06-09",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 65kg × 8, 8, 8, 7\nIncline Chest Press · 42.5kg × 12, 12, 12\nDumbbell OHP · 21kg × 12, 10, 7\nDumbbell Lateral Raise · 6kg × 20, 20, 16\nCable Push Down · 7kg × 20, 16, 13",
+  "notes": "Bench Press: 67.5증량\nIncline Chest Press: 45증량",
+  "approx": true,
+  "id": "m0038"
+ },
+ {
+  "date": "2026-06-10",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 9, 7, 6\nBarbell Row · 62.5kg × 10, 10, 10\nHigh Pull Down · 75kg × 12, 10, 9\nRear Fly · 55kg × 20, 15\nBarbell Curl · 20kg × 12, 12, 9\nHammer Curl · 8kg × 12",
+  "notes": "Barbell Row: 65증량\nRear Fly: 유지",
+  "approx": true,
+  "id": "m0039"
+ },
+ {
+  "date": "2026-06-11",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "workout": "Romanian Deadlift · 85kg × 10, 10, 9, 6\nReverse V Squat · 125kg × 12, 12\nHip Thrust · 50kg × 15, 13, 12\nSeated Leg Curl · 40kg × 15, 15, 15",
+  "notes": "Romanian Deadlift: 그립풀림\nReverse V Squat: 135증량\nSeated Leg Curl: 죽을뻔",
+  "approx": true,
+  "id": "m0040"
+ },
+ {
+  "date": "2026-06-13",
+  "session": "Weight Training",
+  "format": "Upper",
+  "id": "m0041"
+ },
+ {
+  "date": "2026-06-14",
+  "session": "Hyrox Training",
+  "workout": "Hyrox interval",
+  "id": "m0042"
+ },
+ {
+  "date": "2026-06-15",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 67.5kg × 8, 8, 6, 4\nIncline Chest Press · 45kg × 12, 12, 12\nDumbbell OHP · 21kg × 10, 9, 7\nDumbbell Lateral Raise · 6kg × 20, 20, 17\nCable Push Down · 7kg × 20, 18",
+  "notes": "Bench Press: 유지\nIncline Chest Press: 47.5증량",
+  "approx": true,
+  "id": "m0043"
+ },
+ {
+  "date": "2026-06-16",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 9, 7, 6\nBarbell Row · 65kg × 10, 9, 9\nHigh Pull Down · 75kg × 12, 11, 9\nRear Fly · 55kg × 20, 16\nBarbell Curl · 20kg × 12, 10, 8\nHammer Curl · 8kg × 15, 15",
+  "notes": "Pull-Up: RPE10\nBarbell Row: 67.5\nHigh Pull Down: 75\nRear Fly: 55\nHammer Curl: 유지 한번더",
+  "approx": true,
+  "id": "m0044"
+ },
+ {
+  "date": "2026-06-17",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "id": "m0045"
+ },
+ {
+  "date": "2026-06-19",
+  "session": "Weight Training",
+  "format": "Upper",
+  "workout": "Bench Press · 57.5kg × 12, 11, 8\nOHP Machine · 45kg × 12, 11, 8\nLat Pull Down · 45kg × 12, 9, 8\nRow Machine · 145kg × 10, 8, 8\nDumbbell Lateral Raise · 6kg × 20, 20, 14\nLying Triceps Extension · 25kg × 10, 6\nDumbbell Curl · 11kg × 15, 12",
+  "notes": "Bench Press: 57.5\nOHP Machine: 45\nLat Pull Down: 45\nRow Machine: 145\nDumbbell Lateral Raise: 6\nLying Triceps Extension: 25",
+  "approx": true,
+  "id": "m0046"
+ },
+ {
+  "date": "2026-06-23",
+  "session": "Interval run",
+  "km": 8.8,
+  "pace": "5:16",
+  "minutes": 35.9,
+  "avg_hr": 184,
+  "max_hr": 192,
+  "rpe": 8.5,
+  "workout": "Interval 2000(4:55)/400(7:00) 3set + 2km jogging",
+  "shoes": "Puma DNE3",
+  "brief": "2000m(4:55) 인터벌 3세트 + 조깅 2km",
+  "id": "m0047"
+ },
+ {
+  "date": "2026-06-23",
+  "session": "Weight Training",
+  "format": "Push",
+  "id": "m0048"
+ },
+ {
+  "date": "2026-06-24",
+  "session": "Weight Training",
+  "format": "Pull",
+  "id": "m0049"
+ },
+ {
+  "date": "2026-06-25",
+  "session": "Weight Training",
+  "format": "Lower front",
+  "workout": "Squat · 80kg × 10, 10, 7, 6\nHack Squat (Cybex) · 90kg × 10, 10, 10\nLying Leg Curl · 30kg × 15, 10\nLeg Extension · 30kg × 15, 15, 15",
+  "notes": "Squat: 80\nHack Squat (Cybex): 초죽음 95\nLying Leg Curl: 초죽음\nLeg Extension: 유지",
+  "approx": true,
+  "id": "m0050"
+ },
+ {
+  "date": "2026-06-27",
+  "session": "Weight Training",
+  "format": "Upper",
+  "id": "m0051"
+ },
+ {
+  "date": "2026-06-29",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "id": "m0052"
+ },
+ {
+  "date": "2026-07-01",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 67.5kg × 6, 5, 7, 6\nIncline Chest Press · 47.5kg × 12, 11, 6\nDumbbell OHP · 21kg × 10, 8, 8\nDumbbell Lateral Raise · 6kg × 20, 20, 16\nCable Push Down · 7kg × 20, 16",
+  "notes": "Bench Press: 뒤에 2set는 60kg 진행",
+  "approx": true,
+  "id": "m0053"
+ },
+ {
+  "date": "2026-07-02",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 10, 6, 6\nT-Bar Row · 40kg × 8, 8, 7\nHigh Pull Down · 75kg × 12, 10, 9\nRear Fly · 55kg × 20, 20\nBarbell Curl · 20kg × 12, 12, 9\nHammer Curl · 8kg × 15, 15",
+  "approx": true,
+  "id": "m0054"
+ },
+ {
+  "date": "2026-07-04",
+  "session": "Weight Training",
+  "format": "Upper",
+  "workout": "Bench Press · 57.5kg × 11, 8, 7\nOHP Machine · 40kg × 12, 12, 9\nLat Pull Down · 40kg × 12, 12, 12\nRow Machine · 130lb × 10, 10, 10\nDumbbell Curl · 10kg × 15",
+  "notes": "Bench Press: 전날 과음하고 회복 거의 못함\nOHP Machine: 식사도 제대로 못함",
+  "approx": true,
+  "id": "m0055"
+ },
+ {
+  "date": "2026-07-05",
+  "session": "Weight Training",
+  "format": "Lower front",
+  "id": "m0056"
+ },
+ {
+  "date": "2026-07-07",
+  "session": "Jogging",
+  "km": 5.0,
+  "pace": "6:00",
+  "minutes": 30.0,
+  "avg_hr": 166,
+  "max_hr": 176,
+  "rpe": 7,
+  "workout": "카이스트 한 바퀴 조깅",
+  "notes": "오랜만에 조깅을 하는데 6:00 페이스도 좀 힘들더라. 물론 한 3km 이후부터는 몸이 풀렸지만, 육중해진 느낌이 많이 들었음. 숨도 많이 차고 둔해진 느낌이 강했음.",
+  "shoes": "Puma DNE3",
+  "brief": "카이스트 한 바퀴, 오랜만이라 몸 무거움",
+  "id": "m0057"
+ },
+ {
+  "date": "2026-07-07",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 65kg × 7, 6, 6, 6\nIncline Chest Press · 45kg × 12, 12, 12\nDumbbell OHP · 19kg × 12, 10, 10\nDumbbell Lateral Raise · 6kg × 20, 18, 12\nCable Push Down · [7] × 18, 15",
+  "approx": true,
+  "id": "m0058"
+ },
+ {
+  "date": "2026-07-08",
+  "session": "Jogging",
+  "km": 4.72,
+  "pace": "5:49",
+  "minutes": 27.5,
+  "avg_hr": 164,
+  "max_hr": 175,
+  "rpe": 7,
+  "workout": "카이스트 한 바퀴 조깅",
+  "notes": "어제보다 조금 더 몸이 가벼운 느낌이었음",
+  "shoes": "Puma DNE3",
+  "brief": "카이스트 한 바퀴, 어제보다 가벼움",
+  "id": "m0059"
+ },
+ {
+  "date": "2026-07-08",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 10, 7, 6\nT-Bar Row · 40kg × 8, 7, 7\nHigh Pull Down · 75kg × 12, 12, 11\nRear Fly · 55kg × 20, 16\nBarbell Curl · 20kg × 12, 12, 12\nHammer Curl · 8kg × 15, 15",
+  "approx": true,
+  "id": "m0060"
+ },
+ {
+  "date": "2026-07-09",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "workout": "Romanian Deadlift · 90kg × 12, 10, 6, 4\nReverse V Squat · 140kg × 12, 12\nSeated Leg Curl · 35kg × 20, 15",
+  "notes": "Romanian Deadlift: 3,4 세트 때 악력 풀려 종료\nSeated Leg Curl: 반동 억제 / 정자세로 수행",
+  "approx": true,
+  "id": "m0061"
+ },
+ {
+  "date": "2026-07-10",
+  "session": "Jogging",
+  "km": 5.11,
+  "pace": "5:19",
+  "minutes": 27.2,
+  "avg_hr": 171,
+  "max_hr": 190,
+  "rpe": 8,
+  "workout": "카이스트 한 바퀴 조깅",
+  "notes": "조금 속도 올려서 조깅, 웨이트 안 한 날이라 그런지 조금 더 속도가 남",
+  "shoes": "Puma DNE3",
+  "brief": "카이스트 한 바퀴, 속도 올려 조깅",
+  "id": "m0062"
+ },
+ {
+  "date": "2026-07-12",
+  "session": "Weight Training",
+  "format": "Upper",
+  "workout": "Bench Press · 57.5kg × 12, 10, 9\nOHP Machine · 40kg × 12, 12, 10\nLat Pull Down · 45kg × 12, 12, 12\nRow Machine · 145kg × 10, 10, 9\nDumbbell Lateral Raise · 6kg × 20, 16, 13\nLying Triceps Extension · 20kg × 12, 10\nDumbbell Curl · 10kg × 15, 9",
+  "notes": "Bench Press: 유지\nOHP Machine: 유지\nLat Pull Down: 마지막 세트 간신히 함\nRow Machine: 유지",
+  "approx": true,
+  "id": "m0063"
+ },
+ {
+  "date": "2026-07-13",
+  "session": "Weight Training",
+  "format": "Lower front",
+  "id": "m0064"
+ },
+ {
+  "date": "2026-07-14",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 65kg × 8, 8, 6, 6\nIncline Chest Press · 50kg × 10, 8, 8\nDumbbell OHP · 19kg × 12, 12, 10\nDumbbell Lateral Raise · 6kg × 20, 18, 14\nCable Push Down · [7] × 20, 14, 12",
+  "approx": true,
+  "id": "m0065"
+ },
+ {
+  "date": "2026-07-15",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 10, 8, 6\nBarbell Row · 65kg × 9, 10, 9\nLat Pull Down · 55kg × 12, 12\nRear Fly · 55kg × 20, 20\nBarbell Curl · 20kg × 12, 12, 10\nHammer Curl · 8kg × 15, 12",
+  "notes": "Pull-Up: \"Workout at Busan Gym\"\nLat Pull Down: 45kg 12 warmup set\nRear Fly: Different machine",
+  "approx": true,
+  "id": "m0066"
+ },
+ {
+  "date": "2026-07-17",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "workout": "Squat · 80kg × 9, 9, 8, 8\nHack Squat (Other) · 40kg × 6, 9, 9, 11\nLeg Press · 120kg × 15, 12, 8\nSeated Leg Curl · 32kg × 12, 10, 10",
+  "notes": "Hack Squat (Other): Different Machine Heavy — 타 헬스장 세션\nLeg Press: Different Machine\nSeated Leg Curl: Different Machine",
+  "approx": true,
+  "id": "m0067"
+ },
+ {
+  "date": "2026-07-18",
+  "session": "Weight Training",
+  "format": "Upper",
+  "id": "m0068"
+ },
+ {
+  "date": "2026-07-21",
+  "session": "Jogging",
+  "km": 4.76,
+  "pace": "5:20",
+  "minutes": 25.4,
+  "avg_hr": 167,
+  "max_hr": 190,
+  "rpe": 8,
+  "workout": "카이스트 한 바퀴 조깅",
+  "shoes": "Puma DNE3",
+  "brief": "카이스트 한 바퀴",
+  "id": "m0069"
+ },
+ {
+  "date": "2026-07-22",
+  "session": "Weight Training",
+  "format": "Push",
+  "id": "m0070"
+ },
+ {
+  "date": "2026-07-23",
+  "session": "Jogging",
+  "km": 5.5,
+  "pace": "5:29",
+  "minutes": 30.1,
+  "avg_hr": 172,
+  "max_hr": 187,
+  "rpe": 8,
+  "workout": "카이스트 한 바퀴 조깅",
+  "shoes": "Puma DNE3",
+  "brief": "카이스트 한 바퀴",
+  "id": "m0071"
+ },
+ {
+  "date": "2026-07-27",
+  "session": "Hyrox Training",
+  "workout": "Hyrox training (Xon)",
+  "id": "m0072"
+ },
+ {
+  "date": "2026-07-28",
+  "session": "Hyrox Training",
+  "workout": "Hyrox training (Xon)",
+  "id": "m0073"
+ },
+ {
+  "date": "2026-07-29",
+  "session": "Hyrox Training",
+  "workout": "Hyrox training (Xon)",
+  "id": "m0074"
+ },
+ {
+  "date": "2026-07-30",
+  "session": "Hyrox Training",
+  "workout": "Hyrox training (Xon)",
+  "id": "m0075"
+ },
+ {
+  "date": "2026-07-31",
+  "session": "Hyrox Training",
+  "workout": "Hyrox training (Xon)",
+  "id": "m0076"
+ },
+ {
+  "date": "2026-08-05",
+  "session": "Jogging",
+  "km": 4.73,
+  "pace": "5:37",
+  "minutes": 26.5,
+  "avg_hr": 169,
+  "max_hr": 183,
+  "rpe": 8,
+  "workout": "카이스트 한 바퀴 조깅",
+  "notes": "너무 덥다",
+  "shoes": "Puma DNE3",
+  "brief": "카이스트 한 바퀴, 더위",
+  "id": "m0077"
+ },
+ {
+  "date": "2026-08-09",
+  "session": "Jogging",
+  "km": 6.0,
+  "pace": "5:41",
+  "minutes": 34.1,
+  "avg_hr": 170,
+  "max_hr": 184,
+  "rpe": 8,
+  "workout": "갑천 6km 조깅",
+  "notes": "여전히 많이 덥다",
+  "shoes": "Puma DNE3",
+  "brief": "갑천, 더위",
+  "id": "m0078"
+ },
+ {
+  "date": "2026-08-09",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 65kg × 65kg 8(rpe9), 65kg 6(rpe9.5), 60kg 7(rpe9.5), 60kg 6(rpe9)\nDumbbell OHP · 19kg × 12, 12, 12\nIso-Lateral Shoulder Press · 20kg × 15, 15\nChest Press Machine · 40kg × 12, 11, 10\nDumbbell Lateral Raise · 6kg × 20, 20, 13\nCable Push Down · [7] × [7] 20, [7] 14, [6] 14",
+  "notes": "Bench Press: Break the bar, 60kg 감량\nDumbbell OHP: 괜찮았음, 21증량\nIso-Lateral Shoulder Press: 25증량\nChest Press Machine: 한번 더 40kg\nDumbbell Lateral Raise: 6 유지\nCable Push Down: [6] 으로 감량",
+  "approx": true,
+  "id": "m0079"
+ },
+ {
+  "date": "2026-08-10",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 맨몸 × 10, 8, 6\nT-Bar Row · 40kg × 8, 8, 8\nHigh Pull Down · 80kg × 10, 8, 8\nRear Fly · 55kg × 20, 15\nBarbell Curl · 20kg × 12, 12, 10\nHammer Curl · 9kg × 11",
+  "notes": "Pull-Up: Pull down 머신 하듯이 하기\nHigh Pull Down: 가슴을 드는 느낌 가져가기",
+  "approx": true,
+  "id": "m0080"
+ },
+ {
+  "date": "2026-08-11",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "workout": "Romanian Deadlift · 100kg × 10, 10, 10, 8\nReverse V Squat · 160kg × 12, 12\nHip Thrust · 50kg × 12, 12\nSeated Leg Curl · 30kg × 10, 9, 7",
+  "notes": "Reverse V Squat: 165 증량, 온전히 무게 받기",
+  "approx": true,
+  "id": "m0081"
+ },
+ {
+  "date": "2026-08-13",
+  "session": "Weight Training",
+  "format": "Upper",
+  "workout": "Bench Press · 57.5kg × 12, 11, 9\nOHP Machine · 40kg × 12, 12, 10\nLat Pull Down · 45kg × 12, 11, 8\nRow Machine · 145kg × 10, 10, 8\nLying Triceps Extension · 20kg × 12, 8\nDumbbell Curl · 10kg × 15, 8",
+  "notes": "OHP Machine: 허벅지 바깥 쥐\nLat Pull Down: 가슴을 드는 느낌 가져가기",
+  "approx": true,
+  "id": "m0082"
+ },
+ {
+  "date": "2026-08-17",
+  "session": "Jogging",
+  "km": 7.0,
+  "pace": "5:40",
+  "minutes": 39.7,
+  "avg_hr": 170,
+  "max_hr": 192,
+  "rpe": 9,
+  "workout": "갑천 7km 조깅",
+  "shoes": "Puma DNE3",
+  "brief": "갑천",
+  "id": "m0083"
+ },
+ {
+  "date": "2026-08-18",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 65kg × 8, 8, 6, 5\nDumbbell OHP · 21kg × 10, 10, 7\nChest Press Machine · 40kg × 12, 12, 12\nDumbbell Lateral Raise · 6kg × 20, 16, 11\nCable Push Down · [6] × 20, 20, 14",
+  "notes": "Bench Press: 첫 세트 7개 이하면 60kg으로 변경\nDumbbell OHP: 목표 10/10/10",
+  "id": "m0084"
+ },
+ {
+  "date": "2026-08-19",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 맨몸 × 10, 7, 6\nT-Bar Row · 40kg × 10, 10, 10\nHigh Pull Down · 80kg × 10, 10, 8\nRear Fly · 55kg × 20, 16\nBarbell Curl · 20kg × 12, 12, 12\nHammer Curl · 9kg × 15, 14",
+  "notes": "Pull-Up: Pull down 머신 하듯이 하기\nHigh Pull Down: RPE 9.5-10\nBarbell Curl: 마지막 세트 rpe10",
+  "id": "m0085"
+ },
+ {
+  "date": "2026-08-20",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "workout": "Romanian Deadlift · 105kg × 8, 8, 6, 7\nReverse V Squat · 165kg × 12, 12\nHip Thrust · 50kg × 12, 12, 11\nSeated Leg Curl · 35kg × 20, 17, 14",
+  "notes": "Romanian Deadlift: 이 무게 한번 더\nReverse V Squat: 아 힘드네 쉽게 밀리진 않았음. 하ㄴ번 더",
+  "id": "m0086"
+ },
+ {
+  "date": "2026-08-22",
+  "session": "Weight Training",
+  "format": "Upper",
+  "workout": "Bench Press · 60kg × 11, 9, 7\nIso-Lateral Shoulder Press · 30kg × 16, 16, 14\nM-Torture High Row · 80kg × 10, 10, 7\nLow Row Machine · 40kg × 17, 16\nDumbbell Lateral Raise · 6kg × 20, 20, 16\nLying Triceps Extension · 20kg × 12, 8\nDumbbell Curl · 10kg × 15, 15",
+  "notes": "Bench Press: 다른 헬스장이라 바 무게가 좀 가벼운거같아서 정확히 60kg인지는 모르겠음\nIso-Lateral Shoulder Press: 허벅지 바깥 쥐\nM-Torture High Row: 가슴을 드는 느낌 가져가기\nDumbbell Lateral Raise: 1세트하고 덤벨컬 하고 2,3세트 함",
+  "id": "m0087"
+ },
+ {
+  "date": "2026-08-23",
+  "session": "Weight Training",
+  "format": "Lower front",
+  "id": "m0088"
+ },
+ {
+  "date": "2026-08-23",
+  "session": "Cardio",
+  "workout": "Cycle 30min",
+  "id": "m0089"
+ },
+ {
+  "date": "2026-08-24",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 65kg × 8, 8, 6, 5\nDumbbell OHP · 21kg × 12, 11, 8\nChest Press Machine · 45kg × 12, 12, 12\nDumbbell Lateral Raise · 6kg × 20, 18, 14\nCable Push Down · [6] × 20, 16, 12",
+  "notes": "Cable Push Down: Rope로 진행함(기존 스트레이트 바)",
+  "approx": true,
+  "id": "m0090"
+ },
+ {
+  "date": "2026-08-26",
+  "session": "Jogging",
+  "km": 8.0,
+  "pace": "5:34",
+  "minutes": 44.6,
+  "avg_hr": 176,
+  "max_hr": 196,
+  "rpe": 9,
+  "workout": "갑천 8km 조깅",
+  "shoes": "Puma DNE3",
+  "brief": "갑천",
+  "id": "m0091"
+ },
+ {
+  "date": "2026-08-29",
+  "session": "Weight Training",
+  "format": "Lower front",
+  "workout": "Squat · 90kg × 7, 7, 7\nConventional Deadlift · 100kg × 6, 6, 6\nHack Squat (Life Fitness) · 65kg × 10, 10, 10\nLeg Extension · 30kg × 13, 14",
+  "approx": true,
+  "id": "m0092"
+ },
+ {
+  "date": "2026-08-30",
+  "session": "Weight Training",
+  "format": "Upper",
+  "id": "m0093"
+ },
+ {
+  "date": "2026-09-01",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 65kg × 8, 7, 6, 6\nDumbbell OHP · 23kg × 10, 10, 5\nChest Press Machine · 55kg × 11, 8, 8\nDumbbell Lateral Raise · 6kg × 20, 17, 14, 12\nCable Push Down · [7] × 20, 14, [6] 14, [6] 12",
+  "notes": "Dumbbell OHP: RPE9.5로 2세트하고 힘 풀림",
+  "id": "m0094"
+ },
+ {
+  "date": "2026-09-02",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 맨몸 × 9, 7, 6\nT-Bar Row · 42.5kg × 10, 10, 10\nLat Pull Down (Close Grip) · 50kg × 8, 7, 7\nSeated Cable Row · 145lb × 10, 10\nRear Fly · 40lb × 20, 20, 20\nBarbell Curl · 22.5kg × 10, 10, 7\nHammer Curl · 9kg × 10, 9",
+  "notes": "Hammer Curl: 쉬는시간 40초",
+  "id": "m0095"
+ },
+ {
+  "date": "2026-09-03",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "workout": "Conventional Deadlift · 100kg × 8, 7, 6\nReverse V Squat · 165kg × 12, 12, 12\nLeg Extension · 30kg × 20, 20\nLying Leg Curl · 35kg × 12, 7, 30kg 9, 30kg 6\nHanging Knee Raise · 맨몸 × 15, 13",
+  "notes": "Conventional Deadlift: RPE 9.5로 수행, 쉬는 날이라 피로도 상관x\nLeg Extension: 1",
+  "id": "m0096"
+ },
+ {
+  "date": "2026-09-05",
+  "session": "Weight Training",
+  "format": "Upper",
+  "workout": "Bench Press · 57.5kg × 12, 11, 10\nOHP Machine · 45kg × 12, 11, 7\nLat Pull Down · 45kg × 12, 10, 8\nSeated Cable Row · 160lb × 12, 12, 10\nDumbbell Lateral Raise · 6kg × 20, 14, 12\nRear Fly · 40lb × 20, 20\nLying Triceps Extension · 20kg × 12, 8\nDumbbell Curl · 11kg × 14, 10",
+  "notes": "Lat Pull Down: 자리 없어서 뒤에 어깨,팔 다 하고 하니 힘 부족\nDumbbell Curl: 마지막 세트 간신히",
+  "id": "m0097"
+ },
+ {
+  "date": "2026-09-06",
+  "session": "Weight Training",
+  "format": "Lower front",
+  "workout": "Hack Squat (Life Fitness) · 70kg × 15, 15, 15\nLeg Extension · 30kg × 15, 14, 15\nSeated Leg Curl · 35kg × 16, 15, 15\nCrunch · 맨몸 × 30, 20",
+  "notes": "Hack Squat (Life Fitness): Free squat 생략해서 reps를 기존 횟수에 맞추지 않고 rpe에 맞춤.\nLeg Extension: 쉬는시간 2:30으로 잘못 설정되어있어 수정\nSeated Leg Curl: 쉬는시간 1:30으로 잘못 설정되어 수정\nCrunch: 쉬는시간수정",
+  "id": "m0098"
+ },
+ {
+  "date": "2026-09-08",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 65kg × 8, 8, 8, 8\nDumbbell OHP · 21kg × 11, 9, 8\nChest Press Machine · 55kg × 12, 10, 6\nDumbbell Lateral Raise · 6kg × 20, 20, 14, 12\nCable Push Down · [7] × 20, 14, 10\nCrunch · 6kg × 22, 14, 10",
+  "notes": "Crunch: 무게 머리 위로 들고 함",
+  "id": "m0099"
+ },
+ {
+  "date": "2026-09-09",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 맨몸 × 8, 6, 7, 7\nT-Bar Row · 42.5kg × 10, 10, 45kg 10\nLat Pull Down (Close Grip) · 50kg × 8, 6, 6\nSeated Cable Row · 145lb × 12, 12, 12\nRear Fly · 55lb × 15, 13, 13\nBarbell Curl · 22.5kg × 12, 8, 7\nHammer Curl · 9kg × 15, 15",
+  "notes": "T-Bar Row: 다음에 45kg으로 증량\nSeated Cable Row: 클로즈그립 랫풀다운 자리 없어서 먼저 함, 한번 더 이 무게로 하기\nHammer Curl: 무게 낮춰서 진행함(9->8)",
+  "id": "m0100"
+ },
+ {
+  "date": "2026-09-10",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "workout": "Romanian Deadlift · 90kg × 8, 8, 7\nReverse V Squat · 170kg × 12, 12, 12\nSeated Leg Curl · 35kg × 15, 15, 15\nLeg Extension · 30kg × 20, 20\nHanging Knee Raise · 맨몸 × 18, 13, 10",
+  "notes": "Romanian Deadlift: 마지막 세트 악력이 풀림",
+  "id": "m0101"
+ },
+ {
+  "date": "2026-09-15",
+  "session": "Jogging",
+  "km": 0.87,
+  "pace": "4:45",
+  "minutes": 4.1,
+  "avg_hr": 155,
+  "max_hr": 170,
+  "workout": "Hyrox training",
+  "shoes": "Puma DNE3",
+  "brief": "Hyrox Training 중 러닝",
+  "id": "m0102"
+ },
+ {
+  "date": "2026-09-15",
+  "session": "Hyrox Training",
+  "workout": "Hyrox training 35min",
+  "id": "m0103"
+ },
+ {
+  "date": "2026-09-16",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 67.5kg × 7, 7, 6\nDumbbell OHP · 21kg × 12, 9, 7\nDumbbell Chest Press · 25kg × 10, 10, 5\nDumbbell Lateral Raise · 6kg × 20, 20, 13, 14\nCable Push Down · [6] × 20, 20, 20\nCrunch · 6kg × 20, 16",
+  "notes": "Bench Press: 무게 그대로. 1주차 대비 총 반복 +2 이상이면 성공\nDumbbell OHP: 21kg 10/10/10 완성 시 다음 주 23kg 재도전",
+  "approx": true,
+  "id": "m0104"
+ },
+ {
+  "date": "2026-09-17",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 맨몸 × 8, 8, 8, 7\nT-Bar Row · 45kg × 8, 8, 8, 8\nLat Pull Down (Close Grip) · 45kg × 12, 10, 10, 9\nSeated Cable Row · 145lb × 12, 12, 12, 10\nRear Fly · 55lb × 18, 16, 14\nBarbell Curl · 22.5kg × 10, 8",
+  "notes": "Pull-Up: 4세트 유지. 총 반복 24 넘기기\nT-Bar Row: 1주차에 10/10/10이었으면 이번 주 45kg",
+  "approx": true,
+  "id": "m0105"
+ },
+ {
+  "date": "2026-09-19",
+  "session": "Weight Training",
+  "format": "Upper",
+  "workout": "OHP Machine · 45kg × 12, 12, 10\nLat Pull Down · 45kg × 12, 12, 11\nSeated Cable Row · 160lb × 10, 10, 10\nDumbbell Lateral Raise · 6kg × 20, 14, 12\nLying Triceps Extension · 20kg × 10, 8",
+  "id": "m0106"
+ },
+ {
+  "date": "2026-09-22",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 70kg × 6, 6, 5, 4\nDumbbell OHP · 21kg × 12, 12, 12\nDumbbell Chest Press · 23kg × 12, 11, 10\nDumbbell Lateral Raise · 6kg × 20, 20, 14, 13\nCable Push Down · [7] × 20, 14, 12\nCrunch · 7kg × 10, 10, 10",
+  "id": "m0107"
+ },
+ {
+  "date": "2026-09-23",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 맨몸 × 9, 8, 7, 6\nT-Bar Row · 45kg × 10, 10, 9\nLat Pull Down (Close Grip) · 45kg × 9, 7, 5\nSeated Cable Row · 160lb × 11, 10, 10\nRear Fly · 55lb × 17, 40lb 20, 40lb 20\nBarbell Curl · 22.5kg × 12, 9, 7\nHammer Curl · 9kg × 12, 12",
+  "notes": "Lat Pull Down (Close Grip): 자리 없어서 모든 종목들 중 가장 마지막에 진행함. 그러다보니 힘이 빠져있었음\nRear Fly: 40lb로 무게 낮춰서 자세에 신경쓰기",
+  "id": "m0108"
+ },
+ {
+  "date": "2026-09-24",
+  "session": "Jogging",
+  "km": 8.1,
+  "pace": "6:05",
+  "minutes": 49.3,
+  "avg_hr": 170,
+  "max_hr": 193,
+  "rpe": 8,
+  "workout": "홍대 시티런",
+  "shoes": "Puma DNE3",
+  "brief": "홍대 시티런",
+  "id": "m0109"
+ },
+ {
+  "date": "2026-09-26",
+  "session": "Trail run",
+  "km": 12.51,
+  "pace": "6:08",
+  "minutes": 76.9,
+  "avg_hr": 173,
+  "max_hr": 201,
+  "rpe": 9.5,
+  "workout": "남산 2회전",
+  "notes": "남산 2회전 오랜만에 하니까 너무 힘들더라",
+  "shoes": "Puma DNE3",
+  "brief": "남산 2회전, 오랜만이라 힘듦",
+  "id": "m0110"
+ },
+ {
+  "date": "2026-09-30",
+  "session": "Hyrox Training",
+  "workout": "Hyrox training",
+  "id": "m0111"
+ },
+ {
+  "date": "2026-10-01",
+  "session": "Hyrox Training",
+  "workout": "Hyrox training",
+  "id": "m0112"
+ },
+ {
+  "date": "2026-10-02",
+  "session": "Jogging",
+  "km": 7.35,
+  "pace": "5:13",
+  "minutes": 38.4,
+  "avg_hr": 170,
+  "max_hr": 183,
+  "rpe": 9,
+  "workout": "카이스트 두 바퀴 조깅",
+  "notes": "날씨도 시원해지고 좀 더 잘 뛰어짐",
+  "shoes": "Puma DNE3",
+  "brief": "카이스트 두 바퀴, 시원해져 잘 뛰어짐",
+  "id": "m0113"
+ },
+ {
+  "date": "2026-10-02",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 67.5kg × 7, 6, 6, 6\nDumbbell OHP · 23kg × 9, 8, 6\nDumbbell Chest Press · 23kg × 10, 9, 6\nDumbbell Lateral Raise · 6kg × 20, 20, 18, 16\nCable Push Down · [7] × 20, 13, 10\nCrunch · 7kg × 15, 13, 12",
+  "id": "m0114"
+ },
+ {
+  "date": "2026-10-03",
+  "session": "Jogging",
+  "km": 8.8,
+  "pace": "5:36",
+  "minutes": 49.3,
+  "avg_hr": 156,
+  "max_hr": 171,
+  "rpe": 8,
+  "workout": "카이스트 두 바퀴 조깅",
+  "notes": "조깅하기 딱 좋음",
+  "shoes": "Puma DNE3",
+  "brief": "카이스트 두 바퀴, 조깅하기 좋은 날",
+  "id": "m0115"
+ },
+ {
+  "date": "2026-10-03",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 맨몸 × 8, 8, 8, 7\nT-Bar Row · 47.5kg × 10, 8, 8\nLat Pull Down · 45kg × 10, 10, 7\nSeated Cable Row · 160lb × 8, 10, 8\nRear Fly · 40lb × 20, 20, 17\nHammer Curl · 9kg × 15, 15",
+  "id": "m0116"
+ },
+ {
+  "date": "2026-10-04",
+  "session": "Weight Training",
+  "format": "Lower front",
+  "workout": "Squat · 80kg × 8, 8, 8\nHack Squat (Life Fitness) · 80kg × 8, 8, 8, 8\nLeg Extension · 35kg × 12, 12, 12\nLying Leg Curl · 30kg × 12, 10",
+  "id": "m0117"
+ },
+ {
+  "date": "2026-10-05",
+  "session": "Jogging",
+  "km": 5.01,
+  "pace": "5:28",
+  "minutes": 27.4,
+  "avg_hr": 149,
+  "max_hr": 176,
+  "rpe": 7,
+  "workout": "카이스트 한 바퀴 조깅",
+  "shoes": "Nike AlphaFly 3",
+  "brief": "카이스트 한 바퀴",
+  "id": "m0118"
+ },
+ {
+  "date": "2026-10-06",
+  "session": "Weight Training",
+  "format": "Push",
+  "id": "m0119"
+ },
+ {
+  "date": "2026-10-06",
+  "session": "Cardio",
+  "workout": "Cycle 22min",
+  "id": "m0120"
+ },
+ {
+  "date": "2026-10-07",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "workout": "Romanian Deadlift · 90kg × 8, 8, 8\nBulgarian Split Squat · 10kg × 10, 10\nHip Thrust · 50kg × 9, 10\nSeated Leg Curl · 35kg × 15, 15, 13\nLeg Extension · 30kg × 20, 13",
+  "notes": "Romanian Deadlift: 악력이 다 털려서 마지막에 떨굴뻔. 다리는 괜찮게 버팀. 자세 신경쓰기\nBulgarian Split Squat: 신규. 한쪽씩, 2~3개 여유 남기기. 무릎 불편하면 Reverse V Squat 2세트로 교체(둘 다 X)\nHip Thrust: 신규. 2~3개 여유 남기고 자세·다음 날 반응 확인. 상단 1초 정지",
+  "id": "m0121"
+ },
+ {
+  "date": "2026-10-09",
+  "session": "Easy run",
+  "km": 12.39,
+  "pace": "5:35",
+  "minutes": 69.3,
+  "avg_hr": 166,
+  "max_hr": 179,
+  "rpe": 8,
+  "workout": "엑스포 조깅",
+  "shoes": "Nike AlphaFly 3",
+  "brief": "엑스포 조깅",
+  "id": "m0122"
+ },
+ {
+  "date": "2026-10-09",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 65kg × 8, 6, 6, 6\nIncline Dumbbell Press · 21kg × 9, 8, 8\nDumbbell OHP · 21kg × 8, 12\nCable Fly · 85lb 6, 70lb 10\nDumbbell Lateral Raise · 5kg × 20, 20, 14, 12\nLying Triceps Extension · 20kg × 12, 9, 6\nCable Push Down · [7] × 12, 10\nCrunch · 8kg × 12, 11, 10",
+  "notes": "Bench Press: 첫 세트 rpe9로 함, 두번째 세트 rpe9.5, 세네번째 세트 rpe10,\nIncline Dumbbell Press: Rpe9.5 정도로 진행\nDumbbell OHP: 1세트 6-8개 해야하는줄 알고 8개만 함(rpe8), 2세트 rpe9\nCable Fly: 신규. 가볍게, 늘어나는 구간 컨트롤. 사용 무게 기록\nDumbbell Lateral Raise: 무게 줄이고 의자에 앉아서 고립해서 진행함 더 자극 잘 옴\nLying Triceps Extension: 1세트 rpe9, 2세트 9.5, 3세트\nCrunch: 복근이 약점이라 3세트함",
+  "id": "m0123"
+ },
+ {
+  "date": "2026-10-10",
+  "session": "Cardio",
+  "workout": "Cycle 30min",
+  "id": "m0124"
+ },
+ {
+  "date": "2026-10-11",
+  "session": "Interval run",
+  "km": 7.19,
+  "pace": "5:22",
+  "minutes": 38.6,
+  "avg_hr": 191,
+  "max_hr": 202,
+  "rpe": 9,
+  "workout": "Interval 800(4:50)/400(6:30) 6set",
+  "shoes": "Nike AlphaFly 3",
+  "brief": "800m(4:50) 인터벌 6세트",
+  "id": "m0125"
+ },
+ {
+  "date": "2026-10-14",
+  "session": "Weight Training",
+  "format": "Upper",
+  "workout": "Bench Press · 57.5kg × 12, 12, 8\nLat Pull Down · 45kg × 12, 12, 10\nSeated Cable Row · 160lb × 10, 10, 10\nOHP Machine · 45kg × 12, 12\nChest Press Machine · 45kg × 12, 9\nDumbbell Lateral Raise · 5kg × 20, 17, 14, 12\nCable Push Down · [7] × 20, 12\nDumbbell Curl · 10kg × 15, 12",
+  "notes": "Bench Press: 첫세트 rpe8.5-9, 두번째세트 rpe9.5, 세번째 세트도 9-5-10\nLat Pull Down: 첫 세트 10회 전후에서 멈추기(12·10·8로 하한 이탈). 그래도 마지막 10회 어려우면 한 단계 감량\nSeated Cable Row: 10·10·10 안정적. 실제 RPE 8 전후면 유지, 상한(12) 채우면 증량\nOHP Machine: 2세트 rpe 9-9.5\nChest Press Machine: 50kg에서 12·9(2세트 실패) → 한 단계 감량. 벤치 수행 떨어지면 먼저 줄이기\nDumbbell Lateral Raise: 앉아서 반동 없이. 초반 15~17회에서 멈추기. 뒤 세트 15회 미만이면 그 세트만 한 단계 낮추기\nCable Push Down: 12~20회 확보\nDumbbell Curl: 15·10 범위 안 → 유지",
+  "approx": true,
+  "id": "m0126"
+ },
+ {
+  "date": "2026-10-15",
+  "session": "Jogging",
+  "km": 4.72,
+  "pace": "4:58",
+  "minutes": 23.5,
+  "avg_hr": 163,
+  "max_hr": 186,
+  "rpe": 8,
+  "workout": "카이스트 한 바퀴 조깅",
+  "shoes": "Nike AlphaFly 3",
+  "brief": "카이스트 한 바퀴",
+  "id": "m0127"
+ },
+ {
+  "date": "2026-10-15",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "workout": "Romanian Deadlift · 90kg × 8, 8, 8\nBulgarian Split Squat · 12kg × 10, 10\nHip Thrust · 50kg × 11, 12\nSeated Leg Curl · 35kg × 15, 15, 15\nLeg Extension · 30kg × 18, 20\nCrunch · 7kg × 20, 13",
+  "notes": "Romanian Deadlift: 스트랩 사용, 안정적, 발살바 호흡, 고관절 움직임 느끼며 천천히 동작, 코어는 잡고\nBulgarian Split Squat: 한손당 12kg, 다음번에 14로 증량\nHip Thrust: Rpe9-10, 엉덩이로 무게치기\nSeated Leg Curl: 15·15·13 → 유지. 모든 세트 15회면 증량\nLeg Extension: 20·13 → 첫 세트 여유 남기기\nCrunch: 복부 배분 변경(금3·일3·수2, 주 8세트 동일). 시간 부족하면 생략 가능",
+  "approx": true,
+  "id": "m0128"
+ },
+ {
+  "date": "2026-10-16",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 62.5kg × 7, 8, 8, 7\nIncline Dumbbell Press · 19kg × 12, 12, 12\nDumbbell OHP · 21kg × 10, 8\nCable Fly · 55lb × 15, 12\nDumbbell Lateral Raise · 5kg × 18, 12\nLying Triceps Extension · 20kg × 11, 10, 7\nCable Push Down · [6] × 20, 20, 17",
+  "notes": "Bench Press: Rpe: 1세트 8.5, 2세트 8-9, 3세트 9.5, 4세트 10\nIncline Dumbbell Press: 1-2세트 rpe8, 3세트 9.5-10\nDumbbell OHP: 1세트 rpe9.5\nCable Fly: 55lb로 12~15회·1~2개 여유 확인. 너무 가벼우면 한 단계 올리기. 사용 무게 기록\nDumbbell Lateral Raise: 앉아서 반동 없이. 초반 15~17회에서 멈추기(6kg 서서 기록과 직접 비교 X)\nLying Triceps Extension: 12·9·6 → 첫 세트 9~10회에서 멈추기. 그래도 마지막 8회 여유 없으면 감량. 팔꿈치 체크\nCable Push Down: 금요일은 프레스·익스텐션 후라 화요일보다 한 단계 낮춰 12~20회 확보",
+  "id": "m0129"
+ },
+ {
+  "date": "2026-10-17",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 맨몸 × 8, 8, 8, 6\nT-Bar Row · 47.5kg × 10, 8, 7\nLat Pull Down · 45kg × 9, 9\nSeated Cable Row · 160lb × 12, 11\nRear Fly · 40lb × 20, 20, 20\nBarbell Curl · 20kg × 12, 8\nHammer Curl · 10kg × 13, 10",
+  "notes": "Pull-Up: 4×8 되면 +2.5kg 중량 고려\nT-Bar Row: 3×10 되면 증량\nLat Pull Down: 모든 세트 하한 확보 후 증량\nSeated Cable Row: 굉장히 무겁게 느껴지는군\nRear Fly: 마지막 세트 간신히 함, 딱 근육에 걸어놓고 하는 느낌 잡기\nBarbell Curl: 20으로 낮춰 함",
+  "id": "m0130"
+ },
+ {
+  "date": "2026-10-18",
+  "session": "Weight Training",
+  "format": "Lower front",
+  "workout": "Squat · 80kg × 8, 8, 8, 8\nHack Squat (Life Fitness) · 80kg × 9, 9, 9, 9\nLeg Extension · 35kg × 12, 12, 12\nLying Leg Curl · 30kg × 12, 10, 8\nHanging Knee Raise · 맨몸 × 15, 12",
+  "notes": "Squat: 무릎 무통증 + RPE 8일 때만 증량\nLeg Extension: 개수범위 12-20이었는데 12-15로 낮춤. 허벅지 많이 지쳐있음.\nLying Leg Curl: 발목패드 3, 스타트 -1, 엔드 맨끝 포지션(싸이벡스)",
+  "id": "m0131"
+ },
+ {
+  "date": "2026-10-18",
+  "session": "Cardio",
+  "workout": "Cycle 20min",
+  "id": "m0132"
+ },
+ {
+  "date": "2026-10-20",
+  "session": "Weight Training",
+  "format": "Upper",
+  "workout": "Bench Press · 57.5kg × 12, 9, 7\nLat Pull Down · 45kg × 12, 12, 10\nSeated Cable Row · 160lb × 9, 8, 8\nOHP Machine · 45kg × 14, 9\nDumbbell Lateral Raise · 5kg × 20, 20, 16, 15\nHammer Strength Chest Press Machine · 60kg × 13, 9\nCable Push Down · [7] × 13, 11\nDumbbell Curl · 9kg × 15, 10",
+  "notes": "Bench Press: 증량함. 도전적으로 잡음.\nLat Pull Down: 3×12 깔끔하면 증량\nSeated Cable Row: 모든 세트 하한 확보 후 상한 채우기\nOHP Machine: 벤치프레스 하고 바로 ohp 진행함\nDumbbell Lateral Raise: Ohp 다음에 수행, 어깨에 걸고 졸라 패야함\nHammer Strength Chest Press Machine: 벤치 수행 떨어지면 먼저 줄이기",
+  "id": "m0133"
+ },
+ {
+  "date": "2026-10-21",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "workout": "Romanian Deadlift · 95kg × 8, 8, 8, 8\nBulgarian Split Squat · 15kg × 10, 10, 10\nHip Thrust · 50kg × 12, 9\nSeated Leg Curl · 40kg × 35kg 15, 12, 10\nLeg Extension · 35kg × 14, 12\nCrunch · 8kg × 20",
+  "notes": "Romanian Deadlift: 3×8 정자세·RPE 8 → +2.5kg. 악력 한계면 스트랩\nBulgarian Split Squat: 딱 좋음. 마지막 하나 할 때 자세 유지하면서 간신히 올라오는 느낌.\nHip Thrust: 엉덩이 근육 딱 한번 잡아놓고 계속 조지기\nSeated Leg Curl: 첫 세트 무게 잘못함",
+  "id": "m0134"
+ },
+ {
+  "date": "2026-10-22",
+  "session": "Jogging",
+  "km": 8.27,
+  "pace": "5:52",
+  "minutes": 48.6,
+  "avg_hr": 148,
+  "max_hr": 173,
+  "workout": "집 근처 조깅",
+  "notes": "편안한 조깅",
+  "shoes": "Puma DNE3",
+  "brief": "집 근처, 편안한 조깅",
+  "id": "m0135"
+ },
+ {
+  "date": "2026-10-23",
+  "session": "Weight Training",
+  "format": "Push",
+  "workout": "Bench Press · 62.5kg × 8, 8, 8, 8\nIncline Dumbbell Press · 21kg × 12, 11, 9\nDumbbell OHP · 19kg × 11, 10\nCable Fly · 55lb × 15, 15\nDumbbell Lateral Raise · 5kg × 20, 20, 20, 14\nLying Triceps Extension · 20kg × 12, 9, 6\nCable Push Down · [7] × 18, 9\nCrunch · 8kg × 18, 14",
+  "notes": "Bench Press: 다음번에 증량해도 될듯, 초반에는 RPE 확실히 8정도 됐고, 마지막 세트에서는 한 RPE9~9.5 정도\nDumbbell OHP: 무게 낮추고 자세에 집중하기로 함, 자극을 느끼는게 더 중요하다고 판단, 어꺠 걸어놓고 하니까 많이 못 들겠음\nLying Triceps Extension: 오른쪽 팔꿈치 안쪽(가슴 방향) 찌릿 통증 있었는데 동작 할 때 한두번만 아파서 그냥 함.\nCable Push Down: 오른쪽 팔꿈치 안쪽(가슴 방향) 찌릿 통증 계속 발생해서 멈춤. 지금 막 엄청 아픈건 전혀 아닌데 불안함",
+  "id": "m0136"
+ },
+ {
+  "date": "2026-10-24",
+  "session": "Weight Training",
+  "format": "Pull",
+  "workout": "Pull-Up · 맨몸 × 10, 8, 8, 6\nT-Bar Row · 47.5kg × 8, 8, 7\nLat Pull Down · 45kg × 12, 8\nRear Fly · 55lb × 20, 14\nBarbell Curl · 20kg × 12, 12\nHammer Curl · 10kg × 10, 8kg 10",
+  "notes": "Pull-Up: 4×8 되면 +2.5kg 중량 고려\nT-Bar Row: 3×10 되면 증량\nLat Pull Down: 모든 세트 하한 확보 후 증량",
+  "id": "m0137"
+ },
+ {
+  "date": "2026-10-25",
+  "session": "Run",
+  "km": 1.82,
+  "pace": "6:00",
+  "minutes": 10.9,
+  "avg_hr": 165,
+  "max_hr": 179,
+  "id": "m0138"
+ },
+ {
+  "date": "2026-10-25",
+  "session": "Hyrox Training",
+  "workout": "Sprint & Hyrox",
+  "id": "m0139"
+ },
+ {
+  "date": "2026-10-27",
+  "session": "Run",
+  "km": 10.0,
+  "pace": "5:08",
+  "minutes": 51.4,
+  "avg_hr": 159,
+  "max_hr": 186,
+  "id": "m0140"
+ },
+ {
+  "date": "2026-10-28",
+  "session": "Weight Training",
+  "format": "Lower front",
+  "id": "m0141"
+ },
+ {
+  "date": "2026-10-30",
+  "session": "Weight Training",
+  "format": "Upper",
+  "id": "m0142"
+ },
+ {
+  "date": "2026-10-31",
+  "session": "Run",
+  "km": 4.53,
+  "pace": "6:00",
+  "minutes": 27.2,
+  "avg_hr": 145,
+  "max_hr": 168,
+  "id": "m0143"
+ },
+ {
+  "date": "2026-11-03",
+  "session": "Weight Training",
+  "format": "Lower rear",
+  "id": "m0144"
+ },
+ {
+  "date": "2026-11-04",
+  "session": "Hyrox Training",
+  "workout": "Crossfit",
+  "id": "m0145"
+ },
+ {
+  "date": "2026-11-05",
+  "session": "Weight Training",
+  "format": "Upper B",
+  "workout": "Bench Press · 57.5kg × 12, 11, 7\nBarbell OHP · 40kg × 6, 7, 6\nLat Pull Down · 45kg × 12, 12, 9\nDumbbell Lateral Raise · 5kg × 15, 15, 15, 15\nFace Pull · [3] × 15, 13, 10\nArm Curl Machine · 20kg × 12, 10, 7, 15kg 10",
+  "notes": "Barbell OHP: 첫 시도 · 락아웃 가동성 부족\nLat Pull Down: 47.5 대신 45kg\nDumbbell Lateral Raise: 4×15 달성 → 6kg\nArm Curl Machine: 마지막 세트 15kg",
+  "id": "m0146"
+ },
+ {
+  "date": "2026-11-06",
+  "session": "Weight Training",
+  "format": "Lower A",
+  "workout": "Squat · 90kg × 8, 8, 8, 8\nLeg Press · 120kg × 12, 12, 12\nBulgarian Split Squat · 15kg × 12, 12, 12\nLying Leg Curl · 30kg × 15, 15, 15\nDumbbell Lateral Raise · 6kg × 15, 15, 15\nLeg Extension · 35kg × 17\nHanging Knee Raise · 맨몸 × 20, 12",
+  "notes": "Squat: 90도 괜찮게 밀림\nLeg Press: 적당\nBulgarian Split Squat: 진짜 너무 괴롭고 힘듦\nLying Leg Curl: 좀 강하게 팡팡 함 네거티브 때는 받고. 그게 더 나은듯.\nLeg Extension: 너무 힘들어서 못하겠음",
+  "id": "m0147"
+ },
+ {
+  "date": "2026-11-09",
+  "session": "Hyrox Training",
+  "workout": "Hyrox training",
+  "id": "m0148"
+ },
+ {
+  "date": "2026-11-11",
+  "session": "Tempo run",
+  "km": 4.26,
+  "pace": "4:50",
+  "minutes": 20.6,
+  "id": "m0149"
+ },
+ {
+  "date": "2026-11-11",
+  "session": "Weight Training",
+  "format": "Upper A",
+  "workout": "Bench Press · 67.5kg × 5, 5, 5, 5\nPull-Up · 맨몸 × 10, 8, 7\nOHP Machine · 45kg × 12, 12, 9\nLateral Raise Machine · 15kg × 15, 15, 15, 20kg 15\nArm Curl Machine · 15kg × 15, 15, 11, 10",
+  "notes": "Bench Press: 헤비 · 4×6 되면 70kg\nPull-Up: 3×10 되면 +2.5kg 중량 · 6회 미만이면 Assisted\nOHP Machine: 스탠딩 머신 · 3×12 되면 한 칸\nLateral Raise Machine: 사레레 스탠딩 머신 마지막세트 했는데 느낌 개좋음 이걸로 해야함",
+  "id": "m0150"
+ },
+ {
+  "date": "2026-11-12",
+  "session": "Jogging",
+  "km": 4.39,
+  "pace": "5:50",
+  "minutes": 25.7,
+  "id": "m0151"
+ },
+ {
+  "date": "2026-11-12",
+  "session": "Weight Training",
+  "format": "Lower B",
+  "workout": "Romanian Deadlift · 105kg × 8, 8, 8, 8\nHack Squat (Life Fitness) · 85kg × 10, 10, 10\nSeated Leg Curl · 40kg × 15, 15, 15\nLateral Raise Machine · 25kg × 15, 15, 13\nCrunch · 8kg × 20, 15",
+  "notes": "Romanian Deadlift: 다 됨\nHack Squat (Life Fitness): 다 밀림\nSeated Leg Curl: 반동 많이 씀 한번 더 도전\nLateral Raise Machine: 느낌 아주 좋음\nCrunch: 시간 없어서 두 세트만 함",
+  "id": "m0152"
+ },
+ {
+  "date": "2026-11-14",
+  "session": "Weight Training",
+  "format": "Upper B",
+  "workout": "Bench Press · 57.5kg × 12, 12, 11\nBarbell OHP · 40kg × 7, 6, 6\nLat Pull Down · 45kg × 12, 9, 7\nLateral Raise Machine · 25kg × 15, 15, 13, 12\nFace Pull · [4] × 15, 15, 15\nArm Curl Machine · 20kg × 12, 7, 15kg 11",
+  "notes": "Bench Press: 빵빵 치듯이 스피드감을 좀 줌(무게를 날린 것은 아님)\nBarbell OHP: 휴식 2:30 으로 늘리기(다른 날에도 수정 필요)\nLat Pull Down: 2분으로 늘려야하나 싶음 쉬는시간\nLateral Raise Machine: 슈퍼세트: Face Pull · 4×15 되면 한 칸\nFace Pull: 수평 당기기 느낌으로 바꿈 템포 좀 더 빠르게 외전 많이 안 걸고 진행\nArm Curl Machine: 슈퍼세트: Cable Push Down · 4×12 되면 한 칸",
+  "id": "m0153"
+ },
+ {
+  "date": "2026-11-17",
+  "session": "Weight Training",
+  "format": "Lower A",
+  "workout": "Squat · 95kg × 8, 8, 8, 8\nLeg Press · 130kg × 12, 12, 12\nBulgarian Split Squat · 15kg × 12, 12, 12",
+  "notes": "Squat: 4×8 + 무릎 OK면 +5kg\nLeg Press: 3×12 되면 +10kg\nBulgarian Split Squat: 17kg 없고 18kg만 있음. 이ㄹ단 15kg로 더 연습하고 넘어가자",
+  "approx": true,
+  "id": "m0154"
+ },
+ {
+  "date": "2026-11-18",
+  "session": "Weight Training",
+  "format": "Upper A",
+  "workout": "Bench Press · 67.5kg × 6, 6, 6, 6\nT-Bar Row · 45kg × 10, 10, 10\nPull-Up · 맨몸 × 8, 6, 4\nLateral Raise Machine · 25kg × 15, 15, 15, 15\nLying Triceps Extension · 20kg × 12, 10, 7\nArm Curl Machine · 15kg × 15, 15",
+  "notes": "Pull-Up: 가동범위 뭔가 짧아짐. 사ㅇ단구간 잘 안올라가짐.\nLateral Raise Machine: 스탠딩 머신 · 4×15 되면 한 칸\nLying Triceps Extension: 찌릿하면 즉시 Cable Push Down으로 교체 · 3×12 되면 +2.5kg\nArm Curl Machine: 생략 금지(팔 우선) · 3×15 되면 한 칸",
+  "id": "m0155"
+ },
+ {
+  "date": "2026-11-22",
+  "session": "Run",
+  "km": 1.02,
+  "pace": "4:59",
+  "minutes": 5.1,
+  "avg_hr": 149,
+  "max_hr": 163,
+  "brief": "한강 런짐 대회",
+  "id": "m0156"
+ },
+ {
+  "date": "2026-11-22",
+  "session": "Run",
+  "km": 6.59,
+  "pace": "5:45",
+  "minutes": 37.9,
+  "avg_hr": 162,
+  "max_hr": 181,
+  "brief": "한강 런짐 대회",
+  "id": "m0157"
+ },
+ {
+  "date": "2026-11-22",
+  "session": "Race",
+  "workout": "Hangangrungym race (6km run + 6 stations)",
+  "id": "m0158"
+ },
+ {
+  "date": "2026-11-23",
+  "session": "Functional Training",
+  "format": "AMRAP",
+  "minutes": 20,
+  "workout": "4 min Max M Machine\n12 min AMRAP \n  12 KB Thruster\n  12 KB Sumo-Deadlift High Pull\n  12 Double Push-up Burpee\n4 min Max M Machine",
+  "notes": "하이파이브 첫 수업\n운동은 괜찮았지만 20분이라 짧게 느껴짐\n자전거로 편도로 15~20분 걸림\n케틀벨 24kg으로 진행했는데 쓰러스터에서 좀 무겁게 느껴지긴 함\n다 6개씩 끊어서 살짝씩 쉬어가면서 끝까지 진행함",
+  "result": "Ski 900m (2:13)\nKB 24kg 3R+27\nSki 815m (2:27)",
+  "rpe": 8,
+  "id": "m0159"
+ },
+ {
+  "date": "2026-11-24",
+  "session": "Hyrox Double",
+  "format": "Timed Sets",
+  "minutes": 24,
+  "workout": "8 min × 3 sets\n#1 1000m Sync Run\n  Max Sled Push & Drag\n#2 1000m Sync Row\n  Max Farmer's Carry Over Row\n#3 1000m Sync Ski\n  Max Wall Ball Shots",
+  "notes": "컨디션 좋았고 강도 잘 뽑았음\n슬레드도 잘 밀렸고, 월볼도 잘 됐음\n다만, 스키를 할 때 왼쪽 팔꿈치가 좀 무리가 가는 느낌이었고\n실제로 운동이 다 끝나고 통증이 좀 지속됐음\n아무래도 어제 더블 푸쉬업 버피와 오늘 스키가 좀 무리였나봄\n오랜만에 이런 기능성 운동을 고강도로 하니까 좀 인대에 무리가 가는듯\n일단 수요일 푹 쉬고 목요일날 좀 강도를 낮춰서 좀 상태를 보며 하겠음",
+  "result": "Sled push & drag 4장\nFarmer's over row 24kg\nWall ball 6kg",
+  "rpe": 9,
+  "avg_hr": 140,
+  "max_hr": 193,
+  "id": "m0160"
+ }
+]

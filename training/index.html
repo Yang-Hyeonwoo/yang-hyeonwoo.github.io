@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex, nofollow">
+<title>Training · Hyeonwoo Yang</title>
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/site.css?v=1126b">
+</head>
+<body data-root="../" data-page="training">
+<main>
+  <div class="wrap">
+    <h1 class="sr">Hyrox Training</h1>
+    <section class="top" aria-label="목표와 D-day">
+      <div id="goals"></div>
+      <p class="note" style="margin-top:8px"><a href="plan.html">월별 로드맵은 Training Plan에 →</a></p>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head"><span class="sec-no">01</span><h2>Today</h2><span class="ko">오늘 할 것</span></div>
+      <div id="today"></div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head"><span class="sec-no">02</span><h2>This Week</h2><span class="ko">이번 주</span><span class="side num" id="weekSide"></span></div>
+      <div id="week"></div>
+      <p class="note" style="margin-top:12px"><a href="plan.html#now">전체 계획 보기 →</a></p>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head"><span class="sec-no">03</span><h2>Progress</h2><span class="ko">쌓아온 기록</span>
+        <span class="side"><span class="chips" id="range" role="group" aria-label="주간 그래프 기간">
+          <button type="button" data-w="0" class="on" aria-pressed="true">전체</button>
+          <button type="button" data-w="24" aria-pressed="false">24주</button>
+          <button type="button" data-w="12" aria-pressed="false">12주</button>
+        </span></span></div>
+      <div class="totals" id="totals"></div>
+
+      <h3 class="cat">Training <span>운동</span></h3>
+      <div class="grid g2">
+        <div class="plate chart-card"><h3>Training Days · 월별 운동한 날</h3><div class="now num" id="nowMD"></div><div class="chart" id="chMD"></div></div>
+        <div class="plate chart-card"><h3>Running · 주간 러닝 거리</h3><div class="now num" id="nowR"></div><div class="chart" id="chR"></div>
+          <p class="note" style="margin-top:6px">막대는 실제 거리, 검은 가로선은 그 주 기본 계획이에요.</p></div>
+      </div>
+
+      <h3 class="cat">Nutrition <span>영양</span></h3>
+      <div class="grid g2">
+        <div class="plate chart-card"><h3>Intake · 주 평균 섭취 칼로리</h3><div class="now num" id="nowK"></div><div class="chart" id="chK"></div></div>
+        <div class="plate chart-card"><h3>Weight · 주 평균 체중</h3><div class="now num" id="nowW"></div><div class="chart" id="chW"></div></div>
+      </div>
+
+      <h3 class="cat">Recovery <span>회복</span></h3>
+      <div class="grid g2">
+        <div class="plate chart-card"><h3>Sleep · 주 평균 수면</h3><div class="now num" id="nowS"></div><div class="chart" id="chS"></div></div>
+        <div class="soft"><h3 style="font-size:.95rem;color:var(--ink);margin-bottom:12px">Last 4 Weeks <span class="muted" style="font-weight:500">· 최근 4주</span></h3>
+          <div class="kv" id="recov" style="grid-template-columns:repeat(2,minmax(0,1fr))"></div></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head"><span class="sec-no">04</span><h2>Races</h2><span class="ko">대회 기록</span></div>
+      <div class="plate" id="races"></div>
+    </section>
+  </div>
+</main>
+<script src="../assets/site.js?v=1126b"></script>
+</body>
+</html>
