@@ -1,0 +1,55 @@
+name: Garmin sync
+
+# Reads the watch's runs, class heart rate and sleep from Garmin Connect and adds them to data/*.json.
+# The rules are at the top of tools/garmin_sync.py. Log in once on the PC with tools/garmin_login.py.
+
+on:
+  schedule:
+    - cron: '23 * * * *'        # every hour; GitHub may start it some minutes late
+  workflow_dispatch:
+
+permissions:
+  contents: write               # save data/*.json
+  pages: write                  # ask for the public pages to be rebuilt
+
+concurrency:
+  group: garmin-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      HAS_TOKENS: ${{ secrets.GARMIN_TOKENS != '' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools
+      - uses: actions/setup-python@v5
+        if: env.HAS_TOKENS == 'true'
+        with:
+          python-version: '3.12'
+      - name: Install the Garmin library
+        if: env.HAS_TOKENS == 'true'
+        run: pip install --quiet garminconnect==0.3.20
+      - name: Sync
+        env:
+          GARMINTOKENS: ${{ secrets.GARMIN_TOKENS }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python tools/garmin_sync.py --tokens-out "$RUNNER_TEMP/garmin_tokens.json"
+      - name: Keep the new login tokens
+        # Garmin may replace the refresh token when it is used. Saving it back needs a token that may write
+        # this repository's secrets (SECRET_WRITER); the workflow's own token is not allowed to.
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.SECRET_WRITER }}
+        run: |
+          f="$RUNNER_TEMP/garmin_tokens.json"
+          if [ ! -s "$f" ]; then exit 0; fi
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::Garmin replaced the login tokens, but there is no SECRET_WRITER secret to save them with. If the next runs fail, run tools/garmin_login.py again."
+          else
+            gh secret set GARMIN_TOKENS --repo "$GITHUB_REPOSITORY" < "$f" && echo "Saved the new login tokens."
+          fi
+          rm -f "$f"

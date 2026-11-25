@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1126t';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1126u';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -771,8 +771,13 @@
     else if (sync.stale) { let at = ''; try { const v = Number(localStorage.getItem('cache.v1.at')); if (v) { const d = new Date(v); at = `${md(d)} ${d.getHours()}:${pad(d.getMinutes())}에 `; } } catch { /* ignore */ }
       t = `연결이 불안정해서 새 기록을 받아오지 못했어요. ${at}받아둔 기록을 보여주고 있어요.`; }
     const m = $('main'); if (t && m) m.prepend(el(`<div class="wrap" id="syncNote"><div class="banner" role="status" style="margin:16px 0 0">${t}</div></div>`)); };
+  // The watch sync (tools/garmin_sync.py, hourly on GitHub) leaves a mark in data/garmin.json when its Garmin login stops working.
+  // Only the owner can do anything about it, so only a device with a token shows the note.
+  const garminNote = () => { if (PAGE !== 'training' || !token() || $('#garminNote')) return;
+    fetch(`${ROOT}data/garmin.json?v=${Date.now()}`).then((r) => (r.ok ? r.json() : null)).then((g) => { const m = $('main');
+      if (g && g.error === 'auth' && m && !$('#garminNote')) m.prepend(el('<div class="wrap" id="garminNote"><div class="banner" role="status" style="margin:16px 0 0">Garmin 연결이 끊겨서 워치 기록이 자동으로 들어오지 않고 있어요. PC에서 Garmin 로그인 도구(tools/garmin_login.py)를 한 번 다시 실행하면 이어져요.</div></div>')); }).catch(() => { /* no note is fine */ }); };
   const typing = () => !!document.querySelector('#logFormWrap:not([hidden]), #dayFormWrap:not([hidden]), dialog[open]') || /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || '');
-  if (run) run().then(() => { performance.mark('site-drawn'); return Promise.all(pending.splice(0)); }).then((changed) => { settled = true; notice(); if (changed.some(Boolean) && !typing()) return run(); return null; }).catch(fail);
+  if (run) run().then(() => { performance.mark('site-drawn'); return Promise.all(pending.splice(0)); }).then((changed) => { settled = true; notice(); garminNote(); if (changed.some(Boolean) && !typing()) return run(); return null; }).catch(fail);
   // Every link inside the site carries this page's version, so the page it opens is fetched afresh and never an
   // older copy the browser still holds: all tabs then show the same menu, wording and behaviour.
   const stamp = (ev) => { const a = ev.target.closest && ev.target.closest('a[href]'); if (!a) return; let u; try { u = new URL(a.href, location.href); } catch { return; }
