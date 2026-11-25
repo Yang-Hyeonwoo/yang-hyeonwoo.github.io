@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1126n';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1126p';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -321,8 +321,9 @@
   async function training() {
     const [plan, daily] = await Promise.all([load('plan'), load('daily')]); let log = await load('log').then(live);
     const cur = [...plan.roadmap].reverse().find((r) => r.from <= TODAY) || plan.roadmap[0];
+    const wkNow = plan.weeks.find((w) => w.start === iso(monday(NOW)) && w.concept);
     $('#goals').innerHTML = `<div class="dday"><div class="count"><div class="t">${esc(plan.race.name)} · ${esc(plan.race.division)}</div><div class="n num">${ddayText(dday(plan)).replace('-', '<i class="dash"></i>')}</div>
-      <div class="r">${esc(cur.theme)}<span>${esc(plan.race.date_note)}</span></div></div>
+      <div class="r"><span class="lbl">${wkNow ? '이번 주 목표' : '이번 달 테마'}</span>${esc(wkNow ? wkNow.concept : cur.theme)}<span>${esc(plan.race.date_note)}</span></div></div>
       <div class="grid g3">${plan.goals.map((g) => `<div class="goal"><div class="g">Goal · 목표</div><div class="l">${esc(g.label)}</div><div class="v num">${esc(g.value)}</div><div class="s">${esc(g.sub)}</div></div>`).join('')}</div></div>`;
     const mon = monday(NOW), m0 = iso(mon), mo = NOW.getMonth() + 1;
     const paint = () => {
@@ -403,7 +404,8 @@
     const phase = [...plan.roadmap].reverse().find((r) => r.from <= TODAY) || plan.roadmap[0];
     $('#road').innerHTML = `<div class="road" style="margin-top:0">${plan.roadmap.map((r) => `<div class="${r === phase ? 'now' : r.from < phase.from ? 'past' : ''}"><div class="m">${esc(r.m)}</div><div class="th">${esc(r.theme)}</div><div class="f">${esc(r.focus)}</div></div>`).join('')}</div>`;
     $('#weeks').innerHTML = plan.weeks.map((w) => { const mon = parse(w.start);
-      const li = (it, d) => `<li${it.k === 'free' || it.k === 'rest' ? ' class="quiet"' : ''}><b>${esc(it.t)}</b>${it.d ? ` <span class="why">(${esc(it.d)})</span>` : ''}${it.key ? ' <span class="chip a">핵심</span>' : ''}${isDone(it, d, log) ? ` ${doneChip}` : ''}</li>`;
+      const tone = (it) => (it.k === 'hyrox' ? (/Functional/.test(it.t) ? 'fx' : /Double/.test(it.t) ? 'db' : /Single/.test(it.t) ? 'sg' : 'iv') : it.k === 'commute' || it.k === 'run' ? 'run' : it.k === 'weights' ? 'wt' : it.k);
+      const li = (it, d) => `<li${it.k === 'free' || it.k === 'rest' ? ' class="quiet"' : ''}><b class="tone-${tone(it)}">${esc(it.t)}</b>${it.d ? ` <span class="why">(${esc(it.d)})</span>` : ''}${it.key ? ' <span class="chip a">핵심</span>' : ''}${isDone(it, d, log) ? ` ${doneChip}` : ''}</li>`;
       const rows = [0, 1, 2, 3, 4, 5, 6].map((i) => { const dt = addDays(mon, i), d = iso(dt), day = plan.days[d];
         return `<tr><td class="num" style="white-space:nowrap"><b>${KO[dt.getDay()]}</b> <span class="muted">${md(dt)}</span></td><td><ul class="plan-items">${day.items.map((it) => li(it, d)).join('')}</ul></td><td class="r num" style="white-space:nowrap">${n0(day.kcal)} kcal<br><span class="small muted">탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}</span></td></tr>`; }).join('');
       return `<section class="plate plan-week${w.start === thisMon ? ' now' : ''}" id="w-${w.start}"><div class="hd"><h3>${esc(w.label)}</h3><span class="muted small num">${md(mon)}–${md(addDays(mon, 6))}</span>${w.recovery ? '<span class="chip w">회복 주</span>' : ''}${w.start === thisMon ? '<span class="chip a">이번 주</span>' : ''}
@@ -447,8 +449,12 @@
     const first = parse(W[0].date), last = parse(W[W.length - 1].date); const weeks = Math.max(1, Math.round((last - first) / (7 * 864e5)) + 1);
     const dot = (d) => `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
     const t = (l, v, u, sub) => `<div class="total"><div class="l">${l}</div><div class="v num">${v}<small>${u}</small></div><div class="s num">${sub}</div></div>`;
-    const tiles = t('Sessions · 웨이트 한 날', W.length, '일', `${dot(first)} – ${dot(last)}`) + t('Per Week · 주 평균', (W.length / weeks).toFixed(1), '회', `${weeks}주 동안`)
-      + t('Sets · 세트', nSets.toLocaleString('en-US'), '세트', `세트를 적어둔 ${withSets.length}일 기준`) + t('Reps · 반복', nReps.toLocaleString('en-US'), '회', '한 번 한 번 센 횟수')
+    const runs = log.filter((e) => isRun(e) && e.date >= W[0].date && e.date < HYROX_START); const runDays = new Set(runs.map((e) => e.date)).size;
+    const runKm = runs.reduce((k, e) => k + (Number(e.km) || 0), 0); const per = (v) => (v / weeks).toFixed(1);
+    const tiles = t('Weight · 웨이트 한 날', W.length, '일', `${dot(first)} – ${dot(last)}`)
+      + t('Running · 러닝 한 날', runDays, '일', `${runKm.toFixed(0)}km`)
+      + t('Per Week · 주 평균 운동', per(W.length + runDays), '회', `웨이트 ${per(W.length)}회 · 러닝 ${per(runDays)}회`)
+      + t('Reps · 반복', nReps.toLocaleString('en-US'), '회', `${nSets.toLocaleString('en-US')}세트 · 세트를 적어둔 ${withSets.length}일 기준`)
       + t('Volume · 들어 올린 무게', (vol / 1000).toFixed(0), '톤', '무게 × 횟수의 합');
     const by = {}; W.forEach((e) => { const k = e.date.slice(0, 7); by[k] = (by[k] || 0) + 1; });
     const sp = {}; W.forEach((e) => { const k = e.format || '기타'; sp[k] = (sp[k] || 0) + 1; });
@@ -464,8 +470,8 @@
       return `<tr><td><b>${esc(name)}</b></td><td class="r num">${f(start)}</td><td class="r num"><b>${f(end)}</b></td><td class="r num">${end > start ? `<span class="chip g">▲ ${f(end - start)}</span>` : end < start ? `▼ ${f(start - end)}` : '–'}</td><td class="r num muted">${pts.length}회</td></tr>`; }).join('');
     const html = `<section class="plate recap" id="wtRecap">
       <p class="eyebrow">2026 · Weight Training</p>
-      <h3>웨이트로 채운 <em>2026</em></h3>
-      <p class="lead">2026년의 운동 콘셉트는 웨이트였습니다. 더 무거운 무게를 들고 근육량을 늘리는 것이 목표였습니다. Hyrox를 시작한 11월 22일 전까지, 그 한 해를 숫자로 정리했습니다.</p>
+      <h3>웨이트 트레이닝에 집중한 <em>2026</em></h3>
+      <p class="lead">2026년의 운동 콘셉트는 웨이트였습니다. 더 무거운 무게를 들고 근육량을 늘리는 것이 목표였습니다.<br>Hyrox를 시작한 11월 22일 전까지, 그 한 해를 숫자로 정리했습니다.</p>
       <div class="totals">${tiles}</div>
       <div class="grid g2" style="margin-top:20px">
         <div><h4>Sessions · 월별 웨이트 일수</h4><div class="chart" id="wtMonths"></div></div>
@@ -474,7 +480,7 @@
       <h4 style="margin-top:24px">Strength · 종목별 처음과 최종</h4>
       <div class="scroll-x"><table class="t"><thead><tr><th>종목</th><th class="r">처음</th><th class="r">최종</th><th class="r">변화</th><th class="r">기록</th></tr></thead><tbody>${rows}</tbody></table></div>
       <p class="note" style="margin-top:10px">최종은 그 종목을 마지막으로 한 달에 든 가장 무거운 무게예요. 풀업은 한 세트 최고 횟수예요.</p></section>`;
-    const draw = () => { const box = $('#wtMonths'); if (box) barChart(box, Object.keys(by).sort().map((k) => ({ label: MON[+k.slice(5) - 1], y: by[k] })), { label: '월별 웨이트 일수', labels: true, h: 190, color: '#d9731a', tip: (b) => `${b.label} · <b>${b.y}</b>일` }); };
+    const draw = () => { const box = $('#wtMonths'); if (box) barChart(box, Object.keys(by).sort().map((k) => ({ label: MON[+k.slice(5) - 1], y: by[k] })), { label: '월별 웨이트 일수', labels: true, h: 190, tip: (b) => `${b.label} · <b>${b.y}</b>일` }); };
     return { html, draw };
   }
 

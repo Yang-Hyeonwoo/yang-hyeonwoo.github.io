@@ -221,7 +221,7 @@ dialog ol { padding-left: 1.2rem; margin: 12px 0; font-size: 0.9rem; }
 /* ---- Training is a daily tool: tighter than the hub, today first ---- */
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 [id] { scroll-margin-top: 112px; }
-.top { padding: 24px 0 0; }
+.home-top { padding: 24px 0 0; }
 .site-head.sub ~ main .hero { padding: 32px 0 0; }
 .site-head.sub ~ main .hero h1 { font-size: clamp(1.7rem, 1.3rem + 1.6vw, 2.3rem); margin: 12px 0 8px; }
 .site-head.sub ~ main .hero .lead { font-size: 0.95rem; line-height: 1.7; }
@@ -238,7 +238,7 @@ td.m-only, th.m-only { display: none; }
 tr.more-row td { background: var(--bg-soft); }
 @media (max-width: 860px) { .form .c4 { grid-column: span 2; } }
 @media (max-width: 640px) {
-  .top { padding-top: 16px; }
+  .home-top { padding-top: 16px; }
   .chips button, .btn.sm, .xp { min-height: 44px; }
   td.d-only, th.d-only { display: none; } td.m-only, th.m-only { display: table-cell; }
   table.days { min-width: 0; } table.days td, table.days th { padding: 8px 6px; } .cellbar { min-width: 3rem; padding: 2px 6px; }
@@ -403,7 +403,7 @@ table.days td.num { padding-left: 5px; padding-right: 5px; }
 
 /* ---- weight training page: split bars; five tabs scroll sideways on a phone ---- */
 .hbar { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr) 2rem; align-items: center; gap: 10px; margin: 7px 0; font-size: 0.86rem; }
-.hbar i { height: 12px; border-radius: 4px; background: #d9731a; }
+.hbar i { height: 12px; border-radius: 4px; background: var(--accent); }
 .hbar b { text-align: right; color: var(--ink); }
 @media (max-width: 640px) {
   .site-head.sub .nav { justify-content: flex-start; overflow-x: auto; }
@@ -419,3 +419,11 @@ table.days td.num { padding-left: 5px; padding-right: 5px; }
 .lead, .recap .lead { text-wrap: pretty; }
 .hero .lead { max-width: 46rem; }
 @media (max-width: 640px) { .recap { padding: 18px; } }
+
+/* ---- log entries: date and session name on one line; plan colours per kind of training; this week's aim on the D-day card ---- */
+.entry .when { padding-top: 1px; line-height: 1.5; } .entry .when b { line-height: 30px; }
+.entry .top { min-height: 30px; }
+.tone-fx { color: #2b59c3; } .tone-db { color: #0e7c86; } .tone-iv { color: #6b4fc8; } .tone-sg { color: #c2410c; }
+.tone-run { color: #1a7f4b; } .tone-wt { color: #8a5a00; } .tone-core { color: var(--ink); }
+.dday .count .r .lbl { display: block; margin-bottom: 2px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.62); }
+.recap .lead { line-height: 1.8; }
