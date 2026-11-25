@@ -520,3 +520,11 @@ table.body-all td, table.body-all th { white-space: nowrap; }
 @media (max-width: 380px) { .site-head.sub .nav a { padding-left: 0.48rem; padding-right: 0.48rem; } }
 @media (max-width: 340px) { .site-head.sub .nav a { font-size: 0.76rem; padding-left: 0.3rem; padding-right: 0.3rem; } }
 @media (max-width: 400px) { table.body-all .cc { display: none; } table.body-all td, table.body-all th { padding-left: 4px; padding-right: 4px; } }
+
+/* ---- 10 weeks at a glance: every week opens its own plan below; each plan has a way back up ---- */
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+.wk-table tr.go { cursor: pointer; }
+.wk-table tr.go:hover td { background: var(--bg-soft); }
+.go-c { width: 1.4rem; padding-left: 0 !important; text-align: right; color: var(--faint); font-size: 1.1rem; line-height: 1; }
+.wk .h .go-c { width: auto; margin-left: 2px; }
+.plan-week .hd .up { margin-left: auto; font-size: 0.8rem; font-weight: 600; color: var(--accent); white-space: nowrap; }

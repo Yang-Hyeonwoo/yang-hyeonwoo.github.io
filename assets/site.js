@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1126x';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1126y';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -431,21 +431,22 @@
     $('#road').innerHTML = `<div class="road" style="margin-top:0">${plan.roadmap.map((r) => `<div class="${r === phase ? 'now' : r.from < phase.from ? 'past' : ''}"><div class="m">${esc(r.m)}</div><div class="th">${esc(r.theme)}</div><div class="f">${esc(r.focus)}</div></div>`).join('')}</div>`;
     // the weeks at a glance, under the roadmap: number, dates, what the week is for, its Wednesday run, base running distance
     const wedRun = (w) => { const wed = plan.days[iso(addDays(parse(w.start), 2))]; const r = wed && wed.items.find((it) => it.k === 'run'); return r ? r.t : ''; };
-    $('#weekTable').innerHTML = `<div class="scroll-x wk-table"><table class="t"><thead><tr><th>주차</th><th>기간</th><th>콘셉트</th><th>수요일 러닝</th><th class="r">러닝 기본</th></tr></thead><tbody>${plan.weeks.map((w, i) => { const mon = parse(w.start);
-      return `<tr${w.start === thisMon ? ' class="now"' : ''}><td class="num" style="white-space:nowrap"><a href="#w-${w.start}"><b>${i + 1}주차</b></a></td><td style="white-space:nowrap"><b>${esc(w.label)}</b><br><span class="small muted num">${md(mon)}–${md(addDays(mon, 6))}</span></td><td>${esc(w.concept || '')}${w.recovery ? ' <span class="chip w">회복 주</span>' : ''}</td><td>${esc(wedRun(w)) || '–'}</td><td class="r num" style="white-space:nowrap">${w.run_km}km${w.bonus_km ? `<br><span class="small muted">보너스 +${w.bonus_km}km</span>` : ''}</td></tr>`; }).join('')}</tbody></table></div>
+    $('#weekTable').innerHTML = `<div class="scroll-x wk-table"><table class="t"><thead><tr><th>주차</th><th>기간</th><th>콘셉트</th><th>수요일 러닝</th><th class="r">러닝 기본</th><th class="go-c"></th></tr></thead><tbody>${plan.weeks.map((w, i) => { const mon = parse(w.start);
+      return `<tr class="go${w.start === thisMon ? ' now' : ''}" data-go="#w-${w.start}"><td class="num" style="white-space:nowrap"><a href="#w-${w.start}"><b>${i + 1}주차</b></a></td><td style="white-space:nowrap"><b>${esc(w.label)}</b><br><span class="small muted num">${md(mon)}–${md(addDays(mon, 6))}</span></td><td>${esc(w.concept || '')}${w.recovery ? ' <span class="chip w">회복 주</span>' : ''}</td><td>${esc(wedRun(w)) || '–'}</td><td class="r num" style="white-space:nowrap">${w.run_km}km${w.bonus_km ? `<br><span class="small muted">보너스 +${w.bonus_km}km</span>` : ''}</td><td class="go-c" aria-hidden="true">›</td></tr>`; }).join('')}</tbody></table></div>
       <div class="wk-list">${plan.weeks.map((w, i) => { const mon = parse(w.start); const now = w.start === thisMon;
-        return `<a class="wk${now ? ' now' : ''}" href="#w-${w.start}"><div class="h"><b class="num">${i + 1}주차</b><span>${esc(w.label)}</span>${now ? '<span class="chip a">이번 주</span>' : ''}${w.recovery ? '<span class="chip w">회복 주</span>' : ''}<span class="d num">${md(mon)}–${md(addDays(mon, 6))}</span></div>
+        return `<a class="wk${now ? ' now' : ''}" href="#w-${w.start}"><div class="h"><b class="num">${i + 1}주차</b><span>${esc(w.label)}</span>${now ? '<span class="chip a">이번 주</span>' : ''}${w.recovery ? '<span class="chip w">회복 주</span>' : ''}<span class="d num">${md(mon)}–${md(addDays(mon, 6))}</span><span class="go-c" aria-hidden="true">›</span></div>
           <div class="c">${esc(w.concept || '')}</div>
           <dl><dt>수요일</dt><dd>${esc(wedRun(w)) || '–'}</dd><dt>러닝 기본</dt><dd class="num">${w.run_km}km${w.bonus_km ? ` · 보너스 +${w.bonus_km}km` : ''}</dd></dl></a>`; }).join('')}</div>`;
     const raceMon = monday(parse(plan.race.date)); const totalWeeks = Math.round((raceMon - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
     const nowNo = Math.round((monday(NOW) - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
+    $('#weekTable').onclick = (ev) => { const tr = ev.target.closest('tr[data-go]'); if (!tr || ev.target.closest('a')) return; location.hash = tr.dataset.go; };
     $('#weekTotal').textContent = `대회 주까지 총 ${totalWeeks}주${nowNo >= 1 && nowNo <= totalWeeks ? ` · 지금 ${nowNo}주차` : ''}`;
     $('#weeks').innerHTML = plan.weeks.map((w, wi) => { const mon = parse(w.start);
       const tone = (it) => (it.k === 'commute' ? 'run' : it.k);     // bullet colour: the same three kinds as the charts
       const li = (it, d) => `<li class="${it.k === 'free' || it.k === 'rest' ? 'quiet' : `k-${tone(it)}`}"><b>${esc(it.t)}</b>${it.d ? ` <span class="why">(${esc(it.d)})</span>` : ''}${it.first ? ' <span class="chip w">첫 Hyrox Training</span>' : ''}${it.key ? ' <span class="chip a">핵심</span>' : ''}${isDone(it, d, log) ? ` ${doneChip}` : ''}</li>`;
       const rows = [0, 1, 2, 3, 4, 5, 6].map((i) => { const dt = addDays(mon, i), d = iso(dt), day = plan.days[d];
         return `<tr><td class="num dcol"><b>${KO[dt.getDay()]}</b> <span class="muted">${md(dt)}</span></td><td><ul class="plan-items">${day.items.map((it) => li(it, d)).join('')}</ul><div class="m-nut num">${n0(day.kcal)}kcal · 탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}</div></td><td class="r num d-only" style="white-space:nowrap">${n0(day.kcal)}kcal<br><span class="small muted">탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}</span></td></tr>`; }).join('');
-      return `<section class="plate plan-week${w.start === thisMon ? ' now' : ''}" id="w-${w.start}"><div class="hd"><h3>${esc(w.label)}</h3><span class="chip dark num">${wi + 1}주차</span><span class="muted small num">${md(mon)}–${md(addDays(mon, 6))}</span>${w.recovery ? '<span class="chip w">회복 주</span>' : ''}${w.start === thisMon ? '<span class="chip a">이번 주</span>' : ''}
+      return `<section class="plate plan-week${w.start === thisMon ? ' now' : ''}" id="w-${w.start}"><div class="hd"><h3>${esc(w.label)}</h3><span class="chip dark num">${wi + 1}주차</span><span class="muted small num">${md(mon)}–${md(addDays(mon, 6))}</span>${w.recovery ? '<span class="chip w">회복 주</span>' : ''}${w.start === thisMon ? '<span class="chip a">이번 주</span>' : ''}<a class="up" href="#weekTable">↑ 10주 개요</a>
         <span class="small muted" style="margin-left:auto">러닝 기본 <b class="num" style="color:var(--ink)">${w.run_km}km</b> (${esc(w.run_note)})${w.bonus_km ? ` · 보너스 +${w.bonus_km}km` : ''}</span></div>
         ${w.concept ? `<p class="concept">${esc(w.concept)}</p>` : ''}
         <div class="scroll-x"><table class="t"><thead><tr><th class="dcol">Day</th><th>Training</th><th class="r d-only" style="width:9.5rem">Nutrition</th></tr></thead><tbody>${rows}</tbody></table></div></section>`; }).join('');
