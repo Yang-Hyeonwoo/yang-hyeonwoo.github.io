@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1126s';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1126t';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -35,29 +35,37 @@
   const api = (name) => `https://api.github.com/repos/${CFG.owner}/${CFG.repo}/contents/data/${name}.json`;
   const enc = (str) => { const b = new TextEncoder().encode(str); let s = ''; for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(s); };
   const dec = (b64) => new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\s/g, '')), (c) => c.charCodeAt(0)));
+  const cacheGet = (name) => { try { const t = localStorage.getItem('cache.v1.' + name); return t ? JSON.parse(t) : null; } catch { return null; } };
   async function remote(name) {
     const r = await fetch(`${api(name)}?ref=${CFG.branch}`, { headers: { Authorization: `Bearer ${token()}`, Accept: 'application/vnd.github+json' }, cache: 'no-store' });
-    if (!r.ok) throw new Error(`GitHub ${r.status}`);
+    if (!r.ok) { const e = new Error(`GitHub ${r.status}`); e.status = r.status; throw e; }
     const j = await r.json();
     return { sha: j.sha, data: JSON.parse(dec(j.content)) };
   }
+  // What went wrong while fetching, so the page can say so instead of quietly showing an older copy.
+  const sync = { auth: false, stale: false };
+  const seen = () => { try { localStorage.setItem('cache.v1.at', String(Date.now())); } catch { /* ignore */ } };
   async function fresh(name) {
-    if (token()) { try { return (await remote(name)).data; } catch (e) { console.warn('fresh read failed, using published copy', e); } }
+    if (token()) {
+      try { const d = (await remote(name)).data; seen(); return d; }
+      catch (e) { console.warn('fresh read failed', e);
+        if ([401, 403, 404].includes(e.status)) sync.auth = true;          // the token is dead: show the published copy and say so
+        else { sync.stale = true; if (cacheGet(name)) throw e; } }         // a save takes a minute to publish, so this browser's copy may be the newer one: keep it
+    }
     if (LOCAL) { try { const l = localStorage.getItem('preview.' + name); if (l) return JSON.parse(l); } catch { /* ignore */ } }
     const r = await fetch(`${ROOT}data/${name}.json?v=${Date.now()}`);
     if (!r.ok) throw new Error(`${name}.json ${r.status}`);
-    return r.json();
+    const d = await r.json(); if (!token()) seen(); return d;
   }
   // Pages draw from the copy this browser kept from last time, so a tab appears at once. The fresh copy is
   // fetched meanwhile; if it turns out different, the page is drawn again with it (see the end of this file).
   const CACHE = 'cache.v1.'; const pending = []; let settled = false;
-  const cacheGet = (name) => { try { const t = localStorage.getItem(CACHE + name); return t ? JSON.parse(t) : null; } catch { return null; } };
   const cachePut = (name, data) => { try { localStorage.setItem(CACHE + name, JSON.stringify(data)); } catch { /* storage full or blocked: just slower */ } };
   async function load(name) {
     const kept = cacheGet(name);
     if (kept && settled) return kept;
     if (kept) {
-      pending.push(fresh(name).then((d) => { const changed = JSON.stringify(d) !== JSON.stringify(kept); if (changed) cachePut(name, d); return changed; }).catch(() => false));
+      pending.push(fresh(name).then((d) => { const changed = JSON.stringify(d) !== JSON.stringify(kept); if (changed) cachePut(name, d); return changed; }).catch(() => { sync.stale = true; return false; }));
       return kept;
     }
     const d = await fresh(name); cachePut(name, d); return d;
@@ -68,12 +76,15 @@
       const cur = await load(name); const next = mutate(cur) || cur;
       localStorage.setItem('preview.' + name, JSON.stringify(next)); cachePut(name, next); return next;
     }
+    // a dropped connection or a dead token gets a plain sentence, not "Failed to fetch"
+    const net = (p) => p.catch((e) => { throw e instanceof TypeError ? new Error('연결이 불안정해서 저장하지 못했어요. 적은 내용은 그대로 있으니 잠시 뒤 다시 저장해 주세요.')
+      : [401, 403, 404].includes(e.status) ? new Error('토큰이 만료됐거나 권한이 없어요. 오른쪽 위 열쇠 버튼에서 새 토큰을 넣어주세요.') : e; });
     for (let attempt = 0; attempt < 3; attempt++) {
-      const { sha, data } = await remote(name);
+      const { sha, data } = await net(remote(name));
       const next = mutate(data) || data;
-      const r = await fetch(api(name), { method: 'PUT', headers: { Authorization: `Bearer ${token()}`, Accept: 'application/vnd.github+json' },
-        body: JSON.stringify({ message, branch: CFG.branch, sha, content: enc(JSON.stringify(next, null, 1) + '\n') }) });
-      if (r.ok) { cachePut(name, next); return next; }
+      const r = await net(fetch(api(name), { method: 'PUT', headers: { Authorization: `Bearer ${token()}`, Accept: 'application/vnd.github+json' },
+        body: JSON.stringify({ message, branch: CFG.branch, sha, content: enc(JSON.stringify(next, null, 1) + '\n') }) }));
+      if (r.ok) { cachePut(name, next); seen(); return next; }
       if (r.status !== 409) throw new Error(r.status === 401 || r.status === 403 ? '토큰이 맞지 않거나 권한이 없어요.' : `저장 실패 (GitHub ${r.status})`);
     }
     throw new Error('저장이 겹쳤어요. 다시 시도해주세요.');
@@ -135,7 +146,7 @@
   const isDone = (item, date, log) => !!doneEntry(item, date, log);
   const KIND = { hyrox: 'Hyrox', commute: 'Run', run: 'Run', weights: 'Weight', core: 'Core', rest: 'Rest', free: 'Free' };
   const doneChip = '<span class="chip g">완료</span>';
-  const doneMark = '<span class="ok" aria-label="완료">✓</span>';
+  const doneMark = '<span class="tick" role="img" aria-label="완료">✓</span>';
 
   // ---------- sums ----------
   const runSum = (log, a, b) => { const r = log.filter((e) => e.date >= a && e.date <= b && isRun(e)); return { n: r.length, km: r.reduce((s, e) => s + (Number(e.km) || 0), 0) }; };
@@ -264,7 +275,7 @@
     const [plan, log, daily] = await Promise.all([load('plan'), load('log').then(live), load('daily')]);
     $('#hubDday').textContent = ddayText(dday(plan));
     $('#hubHyrox').textContent = `${hyroxCount(log, MONTH0, TODAY)}회`;
-    $('#hubRun').textContent = `${runSum(log, MONTH0, TODAY).km.toFixed(1)} km`;
+    $('#hubRun').textContent = `${runSum(log, MONTH0, TODAY).km.toFixed(1)}km`;
   }
 
   // durations: stored as minutes, typed as 37:54, shown as "37분 54초"; sleep shown as "6시간 47분"
@@ -307,15 +318,24 @@
       <div class="kv" style="margin-top:8px;grid-template-columns:repeat(2,minmax(0,1fr))"><div><div class="l">Bedtime · 오늘 취침</div><div class="v num">${plan.targets.bed}</div><div class="s">기상 ${plan.targets.wake} · ${plan.targets.sleep} 수면</div></div>
       <div><div class="l">Last night · 어젯밤 수면</div><div class="v num">${slept == null ? '–' : hmHtml(slept)}</div><div class="s num">${rec.bed ? `${rec.bed} → ${rec.wake || ''}` : '기록 없음'}</div></div></div></div></div>`;
   }
-  // This week, one card per day. A day with training logged is tinted blue and stamped, so it reads at a glance.
+  // This week, one card per day, one check per session. A day is tinted only when every planned session is logged;
+  // "1/2" marks a day half done and "미기록" a past day with nothing logged. Bonus items and core work don't count.
   function weekStrip(mon, plan, log) {
     return `<div class="week">${[0, 1, 2, 3, 4, 5, 6].map((i) => { const dt = addDays(mon, i), d = iso(dt), day = plan.days[d];
-      const off = !day || day.items.every((it) => it.k === 'free' || it.k === 'rest');
-      const did = log.filter((e) => e.date === d && kindOf(e) !== 'other'); const trained = did.length > 0;
-      const its = off && trained ? did.map((e) => `<div class="it did">${doneMark}<span>${esc(e.session)}${e.km ? ` ${e.km}km` : ''}</span></div>`).join('')
-        : day ? day.items.filter((it) => it.k !== 'core').map((it) => { const ok = isDone(it, d, log);
-          return `<div class="it${it.opt || it.k === 'free' ? ' optional' : ''}${ok ? ' did' : ''}">${ok ? doneMark : ''}<span>${esc(it.t)}${it.opt && it.k !== 'free' ? ' (보너스)' : ''}</span></div>`; }).join('') : '';
-      return `<div class="day${d === TODAY ? ' today' : ''}${trained ? ' done' : off ? ' off' : ''}"><div class="dn"><span>${KO[dt.getDay()]}</span>${trained ? '<i class="stamp">완료</i>' : ''}<b class="num">${dt.getDate()}</b></div><div>${its}</div></div>`; }).join('')}</div>`;
+      const idle = (it) => it.k === 'free' || it.k === 'rest';
+      const items = day ? day.items.filter((it) => it.k !== 'core') : [];
+      const need = items.filter((it) => !it.opt && !idle(it));
+      const got = need.filter((it) => isDone(it, d, log)).length;
+      const did = log.filter((e) => e.date === d && kindOf(e) !== 'other');
+      const planned = new Set(items.map((it) => (it.k === 'commute' ? 'run' : it.k)));
+      const lines = items.filter((it) => !(idle(it) && did.length)).map((it) => ({ ok: !idle(it) && isDone(it, d, log), t: `${esc(it.t)}${it.opt && !idle(it) ? ' (보너스)' : ''}`, quiet: it.opt || idle(it) }))
+        .concat(did.filter((e) => !planned.has(kindOf(e))).map((e) => ({ ok: true, t: `${esc(e.session)}${e.km ? ` ${e.km}km` : ''}` })));   // logged, though not in the plan
+      const any = lines.some((l) => l.ok);
+      const its = lines.map((l) => `<div class="it${l.quiet ? ' optional' : ''}${l.ok ? ' did' : ''}">${l.ok ? doneMark : any ? '<span class="mk"></span>' : ''}<span>${l.t}</span></div>`).join('');
+      const state = need.length ? (got === need.length ? 'done' : got ? 'part' : d < TODAY ? 'miss' : '') : did.length ? 'done' : 'off';
+      const st = state === 'part' ? `<i class="st part num" role="img" aria-label="계획 ${need.length}개 중 ${got}개 기록">${got}/${need.length}</i>` : state === 'miss' ? '<i class="st">미기록</i>' : '';
+      return `<div class="day${d === TODAY ? ' today' : ''}${state ? ` ${state}` : ''}"><div class="dn"><span>${KO[dt.getDay()]}</span>${st}<b class="num">${dt.getDate()}</b></div><div class="its">${its}</div></div>`; }).join('')}</div>
+      <p class="note wk-key">파란 칸은 계획한 운동을 모두 기록한 날이에요. <b class="num">1/2</b>는 일부만 기록, <b>미기록</b>은 지난 날인데 기록이 없다는 뜻이에요.</p>`;
   }
 
   async function training() {
@@ -404,9 +424,13 @@
     const phase = [...plan.roadmap].reverse().find((r) => r.from <= TODAY) || plan.roadmap[0];
     $('#road').innerHTML = `<div class="road" style="margin-top:0">${plan.roadmap.map((r) => `<div class="${r === phase ? 'now' : r.from < phase.from ? 'past' : ''}"><div class="m">${esc(r.m)}</div><div class="th">${esc(r.theme)}</div><div class="f">${esc(r.focus)}</div></div>`).join('')}</div>`;
     // the weeks at a glance, under the roadmap: number, dates, what the week is for, its Wednesday run, base running distance
-    $('#weekTable').innerHTML = `<div class="scroll-x"><table class="t"><thead><tr><th>주차</th><th>기간</th><th>콘셉트</th><th>수요일 러닝</th><th class="r">러닝 기본</th></tr></thead><tbody>${plan.weeks.map((w, i) => { const mon = parse(w.start);
-      const wed = plan.days[iso(addDays(mon, 2))]; const run = wed && wed.items.find((it) => it.k === 'run');
-      return `<tr${w.start === thisMon ? ' class="now"' : ''}><td class="num" style="white-space:nowrap"><a href="#w-${w.start}"><b>${i + 1}주차</b></a></td><td style="white-space:nowrap"><b>${esc(w.label)}</b><br><span class="small muted num">${md(mon)}–${md(addDays(mon, 6))}</span></td><td>${esc(w.concept || '')}${w.recovery ? ' <span class="chip w">회복 주</span>' : ''}</td><td>${run ? esc(run.t) : '–'}</td><td class="r num" style="white-space:nowrap">${w.run_km}km${w.bonus_km ? `<br><span class="small muted">보너스 +${w.bonus_km}km</span>` : ''}</td></tr>`; }).join('')}</tbody></table></div>`;
+    const wedRun = (w) => { const wed = plan.days[iso(addDays(parse(w.start), 2))]; const r = wed && wed.items.find((it) => it.k === 'run'); return r ? r.t : ''; };
+    $('#weekTable').innerHTML = `<div class="scroll-x wk-table"><table class="t"><thead><tr><th>주차</th><th>기간</th><th>콘셉트</th><th>수요일 러닝</th><th class="r">러닝 기본</th></tr></thead><tbody>${plan.weeks.map((w, i) => { const mon = parse(w.start);
+      return `<tr${w.start === thisMon ? ' class="now"' : ''}><td class="num" style="white-space:nowrap"><a href="#w-${w.start}"><b>${i + 1}주차</b></a></td><td style="white-space:nowrap"><b>${esc(w.label)}</b><br><span class="small muted num">${md(mon)}–${md(addDays(mon, 6))}</span></td><td>${esc(w.concept || '')}${w.recovery ? ' <span class="chip w">회복 주</span>' : ''}</td><td>${esc(wedRun(w)) || '–'}</td><td class="r num" style="white-space:nowrap">${w.run_km}km${w.bonus_km ? `<br><span class="small muted">보너스 +${w.bonus_km}km</span>` : ''}</td></tr>`; }).join('')}</tbody></table></div>
+      <div class="wk-list">${plan.weeks.map((w, i) => { const mon = parse(w.start); const now = w.start === thisMon;
+        return `<a class="wk${now ? ' now' : ''}" href="#w-${w.start}"><div class="h"><b class="num">${i + 1}주차</b><span>${esc(w.label)}</span>${now ? '<span class="chip a">이번 주</span>' : ''}${w.recovery ? '<span class="chip w">회복 주</span>' : ''}<span class="d num">${md(mon)}–${md(addDays(mon, 6))}</span></div>
+          <div class="c">${esc(w.concept || '')}</div>
+          <dl><dt>수요일</dt><dd>${esc(wedRun(w)) || '–'}</dd><dt>러닝 기본</dt><dd class="num">${w.run_km}km${w.bonus_km ? ` · 보너스 +${w.bonus_km}km` : ''}</dd></dl></a>`; }).join('')}</div>`;
     const raceMon = monday(parse(plan.race.date)); const totalWeeks = Math.round((raceMon - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
     const nowNo = Math.round((monday(NOW) - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
     $('#weekTotal').textContent = `대회 주까지 총 ${totalWeeks}주${nowNo >= 1 && nowNo <= totalWeeks ? ` · 지금 ${nowNo}주차` : ''}`;
@@ -414,11 +438,11 @@
       const tone = (it) => (it.k === 'hyrox' ? (/Functional/.test(it.t) ? 'fx' : /Double/.test(it.t) ? 'db' : /Single/.test(it.t) ? 'sg' : 'iv') : it.k === 'commute' || it.k === 'run' ? 'run' : it.k === 'weights' ? 'wt' : it.k);
       const li = (it, d) => `<li${it.k === 'free' || it.k === 'rest' ? ' class="quiet"' : ''}><b class="tone-${tone(it)}">${esc(it.t)}</b>${it.d ? ` <span class="why">(${esc(it.d)})</span>` : ''}${it.first ? ' <span class="chip w">첫 Hyrox Training</span>' : ''}${it.key ? ' <span class="chip a">핵심</span>' : ''}${isDone(it, d, log) ? ` ${doneChip}` : ''}</li>`;
       const rows = [0, 1, 2, 3, 4, 5, 6].map((i) => { const dt = addDays(mon, i), d = iso(dt), day = plan.days[d];
-        return `<tr><td class="num" style="white-space:nowrap"><b>${KO[dt.getDay()]}</b> <span class="muted">${md(dt)}</span></td><td><ul class="plan-items">${day.items.map((it) => li(it, d)).join('')}</ul></td><td class="r num" style="white-space:nowrap">${n0(day.kcal)} kcal<br><span class="small muted">탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}</span></td></tr>`; }).join('');
+        return `<tr><td class="num dcol"><b>${KO[dt.getDay()]}</b> <span class="muted">${md(dt)}</span></td><td><ul class="plan-items">${day.items.map((it) => li(it, d)).join('')}</ul><div class="m-nut num">${n0(day.kcal)}kcal · 탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}</div></td><td class="r num d-only" style="white-space:nowrap">${n0(day.kcal)}kcal<br><span class="small muted">탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}</span></td></tr>`; }).join('');
       return `<section class="plate plan-week${w.start === thisMon ? ' now' : ''}" id="w-${w.start}"><div class="hd"><h3>${esc(w.label)}</h3><span class="chip dark num">${wi + 1}주차</span><span class="muted small num">${md(mon)}–${md(addDays(mon, 6))}</span>${w.recovery ? '<span class="chip w">회복 주</span>' : ''}${w.start === thisMon ? '<span class="chip a">이번 주</span>' : ''}
         <span class="small muted" style="margin-left:auto">러닝 기본 <b class="num" style="color:var(--ink)">${w.run_km}km</b> (${esc(w.run_note)})${w.bonus_km ? ` · 보너스 +${w.bonus_km}km` : ''}</span></div>
         ${w.concept ? `<p class="concept">${esc(w.concept)}</p>` : ''}
-        <div class="scroll-x"><table class="t"><thead><tr><th style="width:5.5rem">Day</th><th>Training</th><th class="r" style="width:9.5rem">Nutrition</th></tr></thead><tbody>${rows}</tbody></table></div></section>`; }).join('');
+        <div class="scroll-x"><table class="t"><thead><tr><th class="dcol">Day</th><th>Training</th><th class="r d-only" style="width:9.5rem">Nutrition</th></tr></thead><tbody>${rows}</tbody></table></div></section>`; }).join('');
     const now = document.getElementById(`w-${thisMon}`); if (now && location.hash === '#now') now.scrollIntoView();
 
     // Paces: the newest row is "now"; older rows stay behind the fold so the change over time is visible.
@@ -495,7 +519,17 @@
   async function logPage() {
     let all = await load('log'); let log = live(all); let filter = 'all'; let editing = null;
     const form = $('#logForm'), list = $('#logList'), msg = $('#logMsg'); const f = form.elements;
+    const search = $('#logSearch') || document.createElement('input'); let query = search.value.trim();   // (a page copy from before the search box existed)
     const opt = (arr, v) => arr.map((s) => `<option${s === v ? ' selected' : ''}>${esc(s)}</option>`).join('');
+    const FIELDS = ['date', 'session', 'format', 'km', 'minutes', 'pace', 'rpe', 'avg_hr', 'max_hr', 'workout', 'notes', 'result'];
+    const vals = () => { const o = {}; FIELDS.forEach((k) => { o[k] = f[k].value.trim(); }); return o; };
+    let base = {};          // what the form showed when it opened: saving an edit writes only the fields changed since then
+    // A new entry being typed is kept in this browser until it is saved, so a lost connection or a closed tab does not lose it.
+    const DRAFT = 'draft.log';
+    const draftGet = () => { try { const d = JSON.parse(localStorage.getItem(DRAFT) || 'null');
+      return d && Date.now() - d.at < 3 * 864e5 && (d.v.workout || d.v.notes || d.v.result || d.v.km || d.v.minutes) ? d.v : null; } catch { return null; } };
+    const draftDrop = () => { try { localStorage.removeItem(DRAFT); } catch { /* ignore */ } };
+    form.oninput = () => { if (editing) return; try { localStorage.setItem(DRAFT, JSON.stringify({ at: Date.now(), v: vals() })); } catch { /* ignore */ } };
     // Only the fields that fit the session are shown: a run asks for distance and time first, a class for the workout.
     const kind = () => kindOf({ session: f.session.value });
     const applyKind = () => { const k = kind();
@@ -504,15 +538,19 @@
       $('#lfWorkoutLabel').textContent = k === 'run' ? '세부 구성 (세트, 휴식)' : 'Workout · 운동 내용'; };
     const fill = (e) => { f.date.value = e.date || TODAY; f.session.innerHTML = opt(SESSIONS, e.session || 'Functional Training'); f.format.innerHTML = `<option value="">–</option>${opt(e.format && !FORMATS.includes(e.format) ? [e.format, ...FORMATS] : FORMATS, e.format)}`;
       ['km', 'pace', 'rpe', 'avg_hr', 'max_hr', 'workout', 'notes', 'result'].forEach((k) => { f[k].value = e[k] ?? ''; }); f.minutes.value = e.minutes != null ? durClock(e.minutes) : '';
-      applyKind(); $('#lfMore').open = !!(e.avg_hr || e.max_hr || (kind() === 'run' && e.workout)); };
-    const open = (e, preset) => { editing = e ? e.id : null; fill(e || preset || {}); msg.textContent = ''; $('#logFormWrap').hidden = false; $('#logFormTitle').textContent = e ? '기록 고치기' : '운동 기록'; $('#logFormWrap').scrollIntoView({ block: 'start' }); };
+      applyKind(); $('#lfMore').open = !!(e.avg_hr || e.max_hr || (kind() === 'run' && e.workout)); base = vals(); };
+    const open = (e, preset) => { editing = e ? e.id : null; fill(e || preset || {}); msg.textContent = '';
+      const d = e ? null : draftGet();
+      if (d) { if (SESSIONS.includes(d.session)) f.session.value = d.session; applyKind(); FIELDS.forEach((k) => { if (k !== 'session' && d[k] != null) f[k].value = d[k]; });
+        msg.innerHTML = '저장하지 않고 닫았던 내용을 다시 불러왔어요. <button class="btn line sm" type="button" id="draftDrop">비우기</button>'; }
+      $('#logFormWrap').hidden = false; $('#logFormTitle').textContent = e ? '기록 고치기' : '운동 기록'; $('#logFormWrap').scrollIntoView({ block: 'start' }); };
+    msg.onclick = (ev) => { if (ev.target.id === 'draftDrop') { draftDrop(); open(null); } };
     f.session.onchange = applyKind;
     // A weight session written as "Exercise · 60kg × 8, 8, 7" lines reads best as a table; "Exercise: memo" note lines go in its last column.
     // Anything written differently falls back to plain text.
-    const liftTable = (e) => {
-      const lines = (e.workout || '').split('\n').map((l) => l.trim()).filter(Boolean);
-      const rows = lines.map((l) => /^(.+?) · (?:(.+?) × )?(.+)$/.exec(l));
-      if (!rows.length || rows.some((m) => !m || !/^[\d[]/.test(m[3]))) return '';
+    const liftRows = (e) => { const rows = (e.workout || '').split('\n').map((l) => l.trim()).filter(Boolean).map((l) => /^(.+?) · (?:(.+?) × )?(.+)$/.exec(l));
+      return !rows.length || rows.some((m) => !m || !/^[\d[]/.test(m[3])) ? null : rows; };
+    const liftTable = (e) => { const rows = liftRows(e); if (!rows) return '';
       const memo = {}; const rest = [];
       (e.notes || '').split('\n').forEach((l) => { const m = rows.find((r) => l.startsWith(`${r[1]}: `));
         if (m) memo[m[1]] = [memo[m[1]], l.slice(m[1].length + 2)].filter(Boolean).join(' · '); else if (l.trim()) rest.push(l); });
@@ -521,17 +559,49 @@
     };
     const ICON = { edit: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>', del: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>' };
     const tools = (id) => (canWrite() ? `<span class="tools"><button class="ic" type="button" data-edit="${esc(id)}" title="고치기" aria-label="고치기">${ICON.edit}</button><button class="ic" type="button" data-del="${esc(id)}" title="지우기" aria-label="지우기">${ICON.del}</button></span>` : '');
-    const render = () => {
-      const rows = log.filter((e) => filter === 'all' || kindOf(e) === filter).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
-      let month = ''; let out = ''; const recap = filter === 'all' || filter === 'weights' ? weightRecap(log) : null; let placed = false;
-      rows.forEach((e) => { if (recap && !placed && e.date < HYROX_START) { out += recap.html; placed = true; }
-        const m = e.date.slice(0, 7); if (m !== month) { month = m; out += `<div class="month-h">${m.slice(0, 4)}년 ${+m.slice(5)}월</div>`; }
-        const facts = [e.km != null && `${e.km}km`, e.minutes != null && durText(e.minutes), e.pace && `${e.pace}/km`, e.avg_hr && `평균 심박 ${e.avg_hr}`, e.max_hr && `최대 ${e.max_hr}`].filter(Boolean).map((t) => `<span class="chip num">${esc(t)}</span>`).join('');
-        const col = (t, v) => (v ? `<div><h4>${t}</h4><div class="pre">${esc(v)}</div></div>` : '');
-        const body = (kindOf(e) === 'weights' && liftTable(e)) || `<div class="cols">${col('Workout', e.workout)}${col('Notes', e.notes)}${col('Result', e.result)}</div>`;
-        out += `<article class="entry"><div class="when">${fmtDate(e.date)}</div><div><div class="top"><span class="ttl">${esc(e.session)}</span>${e.format ? `<span class="chip a">${esc(e.format)}</span>` : ''}${e.approx ? '<span class="chip" title="엑셀에 실제 날짜가 없어서 순서와 부위로 맞춘 기록이에요">세트 기록 날짜 추정</span>' : ''}${e.rpe != null ? `<span class="chip ${e.rpe >= 9 ? 'w' : 'g'} num">RPE ${esc(e.rpe)}</span>` : ''}${facts}${tools(e.id)}</div>
-          ${body}</div></article>`; });
-      list.innerHTML = out || '<p class="note" style="padding:24px 0">기록이 없어요.</p>';
+
+    // ---- the list: one fold per month, newest first. An entry shows its result (or, for a run, distance · time · pace);
+    //      the long workout text and the notes open on demand. Search looks through everything, whatever is folded. ----
+    const ALIAS = [['썰매', '슬레드', 'sled'], ['월볼', '월 볼', 'wall ball', 'wallball'], ['로잉', '로우', 'row'], ['스키', 'ski'], ['버피', 'burpee'], ['런지', 'lunge'], ['파머', 'farmer'], ['케틀벨', 'kettlebell', 'kb'],
+      ['스쿼트', 'squat'], ['벤치', 'bench'], ['데드', '데드리프트', 'deadlift'], ['풀업', 'pull-up', 'pull up'], ['팔꿈치', 'elbow']];
+    const words = () => query.toLowerCase().split(/\s+/).filter(Boolean).map((w) => ALIAS.find((a) => a.includes(w)) || [w]);
+    const hit = (text, ws) => ws.every((alts) => alts.some((a) => text.includes(a)));
+    const hay = (e) => [md(parse(e.date)), e.date, e.session, e.format, e.workout, e.result, e.notes, e.brief].filter(Boolean).join('\n').toLowerCase();
+    const short = (t) => !!t && t.length <= 90 && t.split('\n').length <= 2;
+    const block = (t, v) => `<div><h4>${t}</h4><div class="pre">${esc(v)}</div></div>`;
+    const entry = (e, ws) => { const k = kindOf(e); const vis = [md(parse(e.date)), e.date, e.session, e.format];
+      const meta = [e.km != null && `${e.km}km`, e.minutes != null && durText(e.minutes), e.pace && `${e.pace}/km`, e.rpe != null && `RPE ${e.rpe}`, e.avg_hr && `평균 심박 ${e.avg_hr}`, e.max_hr && `최대 ${e.max_hr}`].filter(Boolean).map(esc);
+      if (e.approx) meta.push('<span title="엑셀에 실제 날짜가 없어서 순서와 부위로 맞춘 기록이에요">세트 기록 날짜 추정</span>');
+      let shown = '', hidden = '', label = ''; const rows = k === 'weights' ? liftRows(e) : null;
+      if (rows) { const sum = rows.map((m) => (m[2] && /\d/.test(m[2]) ? `${m[1]} ${m[2]}` : m[1])).join(' · '); vis.push(sum);
+        shown = `<p class="sum clamp">${esc(sum)}</p>`; hidden = liftTable(e); label = '세트 기록'; }
+      else { const w = e.workout, n = e.notes; const parts = [];
+        if (e.result) { shown += `<div class="res"><h4>Result</h4><div class="pre">${esc(e.result)}</div></div>`; vis.push(e.result); }
+        if (short(w)) { shown += `<div class="pre sum">${esc(w)}</div>`; vis.push(w); } else if (w) { hidden += block('Workout', w); parts.push('운동 내용'); }
+        if (short(n)) { shown += `<div class="pre sum q">${esc(n)}</div>`; vis.push(n); }
+        else if (n) { if (e.brief) { shown += `<div class="pre sum q">${esc(e.brief)}</div>`; vis.push(e.brief); } hidden += block('Notes', n); parts.push('메모'); }
+        if (hidden) hidden = `<div class="cols">${hidden}</div>`; label = parts.join(' · '); }
+      const openIt = ws.length > 0 && hidden && !hit(vis.filter(Boolean).join('\n').toLowerCase(), ws);
+      return `<article class="entry"><div class="when">${fmtDate(e.date)}</div><div><div class="top"><span class="ttl">${esc(e.session)}</span>${e.format ? `<span class="fmt">${esc(e.format)}</span>` : ''}${tools(e.id)}</div>
+        ${meta.length ? `<p class="meta num${k === 'run' ? ' fact' : ''}">${meta.join(' · ')}</p>` : ''}${shown}${hidden ? `<details class="ed"${openIt ? ' open' : ''}><summary>${label}</summary>${hidden}</details>` : ''}</div></article>`; };
+    const KN = { hyrox: 'Hyrox', run: 'Running', weights: 'Weight' };
+    const render = () => { const ws = words();
+      const rows = log.filter((e) => (filter === 'all' || kindOf(e) === filter) && (!ws.length || hit(hay(e), ws))).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+      const recap = !ws.length && (filter === 'all' || filter === 'weights') ? weightRecap(log) : null;
+      // a month is one group; the month Hyrox began is two, so the 2026 recap can sit between them
+      const groups = []; rows.forEach((e) => { const key = `${e.date.slice(0, 7)}${e.date >= HYROX_START ? 'h' : 'w'}`; let g = groups[groups.length - 1];
+        if (!g || g.key !== key) { g = { key, rows: [] }; groups.push(g); } g.rows.push(e); });
+      const isOpen = (g, i) => (ws.length ? true : list._open ? list._open.has(g.key) : i < 2);
+      const split = (g) => groups.some((x) => x !== g && x.key.slice(0, 7) === g.key.slice(0, 7));
+      const head = (g) => { const ym = g.key.slice(0, 7); const n = {}; g.rows.forEach((e) => { const k = kindOf(e); n[k] = (n[k] || 0) + 1; });
+        const kinds = filter === 'all' ? Object.keys(KN).filter((k) => n[k]).map((k) => `${KN[k]} ${n[k]}`).join(' · ') : '';
+        return `<summary><span class="mo-t">${ym.slice(0, 4)}년 ${+ym.slice(5)}월${split(g) ? `<small>${g.key.endsWith('h') ? 'Hyrox 시작 후' : 'Hyrox 시작 전'}</small>` : ''}</span><span class="mo-n num">${g.rows.length}건${kinds ? ` · ${kinds}` : ''}</span></summary>`; };
+      let out = ''; let placed = false; const bodies = {};
+      groups.forEach((g, i) => { if (recap && !placed && g.key.endsWith('w')) { out += recap.html; placed = true; }
+        bodies[g.key] = () => g.rows.map((e) => entry(e, ws)).join('');
+        out += `<details class="mo" data-g="${g.key}"${isOpen(g, i) ? ' open' : ''}>${head(g)}<div class="mo-b">${isOpen(g, i) ? bodies[g.key]() : ''}</div></details>`; });
+      list._bodies = bodies; list._searching = ws.length > 0;
+      list.innerHTML = out || `<p class="note" style="padding:24px 0">${ws.length ? `‘${esc(query)}’에 맞는 기록이 없어요.` : '기록이 없어요.'}</p>`;
       if (recap && placed) recap.draw();
       if (location.hash === '#wtRecap' && $('#wtRecap') && !render.jumped) { render.jumped = true; $('#wtRecap').scrollIntoView(); }
       $('#logCount').textContent = `${rows.length}건`;
@@ -539,8 +609,13 @@
       $('#logTrash').innerHTML = canWrite() && gone.length ? `<details class="more"><summary>휴지통 · ${gone.length}건</summary><p class="note" style="margin:8px 0">지운 기록은 여기에 남아 있어요. 되살리면 원래 날짜 자리로 돌아가요.</p>${gone.map((e) =>
         `<div class="trash-row"><span class="num"><b>${md(parse(e.date))}</b></span><span>${esc(e.session)}${e.format ? ` · ${esc(e.format)}` : ''}</span><span class="muted small num">${md(parse(e.deleted))}에 지움</span><span class="tools"><button class="btn line sm" type="button" data-restore="${esc(e.id)}">되살리기</button><button class="ic" type="button" data-purge="${esc(e.id)}" title="완전히 지우기" aria-label="완전히 지우기">${ICON.del}</button></span></div>`).join('')}</details>` : '';
     };
-    render();
-    document.querySelectorAll('#logFilter button').forEach((b) => { b.onclick = () => { filter = b.dataset.f; document.querySelectorAll('#logFilter button').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); render(); }; });
+    // A folded month is drawn the first time it is opened. Which months are open is remembered across redraws (not while searching).
+    if (!list._bound) { list._bound = true; list.addEventListener('toggle', (ev) => { const d = ev.target; if (!d.classList || !d.classList.contains('mo') || !d.isConnected) return;
+      const b = d.lastElementChild; if (d.open && !b.firstChild && list._bodies[d.dataset.g]) b.innerHTML = list._bodies[d.dataset.g]();
+      if (!list._searching) list._open = new Set([...list.querySelectorAll('details.mo[open]')].map((x) => x.dataset.g)); }, true); }
+    list._open = null; render();
+    document.querySelectorAll('#logFilter button').forEach((b) => { b.onclick = () => { filter = b.dataset.f; list._open = null; document.querySelectorAll('#logFilter button').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); render(); }; });
+    let timer; search.oninput = () => { clearTimeout(timer); timer = setTimeout(() => { query = search.value.trim(); render(); }, 150); };
     if (!canWrite()) { $('#logNew').hidden = true; $('#logHint').hidden = false; }
     if (LOCAL && !token()) $('#logPreview').hidden = false;
     $('#logNew').onclick = () => open(null); $('#logCancel').onclick = () => { $('#logFormWrap').hidden = true; };
@@ -555,20 +630,29 @@
       const dur = parseDur(f.minutes.value); if (f.minutes.value.trim() && dur == null) { msg.textContent = '시간은 37:54 처럼 분:초로 적어주세요.'; return; }
       btn.disabled = true; msg.textContent = '저장하는 중…';
       const e = { id: editing || `e${Date.now().toString(36)}`, date: f.date.value, session: f.session.value };
-      const prev = editing ? log.find((x) => x.id === editing) : null;
-      if (prev && prev.shoes) e.shoes = prev.shoes; if (prev && prev.approx && prev.date === e.date) e.approx = true;
       if (k !== 'run' && f.format.value) e.format = f.format.value;
       if (dur != null) e.minutes = dur;
       ['km', 'rpe', 'avg_hr', 'max_hr'].forEach((n) => { if (n === 'km' && k !== 'run') return; const v = numOrNull(f[n].value); if (v != null) e[n] = v; });
       ['pace', 'workout', 'notes', 'result'].forEach((n) => { if ((n === 'pace' && k !== 'run') || (n === 'result' && (k === 'run' || k === 'weights'))) return; const v = f[n].value.trim(); if (v) e[n] = v; });
       if (k === 'run' && !e.pace && e.km > 0 && e.minutes > 0) e.pace = durClock(e.minutes / e.km);
-      try { all = await save('log', (arr) => { const i = arr.findIndex((x) => x.id === e.id); if (i >= 0) arr[i] = e; else arr.push(e); arr.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)); return arr; }, `log: ${e.date} ${e.session}`); log = live(all);
+      const now = vals(); const changed = FIELDS.filter((n) => now[n] !== base[n]); const wasNew = !editing;
+      try { all = await save('log', (arr) => { const i = arr.findIndex((x) => x.id === e.id);
+          if (i < 0) arr.push(e);
+          else { // an edit starts from the entry as it is stored now and changes only what was changed in the form;
+            // a different session is a rewrite, so then every field follows the form
+            const next = { ...arr[i] }; (changed.includes('session') ? FIELDS : changed).forEach((n) => { if (n in e) next[n] = e[n]; else delete next[n]; });
+            if (e.pace && !now.pace) next.pace = e.pace;
+            if (changed.includes('date')) delete next.approx; if (changed.includes('notes')) delete next.brief;
+            arr[i] = next; }
+          arr.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)); return arr; }, `log: ${e.date} ${e.session}`); log = live(all);
+        if (wasNew) draftDrop();
         msg.textContent = token() ? '저장했어요. 다른 사람에게 보이기까지 1분쯤 걸려요.' : '이 기기에만 저장했어요 (미리보기).'; $('#logFormWrap').hidden = true; render();
       } catch (err) { msg.textContent = err.message; } finally { btn.disabled = false; } };
     const h = decodeURIComponent(location.hash);
     if (h.startsWith('#edit=') && canWrite()) { const e = log.find((x) => x.id === h.slice(6)); if (e) open(e); }
     if (h.startsWith('#new') && canWrite()) { const [s, fm] = h.slice(5).split('~'); open(null, s && SESSIONS.includes(s) ? { session: s, format: fm } : null); }
   }
+
 
   // Records: every day since the first record, newest first, with the form to add or fix a day.
   async function recordsPage() {
@@ -595,7 +679,7 @@
         const detail = part('Hyrox', x.hyrox) + part('Running', x.runFull) + part('Weight', wt) + part('Sleep', r.bed ? `${r.sleep || ''} (${r.bed} → ${r.wake || ''})` : '')
           + part('Nutrition', r.kcal != null ? `${n0(r.kcal)}kcal · 탄 ${r.carb ?? '–'}g · 단 ${r.prot ?? '–'}g · 지 ${r.fat ?? '–'}g` : '') + part('Note', noteT);
         out += `<tr><td class="num">${canWrite() ? `<button class="dbtn" type="button" data-edit="${ds}" title="이 날 기록 고치기">${dayLabel}</button>` : dayLabel}</td>
-          <td class="num">${sl == null ? '' : bar(r.sleep, sl / sleepGoal * 100)}</td><td class="num muted d-only">${r.bed ? `${r.bed} → ${r.wake || ''}` : ''}</td>
+          <td class="num">${sl == null ? '' : bar(esc(r.sleep), sl / sleepGoal * 100)}</td><td class="num muted d-only">${r.bed ? `${esc(r.bed)} → ${esc(r.wake || '')}` : ''}</td>
           ${clip(x.hyrox)}${clip(x.run)}${clip(wt)}<td class="m-only clip">${esc(allT)}</td><td class="num">${r.weight != null ? r.weight.toFixed(2) : ''}</td>
           <td class="num">${kc}</td><td class="num d-only">${mac('carb')}</td><td class="num d-only">${mac('prot')}</td><td class="num d-only">${mac('fat')}</td>${clip(noteT)}
           <td class="m-only"><button class="xp" type="button" aria-expanded="false" aria-label="${md(dt)} 자세히 보기">▾</button></td></tr>
@@ -603,7 +687,10 @@
       $('#dayCount').textContent = `${count}일`;
       $('#dayList').innerHTML = `<div class="scroll-x"><table class="t days"><thead><tr><th class="tl" style="width:8%">Date</th><th style="width:7%">Sleep</th><th class="d-only" style="width:9%">Bed → Wake</th><th class="d-only tl" style="width:11%">Hyrox</th><th class="d-only tl" style="width:17%">Running</th><th class="d-only tl" style="width:8%">Weight</th><th class="m-only tl">운동</th><th style="width:6%">Body kg</th><th style="width:7%">kcal</th><th class="d-only" style="width:5.5%">Carb</th><th class="d-only" style="width:5.5%">Prot</th><th class="d-only" style="width:5.5%">Fat</th><th class="d-only tl">Meals · Note</th><th class="m-only"></th></tr></thead><tbody>${out || '<tr><td colspan="12" class="muted">기록이 없어요.</td></tr>'}</tbody></table></div>`;
     }
-    const fill = (d) => { const r = daily.find((x) => x.date === d) || {}; NUM.concat(TXT).forEach((k) => { f[k].value = r[k] ?? ''; }); MEALS.forEach((k) => { f[k].value = (r.meals && r.meals[k]) || ''; });
+    // The form remembers what it showed when it was filled. Saving writes only the fields changed since then, so a form left open
+    // (or opened from an older copy) never blanks what another device saved in the meantime.
+    const ALLF = NUM.concat(TXT, MEALS); const snap = () => { const o = {}; ALLF.forEach((k) => { o[k] = f[k].value.trim(); }); return o; }; let base = {};
+    const fill = (d) => { const r = daily.find((x) => x.date === d) || {}; NUM.concat(TXT).forEach((k) => { f[k].value = r[k] ?? ''; }); MEALS.forEach((k) => { f[k].value = (r.meals && r.meals[k]) || ''; }); base = snap();
       const t = plan.days[d]; $('#dayTarget').textContent = t ? `이날 목표: ${n0(t.kcal)}kcal · 탄 ${t.carb}g · 단 ${t.prot}g · 지 ${t.fat}g` : ''; };
     const open = (d) => { f.date.value = d; fill(d); msg.textContent = ''; $('#dayFormWrap').hidden = false; $('#dayFormWrap').scrollIntoView({ block: 'center' }); };
     // Discipline: how many days were actually written down, and what they average
@@ -614,11 +701,25 @@
         + cell('체중을 잰 날', `${bw.length}<small>일</small>`, `${span}일 중`)
         + cell('식단을 기록한 날', `${kc.length}<small>일</small>`, kc.length ? `평균 ${Math.round(avgOf(kc.map((r) => r.kcal))).toLocaleString('en-US')}kcal` : '')
         + cell('하루 평균 단백질', pr.length ? `${Math.round(avgOf(pr.map((r) => r.prot)))}<small>g</small>` : '–', pr.length && bw.length ? `체중 1kg당 ${(avgOf(pr.map((r) => r.prot)) / avgOf(bw.map((r) => r.weight))).toFixed(1)}g` : ''); };
-    // InBody: every measurement, newest first
+    // InBody: the latest measurement first, each number with its change since the one before; then every measurement as plain numbers
     const bodyTable = () => { const rows = [...body].sort((a, b) => (a.date < b.date ? 1 : -1)); const a = body[0], z = body[body.length - 1]; const sg = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(1)}`;
+      const dot = (d) => { const p = parse(d); return `${p.getFullYear()}.${pad(p.getMonth() + 1)}.${pad(p.getDate())}`; };
       $('#bodyNote').textContent = body.length > 1 ? `첫 측정 대비 골격근량 ${sg(z.muscle - a.muscle)}kg · 체중 ${sg(z.weight - a.weight)}kg` : '';
-      $('#bodyTable').innerHTML = rows.length ? `<div class="scroll-x"><table class="t"><thead><tr><th>측정일</th><th class="r">체중</th><th class="r">골격근량</th><th class="r">체지방량</th><th class="r">체지방률</th></tr></thead><tbody>${rows.map((r) => { const p = parse(r.date);
-        return `<tr><td class="num">${p.getFullYear()}.${pad(p.getMonth() + 1)}.${pad(p.getDate())}</td><td class="r num">${r.weight.toFixed(1)} kg</td><td class="r num"><b>${r.muscle.toFixed(1)} kg</b></td><td class="r num">${r.fat.toFixed(1)} kg</td><td class="r num">${(r.fat_pct * 100).toFixed(1)}%</td></tr>`; }).join('')}</tbody></table></div>` : '<p class="note">측정 기록이 없어요.</p>'; };
+      if (!rows.length) { $('#bodyTable').innerHTML = '<p class="note">측정 기록이 없어요.</p>'; return; }
+      const [cur, prev] = rows; const val = (r, k) => (k === 'fat_pct' ? r[k] * 100 : r[k]);
+      // want: +1 when up is the aim (muscle), -1 when down is (fat), 0 when neither (weight)
+      const tile = ([l, k, u, want]) => { const v = val(cur, k); let sub = '첫 측정';
+        if (prev) { const d = Math.round((v - val(prev, k)) * 10) / 10;
+          sub = d === 0 ? '직전과 같음' : `<span class="${!want ? '' : d * want > 0 ? 'd-good' : 'd-bad'}">${d > 0 ? '▲' : '▼'} ${Math.abs(d).toFixed(1)}${u === '%' ? '%p' : u}</span>`; }
+        return `<div><div class="l">${l}</div><div class="v num">${v.toFixed(1)}<small>${u}</small></div><div class="s num">${sub}</div></div>`; };
+      const KEEP = 6;
+      $('#bodyTable').innerHTML = `<p class="body-h">최근 측정 <b class="num">${dot(cur.date)}</b>${prev ? `<span class="num">화살표는 직전 측정(${dot(prev.date)}) 대비</span>` : ''}</p>
+        <div class="kv body-now">${[['체중', 'weight', 'kg', 0], ['골격근량', 'muscle', 'kg', 1], ['체지방량', 'fat', 'kg', -1], ['체지방률', 'fat_pct', '%', -1]].map(tile).join('')}</div>
+        <table class="t body-all"><thead><tr><th>측정일</th><th class="r">체중 <small>kg</small></th><th class="r">골격근 <small>kg</small></th><th class="r">체지방 <small>kg</small></th><th class="r">체지방률 <small>%</small></th></tr></thead><tbody>${rows.map((r, i) =>
+          `<tr${i >= KEEP ? ' class="old" hidden' : ''}><td class="num"><span class="cc">${r.date.slice(0, 2)}</span>${dot(r.date).slice(2)}</td><td class="r num">${r.weight.toFixed(1)}</td><td class="r num"><b>${r.muscle.toFixed(1)}</b></td><td class="r num">${r.fat.toFixed(1)}</td><td class="r num">${(r.fat_pct * 100).toFixed(1)}</td></tr>`).join('')}</tbody></table>
+        ${rows.length > KEEP ? `<button class="btn line sm" type="button" id="bodyMore" style="margin-top:10px">이전 측정 ${rows.length - KEEP}회 더 보기</button>` : ''}`;
+      const more = $('#bodyMore'); if (more) more.onclick = () => { document.querySelectorAll('#bodyTable tr.old').forEach((tr) => { tr.hidden = false; }); more.remove(); }; };
+
     const bf = $('#bodyForm'); $('#bodyNew').hidden = !canWrite();
     $('#bodyNew').onclick = () => { bf.elements.date.value = TODAY; bf.hidden = false; }; $('#bodyCancel').onclick = () => { bf.hidden = true; };
     bf.onsubmit = async (ev) => { ev.preventDefault(); const e = bf.elements; const v = (k) => numOrNull(e[k].value); const m = $('#bodyMsg');
@@ -637,24 +738,41 @@
       const tr = ev.target.closest('tbody tr'); if (!tr || tr.classList.contains('month-row') || tr.classList.contains('more-row')) return;
       const row = tr.nextElementSibling; row.hidden = !row.hidden; tr.classList.toggle('open', !row.hidden);
       const x = tr.querySelector('.xp'); if (x) { x.setAttribute('aria-expanded', String(!row.hidden)); x.textContent = row.hidden ? '▾' : '▴'; } };
-    form.onsubmit = async (ev) => { ev.preventDefault(); const btn = $('#daySave'); btn.disabled = true; msg.textContent = '저장하는 중…'; const d = f.date.value;
+    form.onsubmit = async (ev) => { ev.preventDefault(); const btn = $('#daySave'); const d = f.date.value;
+      const now = snap(); const changed = ALLF.filter((k) => now[k] !== base[k]);
+      if (!changed.length) { msg.textContent = '바뀐 내용이 없어요.'; return; }
+      const bad = ['bed', 'wake'].find((k) => changed.includes(k) && now[k] && !/^([01]?\d|2[0-3]):[0-5]\d$/.test(now[k]));
+      if (bad) { msg.textContent = '시각은 1:30이나 23:40처럼 적어주세요.'; f[bad].focus(); return; }
+      btn.disabled = true; msg.textContent = '저장하는 중…';
+      // the time in bed, as the site works it out; a measured sleep (a watch) is shorter than that and is never overwritten here
+      const span = (r) => { const b = mins(r.bed), w = mins(r.wake); return b != null && w != null ? (w - b + 1440) % 1440 : null; };
       try { daily = await save('daily', (arr) => { let r = arr.find((x) => x.date === d); if (!r) { r = { date: d }; arr.push(r); }
-          NUM.forEach((k) => { const v = numOrNull(f[k].value); if (v == null) delete r[k]; else r[k] = v; });
-          TXT.forEach((k) => { const v = f[k].value.trim(); if (v) r[k] = v; else delete r[k]; });
-          const b = mins(r.bed), w = mins(r.wake); if (b != null && w != null) r.sleep = hm((w - b + 1440) % 1440);
-          const meals = {}; MEALS.forEach((k) => { const v = f[k].value.trim(); if (v) meals[k] = v; }); if (Object.keys(meals).length) r.meals = meals; else delete r.meals;
+          const worked = r.sleep_src !== 'garmin' && (r.sleep == null || mins(r.sleep) === span(r));     // was the stored sleep worked out from bed and wake?
+          changed.forEach((k) => { const v = now[k];
+            if (NUM.includes(k)) { const n = numOrNull(v); if (n == null) delete r[k]; else r[k] = n; }
+            else if (TXT.includes(k)) { if (v) r[k] = v; else delete r[k]; }
+            else { r.meals = r.meals || {}; if (v) r.meals[k] = v; else delete r.meals[k]; } });
+          if (r.meals && !Object.keys(r.meals).length) delete r.meals;
+          if (worked && (changed.includes('bed') || changed.includes('wake'))) { const m = span(r); if (m == null) delete r.sleep; else r.sleep = hm(m); }
           arr.sort((a, b2) => (a.date < b2.date ? -1 : 1)); return arr; }, `daily: ${d}`);
         msg.textContent = token() ? '저장했어요. 다른 사람에게 보이기까지 1분쯤 걸려요.' : '이 기기에만 저장했어요 (미리보기).';
-        ix = dayIndex(daily, log); table(); care();
+        ix = dayIndex(daily, log); table(); care(); if (f.date.value === d) fill(d);      // the form now shows the day as it is stored, other devices' fields included
       } catch (err) { msg.textContent = err.message; } finally { btn.disabled = false; } };
+
     if (location.hash === '#new' && canWrite()) open(TODAY);
   }
 
   chrome();
   const run = { hub, training, plan: planPage, log: logPage, records: recordsPage }[PAGE];
   const fail = (e) => { console.error(e); const m = $('main'); if (m) m.prepend(el(`<div class="wrap"><div class="banner" style="margin-top:16px">기록을 불러오지 못했어요. 잠시 뒤 새로고침해 주세요. (${esc(e.message)})</div></div>`)); };
+  // After the background fetch: say so when the page is showing an older copy, or when the saved token no longer works.
+  const notice = () => { if (PAGE === 'hub') return; const old = $('#syncNote'); if (old) old.remove(); let t = '';
+    if (sync.auth) t = '이 기기에 넣어둔 토큰이 만료됐거나 권한이 없어요. 지금은 공개된 기록을 보여주고 있고, 저장은 되지 않아요. 오른쪽 위 열쇠 버튼에서 새 토큰을 넣어주세요.';
+    else if (sync.stale) { let at = ''; try { const v = Number(localStorage.getItem('cache.v1.at')); if (v) { const d = new Date(v); at = `${md(d)} ${d.getHours()}:${pad(d.getMinutes())}에 `; } } catch { /* ignore */ }
+      t = `연결이 불안정해서 새 기록을 받아오지 못했어요. ${at}받아둔 기록을 보여주고 있어요.`; }
+    const m = $('main'); if (t && m) m.prepend(el(`<div class="wrap" id="syncNote"><div class="banner" role="status" style="margin:16px 0 0">${t}</div></div>`)); };
   const typing = () => !!document.querySelector('#logFormWrap:not([hidden]), #dayFormWrap:not([hidden]), dialog[open]') || /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || '');
-  if (run) run().then(() => { performance.mark('site-drawn'); return Promise.all(pending.splice(0)); }).then((changed) => { settled = true; if (changed.some(Boolean) && !typing()) return run(); return null; }).catch(fail);
+  if (run) run().then(() => { performance.mark('site-drawn'); return Promise.all(pending.splice(0)); }).then((changed) => { settled = true; notice(); if (changed.some(Boolean) && !typing()) return run(); return null; }).catch(fail);
   // Every link inside the site carries this page's version, so the page it opens is fetched afresh and never an
   // older copy the browser still holds: all tabs then show the same menu, wording and behaviour.
   const stamp = (ev) => { const a = ev.target.closest && ev.target.closest('a[href]'); if (!a) return; let u; try { u = new URL(a.href, location.href); } catch { return; }

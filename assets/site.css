@@ -115,7 +115,6 @@ a.door:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border
 .todo:last-child { border-bottom: 0; }
 .todo .kind { flex: none; width: 4.2rem; padding-top: 3px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
 .todo .b { flex: 1; min-width: 0; } .todo .chip { margin-top: 2px; }
-.ok { flex: none; color: var(--good); font-weight: 700; }
 .todo .t { font-weight: 600; color: var(--ink); } .todo .d { font-size: 0.84rem; color: var(--muted); }
 .todo.key .t::after { content: "핵심"; margin-left: 8px; font-size: 0.7rem; font-weight: 700; color: var(--accent); border: 1px solid var(--accent-line); border-radius: var(--r-full); padding: 0 7px; vertical-align: 2px; }
 .kv { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
@@ -326,7 +325,7 @@ table.days tr.month-row td { background: var(--bg-soft); font-weight: 700; color
 .day .stamp { margin: 0 auto 0 6px; padding: 1px 7px; border-radius: var(--r-full); background: var(--accent); color: #fff; font-style: normal; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.02em; }
 .day.done .dn b { color: var(--accent-strong); }
 .day .it.did { color: var(--ink); font-weight: 600; }
-.ok { display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; margin-top: 2px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 9px; font-weight: 700; }
+.tick { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 15px; height: 15px; margin-top: 2px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 9px; font-weight: 700; }
 @media (max-width: 860px) { .day .stamp { margin: 4px 0 0; align-self: flex-start; } .day .dn { align-items: flex-start; } }
 
 /* ---- category titles inside Progress: bigger, with an accent bar and a rule above ---- */
@@ -430,3 +429,93 @@ table.days td.num { padding-left: 5px; padding-right: 5px; }
 
 table.t tr.now td { background: var(--accent-soft); }
 #weekTable td { vertical-align: middle; }
+
+/* ---- this week: one check per session; a day is tinted only when every planned session is logged ---- */
+.day .it .mk { flex: none; width: 15px; }
+.day .st { margin: 0 auto 0 6px; font-style: normal; font-size: 0.7rem; font-weight: 600; color: var(--muted); }
+.day .st.part { color: var(--accent-strong); font-weight: 700; }
+.day .it:last-child { margin-bottom: 0; }
+.wk-key { margin-top: 10px; }
+@media (max-width: 860px) {
+  .day { grid-template-columns: 54px minmax(0, 1fr); min-height: 76px; align-items: start; }
+  .day .dn { flex-direction: row; flex-wrap: wrap; justify-content: flex-start; align-items: baseline; gap: 0 6px; }
+  .day .dn b { font-size: 1.05rem; }
+  .day .st { order: 3; flex: 0 0 100%; margin: 1px 0 0; }
+}
+
+/* ---- plan: the ten weeks as a list on a phone (the table needs a wide screen); nutrition under the training ---- */
+.wk-list, .m-nut { display: none; }
+.dcol { width: 5.5rem; white-space: nowrap; }
+@media (max-width: 640px) {
+  #weekTable { padding: 6px; } #weekTable .wk-table { display: none; } .wk-list { display: block; }
+  .wk { display: block; padding: 12px; color: var(--text); border-bottom: 1px solid var(--line-soft); }
+  .wk:last-child { border-bottom: 0; } .wk:hover { color: var(--text); }
+  .wk.now { background: var(--accent-soft); border-radius: var(--r-md); border-bottom-color: transparent; }
+  .wk .h { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 0.8rem; color: var(--muted); }
+  .wk .h b { font-size: 0.88rem; color: var(--accent-strong); } .wk .h .d { margin-left: auto; }
+  .wk .c { margin: 3px 0 6px; font-weight: 600; line-height: 1.5; color: var(--ink); }
+  .wk dl { display: grid; grid-template-columns: 4.4rem minmax(0, 1fr); gap: 1px 8px; margin: 0; font-size: 0.84rem; line-height: 1.6; }
+  .wk dt { color: var(--muted); } .wk dd { margin: 0; }
+  .m-nut { display: block; margin-top: 4px; font-size: 0.78rem; color: var(--muted); }
+  .plan-week table.t td, .plan-week table.t th { padding-left: 6px; padding-right: 6px; }
+  .plan-week .dcol { width: 3.1rem; white-space: normal; line-height: 1.35; } .plan-week td.dcol b { display: block; }
+}
+
+/* ---- training log: a fold per month; an entry leads with its result, the long text opens on demand ---- */
+.log-find { margin: 0 0 8px; } .log-find .in { max-width: 380px; }
+details.mo { border-bottom: 1px solid var(--line); }
+details.mo > summary { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 12px; min-height: 56px; padding: 14px 0 12px; cursor: pointer; list-style: none; }
+details.mo > summary::-webkit-details-marker { display: none; }
+details.mo > summary::after { content: ""; flex: none; align-self: center; width: 8px; height: 8px; margin-left: auto; border-right: 2px solid var(--faint); border-bottom: 2px solid var(--faint); transform: rotate(45deg) translateY(-3px); transition: transform 200ms var(--ease); }
+details.mo[open] > summary::after { transform: rotate(225deg) translateY(-2px); }
+details.mo > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.mo-t { font-family: var(--display); font-size: 1.3rem; font-weight: 600; color: var(--ink); line-height: 1.3; }
+.mo-t small { margin-left: 8px; font-family: var(--font); font-size: 0.76rem; font-weight: 600; color: var(--accent-strong); }
+.mo-n { font-size: 0.82rem; color: var(--muted); }
+details.mo .entry:last-child { border-bottom: 0; }
+details.mo[open] > summary { border-bottom: 1px solid var(--line-soft); }
+.entry { padding: 16px 0; }
+.entry .top { margin-bottom: 2px; flex-wrap: nowrap; align-items: baseline; }
+.entry .top .ttl { margin-right: 0; } .entry .fmt { font-size: 0.84rem; color: var(--muted); } .entry .fmt::before { content: "· "; }
+.entry .tools { align-self: center; }
+.entry .meta { font-size: 0.84rem; color: var(--muted); line-height: 1.5; }
+.entry .meta.fact { font-size: 0.92rem; font-weight: 600; color: var(--ink); }
+.entry .res { margin-top: 8px; } .entry .res .pre { font-size: 0.95rem; font-weight: 600; color: var(--ink); }
+.entry .sum { margin-top: 6px; font-size: 0.88rem; line-height: 1.6; color: var(--text); } .entry .sum.q { color: var(--muted); }
+.entry .clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+details.ed { margin-top: 6px; }
+details.ed > summary { display: inline-flex; align-items: center; min-height: 32px; cursor: pointer; font-size: 0.84rem; font-weight: 600; color: var(--accent); list-style: none; }
+details.ed > summary::-webkit-details-marker { display: none; }
+details.ed > summary::after { content: " 보기"; white-space: pre; } details.ed[open] > summary::after { content: " 접기"; }
+details.ed > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+details.ed .cols { margin-top: 4px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; }
+details.ed .scroll-x { margin-top: 4px; }
+@media (max-width: 860px) { details.ed .cols { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+  .log-find .in { max-width: none; }
+  details.ed > summary { min-height: 44px; } .ic { width: 44px; height: 44px; } .entry .tools { margin-right: -10px; }
+  .mo-t { font-size: 1.2rem; }
+}
+
+/* ---- InBody: the latest measurement as four numbers, then the history as plain numbers that fit a phone ---- */
+.body-h { margin-bottom: 10px; font-size: 0.86rem; color: var(--muted); } .body-h b { color: var(--ink); font-size: 0.95rem; }
+.body-h span::before { content: " · "; white-space: pre; }
+.body-now > div { background: var(--bg-soft); border-color: transparent; }
+.body-now .v { font-size: 1.5rem; } .body-now .v small { font-size: 0.78rem; }
+.d-good { color: var(--good); font-weight: 600; } .d-bad { color: var(--warn); font-weight: 600; }
+table.body-all { margin-top: 16px; } table.body-all th small { font-weight: 500; color: var(--muted); }
+table.body-all td, table.body-all th { white-space: nowrap; }
+@media (max-width: 640px) {
+  table.body-all { font-size: 0.82rem; } table.body-all td, table.body-all th { padding: 8px 5px; } table.body-all th { font-size: 0.74rem; }
+  .body-h span { display: block; } .body-h span::before { content: none; }
+}
+
+.wk.now .chip.a { background: #fff; }
+@media (max-width: 640px) {
+  .entry .top { align-items: center; } .entry .tools { margin-top: -7px; margin-bottom: -7px; }
+  .plan-week table.t th:nth-child(2) { border-radius: 0 var(--r-sm) var(--r-sm) 0; }
+}
+/* the four tabs fit a narrow phone without sideways scrolling */
+@media (max-width: 380px) { .site-head.sub .nav a { padding-left: 0.48rem; padding-right: 0.48rem; } }
+@media (max-width: 340px) { .site-head.sub .nav a { font-size: 0.76rem; padding-left: 0.3rem; padding-right: 0.3rem; } }
+@media (max-width: 400px) { table.body-all .cc { display: none; } table.body-all td, table.body-all th { padding-left: 4px; padding-right: 4px; } }

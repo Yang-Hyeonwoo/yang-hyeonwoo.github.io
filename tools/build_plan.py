@@ -104,8 +104,8 @@ plan = {
              "date_note": "5/13 개막일 기준 · 대회 5/13–16 예정 · 출전일 미정"},
     "goals": [
         {"label": "Hyrox Pro Single", "value": "1:15:00", "sub": "2027년 5월 HYROX Incheon"},
-        {"label": "10 km", "value": "37:59", "sub": "3월 말~4월 초 대회"},
-        {"label": "Body", "value": "67–68 kg", "sub": "체지방 10–12% · 2월 말까지"},
+        {"label": "10km", "value": "37:59", "sub": "3월 말~4월 초 대회"},
+        {"label": "Body", "value": "67–68kg", "sub": "체지방 10–12% · 2월 말까지"},
     ],
     "roadmap": [
         {"m": "12월", "from": "2026-11-23", "theme": "적응 + 페이스 찾기", "focus": "체육관 왕복 러닝으로 거리 쌓기 · 5km 기록 측정 · 프로 무게 시작"},
@@ -119,8 +119,8 @@ plan = {
         {"date": "2025.11.08", "name": "HYROX Seoul", "event": "Hyrox · Open Single", "result": "1:15:00"},
         {"date": "2025.05.17", "name": "HYROX Incheon", "event": "Hyrox · Open Single", "result": "1:22:46"},
         {"date": "2025.04.27", "name": "서울하프마라톤", "event": "Half Marathon", "result": "1:33:52"},
-        {"date": "2024.11.17", "name": "손기정 마라톤", "event": "10 km", "result": "38:15"},
-        {"date": "2023.11.19", "name": "손기정 마라톤", "event": "10 km", "result": "39:14"},
+        {"date": "2024.11.17", "name": "손기정 마라톤", "event": "10km", "result": "38:15"},
+        {"date": "2023.11.19", "name": "손기정 마라톤", "event": "10km", "result": "39:14"},
         {"date": "2023.11.05", "name": "JTBC 마라톤", "event": "Full Marathon", "result": "3:28:06"},
         {"date": "2023.10.08", "name": "서울레이스", "event": "Half Marathon", "result": "1:36:16"},
     ],
