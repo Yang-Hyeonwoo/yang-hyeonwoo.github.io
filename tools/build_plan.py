@@ -58,6 +58,9 @@ CONCEPT = {
     D(2027, 1, 25): "회복 주 · 5km 재측정으로 두 달 점검",
 }
 
+FIRST_DAY = D(2026, 11, 23)                      # the first Hyrox Training: week 1 starts here
+NO_CORE = {D(2026, 11, 23), D(2026, 11, 24)}     # days the hanging leg raises were not part of the session
+
 days, weeks = {}, []
 for monday, (commute, bonus, wed_run, wed_detail, recovery) in sorted(WEEKS.items()):
     label = week_label(monday)
@@ -74,13 +77,16 @@ for monday, (commute, bonus, wed_run, wed_detail, recovery) in sorted(WEEKS.item
             name, how = HYROX[wd]
             key = wd == 4
             items.append({"k": "hyrox", "t": "Hyrox Training · " + name, "d": "17:50 · " + how, "key": key})
+            if d == FIRST_DAY:
+                items[-1]["first"] = True
             kcal, carb = 2300, 270
             if wd in commute:
                 items.append({"k": "commute", "t": "체육관 왕복 러닝 10km", "d": "심박 150 이하" + (" · 끝에 100m 빠르게 4번" if wd == 0 else "")})
                 kcal, carb = 2500, 320
             elif wd in bonus:
                 items.append({"k": "commute", "t": "체육관 왕복 러닝 10km", "d": "보너스 · 컨디션 좋은 날만, 아니면 자전거", "opt": True})
-            items.append({"k": "core", "t": "행잉 레그레이즈 3–4세트"})
+            if d not in NO_CORE:
+                items.append({"k": "core", "t": "행잉 레그레이즈 3–4세트"})
         elif wd == 2:
             items.append({"k": "run", "t": wed_run, "d": "17:50 트랙 · " + wed_detail, "key": True})
             items.append({"k": "weights", "t": "상체 웨이트 45분", "d": "22:30 헬스장 · 23:30까지"})

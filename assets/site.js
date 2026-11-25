@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1126p';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1126q';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -403,12 +403,15 @@
     const thisMon = iso(monday(NOW));
     const phase = [...plan.roadmap].reverse().find((r) => r.from <= TODAY) || plan.roadmap[0];
     $('#road').innerHTML = `<div class="road" style="margin-top:0">${plan.roadmap.map((r) => `<div class="${r === phase ? 'now' : r.from < phase.from ? 'past' : ''}"><div class="m">${esc(r.m)}</div><div class="th">${esc(r.theme)}</div><div class="f">${esc(r.focus)}</div></div>`).join('')}</div>`;
-    $('#weeks').innerHTML = plan.weeks.map((w) => { const mon = parse(w.start);
+    const raceMon = monday(parse(plan.race.date)); const totalWeeks = Math.round((raceMon - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
+    const nowNo = Math.round((monday(NOW) - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
+    $('#weekTotal').textContent = `대회 주까지 총 ${totalWeeks}주${nowNo >= 1 && nowNo <= totalWeeks ? ` · 지금 ${nowNo}주차` : ''}`;
+    $('#weeks').innerHTML = plan.weeks.map((w, wi) => { const mon = parse(w.start);
       const tone = (it) => (it.k === 'hyrox' ? (/Functional/.test(it.t) ? 'fx' : /Double/.test(it.t) ? 'db' : /Single/.test(it.t) ? 'sg' : 'iv') : it.k === 'commute' || it.k === 'run' ? 'run' : it.k === 'weights' ? 'wt' : it.k);
-      const li = (it, d) => `<li${it.k === 'free' || it.k === 'rest' ? ' class="quiet"' : ''}><b class="tone-${tone(it)}">${esc(it.t)}</b>${it.d ? ` <span class="why">(${esc(it.d)})</span>` : ''}${it.key ? ' <span class="chip a">핵심</span>' : ''}${isDone(it, d, log) ? ` ${doneChip}` : ''}</li>`;
+      const li = (it, d) => `<li${it.k === 'free' || it.k === 'rest' ? ' class="quiet"' : ''}><b class="tone-${tone(it)}">${esc(it.t)}</b>${it.d ? ` <span class="why">(${esc(it.d)})</span>` : ''}${it.first ? ' <span class="chip w">첫 Hyrox Training</span>' : ''}${it.key ? ' <span class="chip a">핵심</span>' : ''}${isDone(it, d, log) ? ` ${doneChip}` : ''}</li>`;
       const rows = [0, 1, 2, 3, 4, 5, 6].map((i) => { const dt = addDays(mon, i), d = iso(dt), day = plan.days[d];
         return `<tr><td class="num" style="white-space:nowrap"><b>${KO[dt.getDay()]}</b> <span class="muted">${md(dt)}</span></td><td><ul class="plan-items">${day.items.map((it) => li(it, d)).join('')}</ul></td><td class="r num" style="white-space:nowrap">${n0(day.kcal)} kcal<br><span class="small muted">탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}</span></td></tr>`; }).join('');
-      return `<section class="plate plan-week${w.start === thisMon ? ' now' : ''}" id="w-${w.start}"><div class="hd"><h3>${esc(w.label)}</h3><span class="muted small num">${md(mon)}–${md(addDays(mon, 6))}</span>${w.recovery ? '<span class="chip w">회복 주</span>' : ''}${w.start === thisMon ? '<span class="chip a">이번 주</span>' : ''}
+      return `<section class="plate plan-week${w.start === thisMon ? ' now' : ''}" id="w-${w.start}"><div class="hd"><h3>${esc(w.label)}</h3><span class="chip dark num">${wi + 1}주차</span><span class="muted small num">${md(mon)}–${md(addDays(mon, 6))}</span>${w.recovery ? '<span class="chip w">회복 주</span>' : ''}${w.start === thisMon ? '<span class="chip a">이번 주</span>' : ''}
         <span class="small muted" style="margin-left:auto">러닝 기본 <b class="num" style="color:var(--ink)">${w.run_km}km</b> (${esc(w.run_note)})${w.bonus_km ? ` · 보너스 +${w.bonus_km}km` : ''}</span></div>
         ${w.concept ? `<p class="concept">${esc(w.concept)}</p>` : ''}
         <div class="scroll-x"><table class="t"><thead><tr><th style="width:5.5rem">Day</th><th>Training</th><th class="r" style="width:9.5rem">Nutrition</th></tr></thead><tbody>${rows}</tbody></table></div></section>`; }).join('');

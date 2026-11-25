@@ -221,11 +221,8 @@
      "k": "hyrox",
      "t": "Hyrox Training · Functional",
      "d": "17:50 · RPE 8–9",
-     "key": false
-    },
-    {
-     "k": "core",
-     "t": "행잉 레그레이즈 3–4세트"
+     "key": false,
+     "first": true
     }
    ],
    "kcal": 2300,
@@ -241,10 +238,6 @@
      "t": "Hyrox Training · Double",
      "d": "17:50 · RPE 8 · 한두 개 여유",
      "key": false
-    },
-    {
-     "k": "core",
-     "t": "행잉 레그레이즈 3–4세트"
     }
    ],
    "kcal": 2300,
