@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1126g';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1126h';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -98,7 +98,7 @@
       <nav class="nav" aria-label="주 메뉴"><a href="${CFG.research}">Research</a><a href="${ROOT}training/">Training</a></nav></div></header>`));
     document.body.append(el(`<footer class="foot"><div class="wrap">© 2026 Hyeonwoo Yang · KAIST</div></footer>`));
     // fetch the other tabs ahead of time, so the first visit to each is as quick as a return visit
-    ['', 'plan.html', 'log.html', 'records.html'].forEach((f) => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = `${ROOT}training/${f}`; document.head.append(l); });
+    ['', 'plan.html', 'log.html', 'records.html'].forEach((f) => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = `${ROOT}training/${f}?v=${VERSION}`; document.head.append(l); });
     if (!sub) return;
     const dlg = el(`<dialog id="keyDlg"><h3>입력 설정</h3>
       <p class="note">이 사이트는 누구나 볼 수 있지만, 기록을 저장하려면 본인 확인용 GitHub 토큰이 필요해요. 토큰은 이 브라우저에만 저장돼요.</p>
@@ -570,6 +570,12 @@
   const fail = (e) => { console.error(e); const m = $('main'); if (m) m.prepend(el(`<div class="wrap"><div class="banner" style="margin-top:16px">기록을 불러오지 못했어요. 잠시 뒤 새로고침해 주세요. (${esc(e.message)})</div></div>`)); };
   const typing = () => !!document.querySelector('#logFormWrap:not([hidden]), #dayFormWrap:not([hidden]), dialog[open]') || /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || '');
   if (run) run().then(() => { performance.mark('site-drawn'); return Promise.all(pending.splice(0)); }).then((changed) => { settled = true; if (changed.some(Boolean) && !typing()) return run(); return null; }).catch(fail);
+  // Every link inside the site carries this page's version, so the page it opens is fetched afresh and never an
+  // older copy the browser still holds: all tabs then show the same menu, wording and behaviour.
+  const stamp = (ev) => { const a = ev.target.closest && ev.target.closest('a[href]'); if (!a) return; let u; try { u = new URL(a.href, location.href); } catch { return; }
+    if (u.origin !== location.origin || u.pathname.startsWith('/why-ions-compute') || (u.pathname === location.pathname && u.hash)) return;
+    u.searchParams.set('v', VERSION); a.href = u.href; };
+  document.addEventListener('click', stamp, true); document.addEventListener('auxclick', stamp, true);
   // Browsers keep each page for up to ten minutes. If the site has moved on since this copy was fetched, reload once to get the new one.
   fetch(`${ROOT}version.txt?t=${Date.now()}`, { cache: 'no-store' }).then((r) => (r.ok ? r.text() : '')).then((v) => { const live = v.trim();
     if (live && live !== VERSION && !typing() && sessionStorage.getItem('site.reloaded') !== live) { sessionStorage.setItem('site.reloaded', live); location.reload(); } }).catch(() => {});
