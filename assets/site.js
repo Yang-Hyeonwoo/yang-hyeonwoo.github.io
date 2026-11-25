@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1126j';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1126m';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -85,9 +85,9 @@
     const t = (p) => (PAGE === p ? ' class="on" aria-current="page"' : '');
     const sub = PAGE !== 'hub';
     document.body.prepend(el(sub ? `<header class="site-head sub"><div class="wrap">
-      <a class="brand" href="${ROOT}training/">Body &amp; <em>Training</em></a>
+      <a class="brand" href="${ROOT}training/"><em>Training</em></a>
       <nav class="nav" aria-label="Training 메뉴">
-        <a href="${ROOT}training/"${t('training')}>Home</a><a href="${ROOT}training/plan.html"${t('plan')}>Hyrox Plan</a><a href="${ROOT}training/weights.html"${t('weights')}>Weight Training</a>
+        <a href="${ROOT}training/"${t('training')}>Home</a><a href="${ROOT}training/plan.html"${t('plan')}>Hyrox Plan</a>
         <a href="${ROOT}training/log.html"${t('log')}>Training Log</a><a href="${ROOT}training/records.html"${t('records')}>Daily Records</a>
       </nav>
       <a class="back" href="${ROOT}">← Main</a>
@@ -98,7 +98,7 @@
       <nav class="nav" aria-label="주 메뉴"><a href="${CFG.research}">Research</a><a href="${ROOT}training/">Training</a></nav></div></header>`));
     document.body.append(el(`<footer class="foot"><div class="wrap">© 2026 Hyeonwoo Yang · KAIST</div></footer>`));
     // fetch the other tabs ahead of time, so the first visit to each is as quick as a return visit
-    ['', 'plan.html', 'weights.html', 'log.html', 'records.html'].forEach((f) => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = `${ROOT}training/${f}?v=${VERSION}`; document.head.append(l); });
+    ['', 'plan.html', 'log.html', 'records.html'].forEach((f) => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = `${ROOT}training/${f}?v=${VERSION}`; document.head.append(l); });
     const here = $('.nav a.on'); if (here && here.scrollIntoView) here.scrollIntoView({ block: 'nearest', inline: 'center' });   // on a phone the menu scrolls sideways
     if (!sub) return;
     const dlg = el(`<dialog id="keyDlg"><h3>입력 설정</h3>
@@ -431,6 +431,53 @@
     if (P.length > 1) lineChart($('#paceChart'), P.map((p) => ({ x: parse(p.date), y: secs(p.threshold) })).filter((p) => p.y != null), { label: '역치 페이스 변화', fmt: clock, unit: '/km' });
   }
 
+  // ---------- 2026, the year of weight training: a recap shown inside the Training Log ----------
+  const HYROX_START = '2026-11-22';     // the race that opened the Hyrox chapter; the recap covers everything before it
+  // sets of one weight session: [{ name, sets: [{ kg (null for bodyweight or a pin number), reps }] }]
+  const liftSets = (e) => (e.workout || '').split('\n').map((l) => /^(.+?) · (?:(.+?) × )?(.+)$/.exec(l.trim())).filter(Boolean).map((m) => { const base = m[2] || '';
+    const kgOf = (t) => { const k = /(\d+(?:\.\d+)?)\s*kg/.exec(t); if (k) return +k[1]; const p = /(\d+(?:\.\d+)?)\s*lb/.exec(t); return p ? +p[1] * 0.4536 : null; };
+    const sets = m[3].split(',').map((tok) => { const r = /(\d+)\s*$/.exec(tok.replace(/\([^)]*\)/g, '').trim()); return r ? { kg: kgOf(tok) ?? kgOf(base), reps: +r[1] } : null; }).filter(Boolean);
+    return { name: m[1], sets }; });
+  function weightRecap(log) {
+    const W = log.filter((e) => e.session === 'Weight Training' && e.date < HYROX_START).sort((a, b) => (a.date < b.date ? -1 : 1));
+    if (!W.length) return null;
+    const withSets = W.map((e) => ({ e, lifts: liftSets(e) })).filter((s) => s.lifts.length);
+    let nSets = 0, nReps = 0, vol = 0;
+    withSets.forEach((s) => s.lifts.forEach((l) => l.sets.forEach((x) => { nSets++; nReps += x.reps; if (x.kg) vol += x.kg * x.reps; })));
+    const first = parse(W[0].date), last = parse(W[W.length - 1].date); const weeks = Math.max(1, Math.round((last - first) / (7 * 864e5)) + 1);
+    const dot = (d) => `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
+    const t = (l, v, u, sub) => `<div class="total"><div class="l">${l}</div><div class="v num">${v}<small>${u}</small></div><div class="s num">${sub}</div></div>`;
+    const tiles = t('Sessions · 웨이트 한 날', W.length, '일', `${dot(first)} – ${dot(last)}`) + t('Per Week · 주 평균', (W.length / weeks).toFixed(1), '회', `${weeks}주 동안`)
+      + t('Sets · 세트', nSets.toLocaleString('en-US'), '세트', `세트를 적어둔 ${withSets.length}일 기준`) + t('Reps · 반복', nReps.toLocaleString('en-US'), '회', '한 번 한 번 센 횟수')
+      + t('Volume · 들어 올린 무게', (vol / 1000).toFixed(0), '톤', '무게 × 횟수의 합');
+    const by = {}; W.forEach((e) => { const k = e.date.slice(0, 7); by[k] = (by[k] || 0) + 1; });
+    const sp = {}; W.forEach((e) => { const k = e.format || '기타'; sp[k] = (sp[k] || 0) + 1; });
+    const spl = Object.entries(sp).sort((a, b) => b[1] - a[1]);
+    const split = spl.map(([k, v]) => `<div class="hbar"><span>${esc(k)}</span><i style="width:${Math.round(v / spl[0][1] * 100)}%"></i><b class="num">${v}</b></div>`).join('');
+    // first weight vs the heaviest of the last month each lift was trained (best set of reps for bodyweight moves)
+    const LIFTS = [['Bench Press', 'kg'], ['Squat', 'kg'], ['Romanian Deadlift', 'kg'], ['Hip Thrust', 'kg'], ['Dumbbell OHP', 'kg'], ['T-Bar Row', 'kg'], ['Pull-Up', '회']];
+    const rows = LIFTS.map(([name, unit]) => { const pts = [];
+      withSets.forEach((s) => { const l = s.lifts.find((x) => x.name === name); if (!l || !l.sets.length) return;
+        const v = unit === 'kg' ? Math.max(...l.sets.map((x) => x.kg || 0)) : Math.max(...l.sets.map((x) => x.reps)); if (v > 0) pts.push({ d: s.e.date, y: v }); });
+      if (pts.length < 2) return '';
+      const lastM = pts[pts.length - 1].d.slice(0, 7); const end = Math.max(...pts.filter((p) => p.d.slice(0, 7) === lastM).map((p) => p.y)); const start = pts[0].y; const f = (v) => `${+v.toFixed(1)}${unit}`;
+      return `<tr><td><b>${esc(name)}</b></td><td class="r num">${f(start)}</td><td class="r num"><b>${f(end)}</b></td><td class="r num">${end > start ? `<span class="chip g">▲ ${f(end - start)}</span>` : end < start ? `▼ ${f(start - end)}` : '–'}</td><td class="r num muted">${pts.length}회</td></tr>`; }).join('');
+    const html = `<section class="plate recap" id="wtRecap">
+      <p class="eyebrow">2026 · Weight Training</p>
+      <h3>웨이트로 채운 <em>2026</em></h3>
+      <p class="lead">2026년의 운동 콘셉트는 웨이트였습니다. 더 무거운 무게를 들고 근육량을 늘리는 것이 목표였습니다. Hyrox를 시작한 11월 22일 전까지, 그 한 해를 숫자로 정리했습니다.</p>
+      <div class="totals">${tiles}</div>
+      <div class="grid g2" style="margin-top:20px">
+        <div><h4>Sessions · 월별 웨이트 일수</h4><div class="chart" id="wtMonths"></div></div>
+        <div><h4>Split · 부위별로 한 날 수</h4>${split}</div>
+      </div>
+      <h4 style="margin-top:24px">Strength · 종목별 처음과 최종</h4>
+      <div class="scroll-x"><table class="t"><thead><tr><th>종목</th><th class="r">처음</th><th class="r">최종</th><th class="r">변화</th><th class="r">기록</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <p class="note" style="margin-top:10px">최종은 그 종목을 마지막으로 한 달에 든 가장 무거운 무게예요. 풀업은 한 세트 최고 횟수예요.</p></section>`;
+    const draw = () => { const box = $('#wtMonths'); if (box) barChart(box, Object.keys(by).sort().map((k) => ({ label: MON[+k.slice(5) - 1], y: by[k] })), { label: '월별 웨이트 일수', labels: true, h: 190, color: '#d9731a', tip: (b) => `${b.label} · <b>${b.y}</b>일` }); };
+    return { html, draw };
+  }
+
   const fmtDate = (d) => { const x = parse(d); return `<b class="num">${x.getMonth() + 1}/${x.getDate()}</b>${KO[x.getDay()]}요일`; };
   async function logPage() {
     let all = await load('log'); let log = live(all); let filter = 'all'; let editing = null;
@@ -463,14 +510,16 @@
     const tools = (id) => (canWrite() ? `<span class="tools"><button class="ic" type="button" data-edit="${esc(id)}" title="고치기" aria-label="고치기">${ICON.edit}</button><button class="ic" type="button" data-del="${esc(id)}" title="지우기" aria-label="지우기">${ICON.del}</button></span>` : '');
     const render = () => {
       const rows = log.filter((e) => filter === 'all' || kindOf(e) === filter).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
-      let month = ''; let out = '';
-      rows.forEach((e) => { const m = e.date.slice(0, 7); if (m !== month) { month = m; out += `<div class="month-h">${m.slice(0, 4)}년 ${+m.slice(5)}월</div>`; }
+      let month = ''; let out = ''; const recap = filter === 'all' || filter === 'weights' ? weightRecap(log) : null; let placed = false;
+      rows.forEach((e) => { if (recap && !placed && e.date < HYROX_START) { out += recap.html; placed = true; }
+        const m = e.date.slice(0, 7); if (m !== month) { month = m; out += `<div class="month-h">${m.slice(0, 4)}년 ${+m.slice(5)}월</div>`; }
         const facts = [e.km != null && `${e.km}km`, e.minutes != null && durText(e.minutes), e.pace && `${e.pace}/km`, e.avg_hr && `평균 심박 ${e.avg_hr}`, e.max_hr && `최대 ${e.max_hr}`].filter(Boolean).map((t) => `<span class="chip num">${esc(t)}</span>`).join('');
         const col = (t, v) => (v ? `<div><h4>${t}</h4><div class="pre">${esc(v)}</div></div>` : '');
         const body = (kindOf(e) === 'weights' && liftTable(e)) || `<div class="cols">${col('Workout', e.workout)}${col('Notes', e.notes)}${col('Result', e.result)}</div>`;
         out += `<article class="entry"><div class="when">${fmtDate(e.date)}</div><div><div class="top"><span class="ttl">${esc(e.session)}</span>${e.format ? `<span class="chip a">${esc(e.format)}</span>` : ''}${e.approx ? '<span class="chip" title="엑셀에 실제 날짜가 없어서 순서와 부위로 맞춘 기록이에요">세트 기록 날짜 추정</span>' : ''}${e.rpe != null ? `<span class="chip ${e.rpe >= 9 ? 'w' : 'g'} num">RPE ${esc(e.rpe)}</span>` : ''}${facts}${tools(e.id)}</div>
           ${body}</div></article>`; });
       list.innerHTML = out || '<p class="note" style="padding:24px 0">기록이 없어요.</p>';
+      if (recap && placed) recap.draw();
       $('#logCount').textContent = `${rows.length}건`;
       const gone = all.filter((e) => e.deleted).sort((a, b) => (a.deleted < b.deleted ? 1 : -1));
       $('#logTrash').innerHTML = canWrite() && gone.length ? `<details class="more"><summary>휴지통 · ${gone.length}건</summary><p class="note" style="margin:8px 0">지운 기록은 여기에 남아 있어요. 되살리면 원래 날짜 자리로 돌아가요.</p>${gone.map((e) =>
@@ -507,71 +556,9 @@
     if (h.startsWith('#new') && canWrite()) { const [s, fm] = h.slice(5).split('~'); open(null, s && SESSIONS.includes(s) ? { session: s, format: fm } : null); }
   }
 
-  // Weight Training: the year in review. Everything is counted from the log's weight sessions; nothing is typed in by hand.
-  async function weightsPage() {
-    const [log, daily, body] = await Promise.all([load('log').then(live), load('daily'), load('inbody')]);
-    const W = log.filter((e) => e.session === 'Weight Training').sort((a, b) => (a.date < b.date ? -1 : 1));
-    if (!W.length) { $('#wtTiles').innerHTML = '<p class="note">웨이트 기록이 아직 없어요.</p>'; return; }
-    // one set = { kg (null for bodyweight or a pin number), reps }
-    const setsOf = (e) => (e.workout || '').split('\n').map((l) => /^(.+?) · (?:(.+?) × )?(.+)$/.exec(l.trim())).filter(Boolean).map((m) => { const base = m[2] || '';
-      const kgOf = (t) => { const k = /(\d+(?:\.\d+)?)\s*kg/.exec(t); if (k) return +k[1]; const p = /(\d+(?:\.\d+)?)\s*lb/.exec(t); return p ? +p[1] * 0.4536 : null; };
-      const sets = m[3].split(',').map((tok) => { const r = /(\d+)\s*$/.exec(tok.replace(/\([^)]*\)/g, '').trim()); return r ? { kg: kgOf(tok) ?? kgOf(base), reps: +r[1] } : null; }).filter(Boolean);
-      return { name: m[1], sets }; });
-    const sessions = W.map((e) => ({ e, lifts: setsOf(e) })); const withSets = sessions.filter((s) => s.lifts.length);
-    let nSets = 0, nReps = 0, vol = 0;
-    withSets.forEach((s) => s.lifts.forEach((l) => l.sets.forEach((x) => { nSets++; nReps += x.reps; if (x.kg) vol += x.kg * x.reps; })));
-    const first = parse(W[0].date), last = parse(W[W.length - 1].date); const weeks = Math.max(1, Math.round((last - first) / (7 * 864e5)) + 1);
-    const t = (l, v, u, sub) => `<div class="total"><div class="l">${l}</div><div class="v num">${v}<small>${u}</small></div><div class="s num">${sub}</div></div>`;
-    const dot = (d) => `${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}`;
-    $('#wtTiles').innerHTML = t('Sessions · 웨이트 한 날', W.length, '일', `${dot(first)} – ${dot(last)}`)
-      + t('Per Week · 주 평균', (W.length / weeks).toFixed(1), '회', `${weeks}주 동안`)
-      + t('Sets · 세트', nSets.toLocaleString('en-US'), '세트', `세트를 적어둔 ${withSets.length}일 기준`)
-      + t('Reps · 반복', nReps.toLocaleString('en-US'), '회', '한 번 한 번 센 횟수')
-      + t('Volume · 들어 올린 무게', (vol / 1000).toFixed(0), '톤', '무게 × 횟수의 합');
-
-    // sessions per month
-    const by = {}; W.forEach((e) => { const k = e.date.slice(0, 7); by[k] = (by[k] || 0) + 1; });
-    const months = Object.keys(by).sort();
-    barChart($('#wtMonths'), months.map((k) => ({ label: MON[+k.slice(5) - 1], y: by[k] })), { label: '월별 웨이트 일수', labels: true, h: 200, color: '#d9731a', tip: (b) => `${b.label} · <b>${b.y}</b>일` });
-    $('#wtMonthsNow').innerHTML = `${Math.max(...Object.values(by))}<small>일 · 가장 많이 한 달</small>`;
-    // what was trained
-    const sp = {}; W.forEach((e) => { const k = e.format || '기타'; sp[k] = (sp[k] || 0) + 1; });
-    const spl = Object.entries(sp).sort((a, b) => b[1] - a[1]); const top = spl[0][1];
-    $('#wtSplit').innerHTML = spl.map(([k, v]) => `<div class="hbar"><span>${esc(k)}</span><i style="width:${Math.round(v / top * 100)}%"></i><b class="num">${v}</b></div>`).join('');
-
-    // main lifts: the heaviest working weight of each session (best set of reps for bodyweight moves)
-    const LIFTS = [['Bench Press', 'kg'], ['Squat', 'kg'], ['Romanian Deadlift', 'kg'], ['Dumbbell OHP', 'kg'], ['Lat Pull Down', 'kg'], ['Pull-Up', '회']];
-    $('#wtLifts').innerHTML = LIFTS.map(([name], i) => `<div class="plate chart-card"><h3>${esc(name)}</h3><div class="now num" id="wtNow${i}"></div><div class="chart" id="wtCh${i}"></div></div>`).join('');
-    LIFTS.forEach(([name, unit], i) => { const pts = [];
-      withSets.forEach((s) => { const l = s.lifts.find((x) => x.name === name); if (!l || !l.sets.length) return;
-        const v = unit === 'kg' ? Math.max(...l.sets.map((x) => x.kg || 0)) : Math.max(...l.sets.map((x) => x.reps)); if (v > 0) pts.push({ x: parse(s.e.date), y: v }); });
-      const el = $(`#wtNow${i}`); if (pts.length < 2) { el.innerHTML = '–'; $(`#wtCh${i}`).innerHTML = '<p class="note">기록이 적어요.</p>'; return; }
-      const start = pts[0].y, best = Math.max(...pts.map((p) => p.y)); const f = (v) => (unit === 'kg' ? `${+v.toFixed(1)}` : `${v}`);
-      el.innerHTML = `${f(start)} → ${f(best)}<small>${unit}</small>${best > start ? `<span class="chip g num">▲ ${f(best - start)}${unit} · ${pts.length}회 기록</span>` : `<span class="chip num">${pts.length}회 기록</span>`}`;
-      // heavy and light days alternate, so the chart shows the best of each month rather than every session
-      const bym = {}; pts.forEach((p) => { const k = iso(p.x).slice(0, 7); bym[k] = Math.max(bym[k] || 0, p.y); });
-      lineChart($(`#wtCh${i}`), Object.keys(bym).sort().map((k) => ({ x: parse(`${k}-01`), y: bym[k] })), { label: `${name} 월별 최고`, labels: true, area: true, h: 180, color: '#d9731a', fmt: f, unit, xfmt: (d) => MON[d.getMonth()] }); });
-
-    // body composition
-    const pct = (v) => `${(v * 100).toFixed(1)}%`;
-    if (body.length) { const a = body[0], peak = body.reduce((m, r) => (r.muscle > m.muscle ? r : m), body[0]); const d = (x) => { const p = parse(x); return `${p.getFullYear()}.${p.getMonth() + 1}`; };
-      $('#wtBodyNote').textContent = `${d(a.date)} → ${d(peak.date)}: 골격근량 ${peak.muscle - a.muscle >= 0 ? '+' : '−'}${Math.abs(peak.muscle - a.muscle).toFixed(1)}kg, 체중 ${peak.weight - a.weight >= 0 ? '+' : '−'}${Math.abs(peak.weight - a.weight).toFixed(1)}kg`;
-      $('#wtBody').innerHTML = `<div class="scroll-x"><table class="t"><thead><tr><th>측정일</th><th class="r">체중</th><th class="r">골격근량</th><th class="r">체지방량</th><th class="r">체지방률</th></tr></thead><tbody>${body.map((r) => { const p = parse(r.date);
-        return `<tr><td class="num">${p.getFullYear()}.${pad(p.getMonth() + 1)}.${pad(p.getDate())}</td><td class="r num">${r.weight.toFixed(1)} kg</td><td class="r num"><b>${r.muscle.toFixed(1)} kg</b></td><td class="r num">${r.fat.toFixed(1)} kg</td><td class="r num">${pct(r.fat_pct)}</td></tr>`; }).join('')}</tbody></table></div>`; }
-
-    // discipline: how many days were actually written down, and what they average
-    const span = daily.length ? Math.round((parse(TODAY) - parse(daily[0].date)) / 864e5) + 1 : 0;
-    const sl = daily.map((r) => mins(r.sleep)).filter((v) => v != null), kc = daily.filter((r) => r.kcal != null), bw = daily.filter((r) => r.weight != null), pr = daily.filter((r) => r.prot != null);
-    const cell = (l, v, sub) => `<div><div class="l">${l}</div><div class="v num">${v}</div><div class="s num">${sub}</div></div>`;
-    $('#wtCare').innerHTML = cell('수면을 기록한 날', `${sl.length}<small>일</small>`, `${span}일 중 · 평균 ${hm(avgOf(sl))}`)
-      + cell('체중을 잰 날', `${bw.length}<small>일</small>`, `${span}일 중`)
-      + cell('식단을 기록한 날', `${kc.length}<small>일</small>`, `평균 ${Math.round(avgOf(kc.map((r) => r.kcal))).toLocaleString('en-US')}kcal`)
-      + cell('하루 평균 단백질', `${Math.round(avgOf(pr.map((r) => r.prot)))}<small>g</small>`, bw.length ? `체중 1kg당 ${(avgOf(pr.map((r) => r.prot)) / avgOf(bw.map((r) => r.weight))).toFixed(1)}g` : '');
-  }
-
   // Records: every day since the first record, newest first, with the form to add or fix a day.
   async function recordsPage() {
-    let daily = await load('daily'); const [plan, log] = await Promise.all([load('plan'), load('log').then(live)]);
+    let daily = await load('daily'); const [plan, log] = await Promise.all([load('plan'), load('log').then(live)]); let body = await load('inbody');
     const form = $('#dayForm'), msg = $('#dayMsg'); const f = form.elements;
     const NUM = ['weight', 'kcal', 'carb', 'prot', 'fat'], TXT = ['bed', 'wake', 'note'], MEALS = ['breakfast', 'lunch', 'snack', 'dinner', 'late'];
     const OLD = { kcal: 2000, carb: 226, prot: 150, fat: 55 };          // the tracker's goals before this plan started
@@ -605,7 +592,28 @@
     const fill = (d) => { const r = daily.find((x) => x.date === d) || {}; NUM.concat(TXT).forEach((k) => { f[k].value = r[k] ?? ''; }); MEALS.forEach((k) => { f[k].value = (r.meals && r.meals[k]) || ''; });
       const t = plan.days[d]; $('#dayTarget').textContent = t ? `이날 목표: ${n0(t.kcal)}kcal · 탄 ${t.carb}g · 단 ${t.prot}g · 지 ${t.fat}g` : ''; };
     const open = (d) => { f.date.value = d; fill(d); msg.textContent = ''; $('#dayFormWrap').hidden = false; $('#dayFormWrap').scrollIntoView({ block: 'center' }); };
-    table(); f.date.value = TODAY; fill(TODAY);
+    // Discipline: how many days were actually written down, and what they average
+    const care = () => { const span = daily.length ? Math.round((parse(TODAY) - parse(daily[0].date)) / 864e5) + 1 : 0;
+      const sl = daily.map((r) => mins(r.sleep)).filter((v) => v != null), kc = daily.filter((r) => r.kcal != null), bw = daily.filter((r) => r.weight != null), pr = daily.filter((r) => r.prot != null);
+      const cell = (l, v, sub) => `<div><div class="l">${l}</div><div class="v num">${v}</div><div class="s num">${sub}</div></div>`;
+      $('#careKv').innerHTML = cell('수면을 기록한 날', `${sl.length}<small>일</small>`, `${span}일 중 · 평균 ${sl.length ? hm(avgOf(sl)) : '–'}`)
+        + cell('체중을 잰 날', `${bw.length}<small>일</small>`, `${span}일 중`)
+        + cell('식단을 기록한 날', `${kc.length}<small>일</small>`, kc.length ? `평균 ${Math.round(avgOf(kc.map((r) => r.kcal))).toLocaleString('en-US')}kcal` : '')
+        + cell('하루 평균 단백질', pr.length ? `${Math.round(avgOf(pr.map((r) => r.prot)))}<small>g</small>` : '–', pr.length && bw.length ? `체중 1kg당 ${(avgOf(pr.map((r) => r.prot)) / avgOf(bw.map((r) => r.weight))).toFixed(1)}g` : ''); };
+    // InBody: every measurement, newest first
+    const bodyTable = () => { const rows = [...body].sort((a, b) => (a.date < b.date ? 1 : -1)); const a = body[0], z = body[body.length - 1]; const sg = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(1)}`;
+      $('#bodyNote').textContent = body.length > 1 ? `첫 측정 대비 골격근량 ${sg(z.muscle - a.muscle)}kg · 체중 ${sg(z.weight - a.weight)}kg` : '';
+      $('#bodyTable').innerHTML = rows.length ? `<div class="scroll-x"><table class="t"><thead><tr><th>측정일</th><th class="r">체중</th><th class="r">골격근량</th><th class="r">체지방량</th><th class="r">체지방률</th></tr></thead><tbody>${rows.map((r) => { const p = parse(r.date);
+        return `<tr><td class="num">${p.getFullYear()}.${pad(p.getMonth() + 1)}.${pad(p.getDate())}</td><td class="r num">${r.weight.toFixed(1)} kg</td><td class="r num"><b>${r.muscle.toFixed(1)} kg</b></td><td class="r num">${r.fat.toFixed(1)} kg</td><td class="r num">${(r.fat_pct * 100).toFixed(1)}%</td></tr>`; }).join('')}</tbody></table></div>` : '<p class="note">측정 기록이 없어요.</p>'; };
+    const bf = $('#bodyForm'); $('#bodyNew').hidden = !canWrite();
+    $('#bodyNew').onclick = () => { bf.elements.date.value = TODAY; bf.hidden = false; }; $('#bodyCancel').onclick = () => { bf.hidden = true; };
+    bf.onsubmit = async (ev) => { ev.preventDefault(); const e = bf.elements; const v = (k) => numOrNull(e[k].value); const m = $('#bodyMsg');
+      if ([v('weight'), v('muscle'), v('fat'), v('fat_pct')].some((x) => x == null)) { m.textContent = '네 칸을 모두 숫자로 채워주세요.'; return; }
+      const row = { date: e.date.value, weight: v('weight'), muscle: v('muscle'), fat: v('fat'), fat_pct: Math.round(v('fat_pct') * 10) / 1000 };
+      m.textContent = '저장하는 중…';
+      try { body = await save('inbody', (arr) => { const rest = arr.filter((x) => x.date !== row.date); rest.push(row); rest.sort((x, y) => (x.date < y.date ? -1 : 1)); arr.length = 0; arr.push(...rest); return arr; }, `inbody: ${row.date}`);
+        m.textContent = ''; bf.hidden = true; bf.reset(); bodyTable(); } catch (err) { m.textContent = err.message; } };
+    care(); bodyTable(); table(); f.date.value = TODAY; fill(TODAY);
     f.date.onchange = () => fill(f.date.value);
     if (!canWrite()) { $('#dayNew').hidden = true; $('#dayHint').hidden = false; }
     if (LOCAL && !token()) $('#dayPreview').hidden = false;
@@ -623,13 +631,13 @@
           const meals = {}; MEALS.forEach((k) => { const v = f[k].value.trim(); if (v) meals[k] = v; }); if (Object.keys(meals).length) r.meals = meals; else delete r.meals;
           arr.sort((a, b2) => (a.date < b2.date ? -1 : 1)); return arr; }, `daily: ${d}`);
         msg.textContent = token() ? '저장했어요. 다른 사람에게 보이기까지 1분쯤 걸려요.' : '이 기기에만 저장했어요 (미리보기).';
-        ix = dayIndex(daily, log); table();
+        ix = dayIndex(daily, log); table(); care();
       } catch (err) { msg.textContent = err.message; } finally { btn.disabled = false; } };
     if (location.hash === '#new' && canWrite()) open(TODAY);
   }
 
   chrome();
-  const run = { hub, training, plan: planPage, log: logPage, records: recordsPage, weights: weightsPage }[PAGE];
+  const run = { hub, training, plan: planPage, log: logPage, records: recordsPage }[PAGE];
   const fail = (e) => { console.error(e); const m = $('main'); if (m) m.prepend(el(`<div class="wrap"><div class="banner" style="margin-top:16px">기록을 불러오지 못했어요. 잠시 뒤 새로고침해 주세요. (${esc(e.message)})</div></div>`)); };
   const typing = () => !!document.querySelector('#logFormWrap:not([hidden]), #dayFormWrap:not([hidden]), dialog[open]') || /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || '');
   if (run) run().then(() => { performance.mark('site-drawn'); return Promise.all(pending.splice(0)); }).then((changed) => { settled = true; if (changed.some(Boolean) && !typing()) return run(); return null; }).catch(fail);

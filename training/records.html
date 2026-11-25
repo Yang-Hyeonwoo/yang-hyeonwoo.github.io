@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&amp;family=Noto+Serif+KR:wght@600;700&amp;display=swap">
-<link rel="stylesheet" href="../assets/site.css?v=1126j">
+<link rel="stylesheet" href="../assets/site.css?v=1126m">
 </head>
 <body data-root="../" data-page="records">
 <main>
@@ -23,7 +23,29 @@
       <p class="lead">수면, 운동, 체중, 식단을 하루 한 줄로 모았습니다. 첫 기록부터 오늘까지 전부 보여줍니다.</p>
     </section>
 
-    <section class="sec" id="daily" style="padding-top:16px">
+    <section class="sec">
+      <div class="sec-head"><span class="sec-no">01</span><h2>Discipline</h2><span class="ko">얼마나 꾸준히 기록했나</span></div>
+      <div class="soft"><div class="kv" id="careKv"></div></div>
+    </section>
+
+    <section class="sec">
+      <div class="sec-head"><span class="sec-no">02</span><h2>Body</h2><span class="ko">인바디</span><span class="side num" id="bodyNote"></span></div>
+      <div class="plate"><div id="bodyTable"></div>
+        <div class="form-foot" style="margin-top:14px"><button class="btn line sm" id="bodyNew" type="button">측정값 추가</button></div>
+        <form id="bodyForm" hidden autocomplete="off" style="margin-top:14px">
+          <div class="form">
+            <div class="c2"><label for="bd-date">측정일</label><input class="in" id="bd-date" name="date" type="date" required></div>
+            <div class="c1"><label for="bd-w">체중 kg</label><input class="in" id="bd-w" name="weight" type="number" inputmode="decimal" step="0.1" min="0"></div>
+            <div class="c1"><label for="bd-m">골격근량 kg</label><input class="in" id="bd-m" name="muscle" type="number" inputmode="decimal" step="0.1" min="0"></div>
+            <div class="c1"><label for="bd-f">체지방량 kg</label><input class="in" id="bd-f" name="fat" type="number" inputmode="decimal" step="0.1" min="0"></div>
+            <div class="c1"><label for="bd-p">체지방률 %</label><input class="in" id="bd-p" name="fat_pct" type="number" inputmode="decimal" step="0.1" min="0" max="100"></div>
+          </div>
+          <div class="form-foot"><button class="btn" type="submit">저장</button><button class="btn line" id="bodyCancel" type="button">닫기</button><span class="note" id="bodyMsg" role="status"></span></div>
+        </form></div>
+    </section>
+
+    <section class="sec" id="daily">
+      <div class="sec-head"><span class="sec-no">03</span><h2>Daily Records</h2><span class="ko">일별 기록</span></div>
       <div class="form-foot" style="margin:0 0 16px">
         <span class="note num" id="dayCount"></span>
         <button class="btn" id="dayNew" type="button" style="margin-left:auto">식단 · 체중 기록</button>
@@ -57,6 +79,6 @@
     </section>
   </div>
 </main>
-<script src="../assets/site.js?v=1126j"></script>
+<script src="../assets/site.js?v=1126m"></script>
 </body>
 </html>

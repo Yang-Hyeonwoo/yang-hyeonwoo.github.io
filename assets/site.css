@@ -409,3 +409,13 @@ table.days td.num { padding-left: 5px; padding-right: 5px; }
   .site-head.sub .nav { justify-content: flex-start; overflow-x: auto; }
   .site-head.sub .nav a { flex: none; font-size: 0.82rem; padding-left: 0.7rem; padding-right: 0.7rem; }
 }
+
+/* ---- 2026 weight-training recap inside the log; friendlier line breaks in running text ---- */
+.recap { margin: 28px 0; padding: 28px; border-color: var(--accent-line); box-shadow: 0 0 0 3px var(--accent-soft); }
+.recap h3 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem); font-weight: 800; letter-spacing: -0.03em; color: var(--ink); margin: 12px 0 8px; }
+.recap h3 em { font-style: normal; color: var(--accent); }
+.recap .lead { color: var(--muted); max-width: none; margin-bottom: 20px; }
+.recap h4 { font-size: 0.95rem; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+.lead, .recap .lead { text-wrap: pretty; }
+.hero .lead { max-width: 46rem; }
+@media (max-width: 640px) { .recap { padding: 18px; } }

@@ -1286,7 +1286,7 @@
  {
   "date": "2026-11-05",
   "session": "Weight Training",
-  "format": "Upper B",
+  "format": "Upper",
   "workout": "Bench Press · 57.5kg × 12, 11, 7\nBarbell OHP · 40kg × 6, 7, 6\nLat Pull Down · 45kg × 12, 12, 9\nDumbbell Lateral Raise · 5kg × 15, 15, 15, 15\nFace Pull · [3] × 15, 13, 10\nArm Curl Machine · 20kg × 12, 10, 7, 15kg 10",
   "notes": "Barbell OHP: 첫 시도 · 락아웃 가동성 부족\nLat Pull Down: 47.5 대신 45kg\nDumbbell Lateral Raise: 4×15 달성 → 6kg\nArm Curl Machine: 마지막 세트 15kg",
   "id": "m0146"
@@ -1294,7 +1294,7 @@
  {
   "date": "2026-11-06",
   "session": "Weight Training",
-  "format": "Lower A",
+  "format": "Lower front",
   "workout": "Squat · 90kg × 8, 8, 8, 8\nLeg Press · 120kg × 12, 12, 12\nBulgarian Split Squat · 15kg × 12, 12, 12\nLying Leg Curl · 30kg × 15, 15, 15\nDumbbell Lateral Raise · 6kg × 15, 15, 15\nLeg Extension · 35kg × 17\nHanging Knee Raise · 맨몸 × 20, 12",
   "notes": "Squat: 90도 괜찮게 밀림\nLeg Press: 적당\nBulgarian Split Squat: 진짜 너무 괴롭고 힘듦\nLying Leg Curl: 좀 강하게 팡팡 함 네거티브 때는 받고. 그게 더 나은듯.\nLeg Extension: 너무 힘들어서 못하겠음",
   "id": "m0147"
@@ -1316,7 +1316,7 @@
  {
   "date": "2026-11-11",
   "session": "Weight Training",
-  "format": "Upper A",
+  "format": "Upper",
   "workout": "Bench Press · 67.5kg × 5, 5, 5, 5\nPull-Up · 맨몸 × 10, 8, 7\nOHP Machine · 45kg × 12, 12, 9\nLateral Raise Machine · 15kg × 15, 15, 15, 20kg 15\nArm Curl Machine · 15kg × 15, 15, 11, 10",
   "notes": "Bench Press: 헤비 · 4×6 되면 70kg\nPull-Up: 3×10 되면 +2.5kg 중량 · 6회 미만이면 Assisted\nOHP Machine: 스탠딩 머신 · 3×12 되면 한 칸\nLateral Raise Machine: 사레레 스탠딩 머신 마지막세트 했는데 느낌 개좋음 이걸로 해야함",
   "id": "m0150"
@@ -1332,7 +1332,7 @@
  {
   "date": "2026-11-12",
   "session": "Weight Training",
-  "format": "Lower B",
+  "format": "Lower rear",
   "workout": "Romanian Deadlift · 105kg × 8, 8, 8, 8\nHack Squat (Life Fitness) · 85kg × 10, 10, 10\nSeated Leg Curl · 40kg × 15, 15, 15\nLateral Raise Machine · 25kg × 15, 15, 13\nCrunch · 8kg × 20, 15",
   "notes": "Romanian Deadlift: 다 됨\nHack Squat (Life Fitness): 다 밀림\nSeated Leg Curl: 반동 많이 씀 한번 더 도전\nLateral Raise Machine: 느낌 아주 좋음\nCrunch: 시간 없어서 두 세트만 함",
   "id": "m0152"
@@ -1340,7 +1340,7 @@
  {
   "date": "2026-11-14",
   "session": "Weight Training",
-  "format": "Upper B",
+  "format": "Upper",
   "workout": "Bench Press · 57.5kg × 12, 12, 11\nBarbell OHP · 40kg × 7, 6, 6\nLat Pull Down · 45kg × 12, 9, 7\nLateral Raise Machine · 25kg × 15, 15, 13, 12\nFace Pull · [4] × 15, 15, 15\nArm Curl Machine · 20kg × 12, 7, 15kg 11",
   "notes": "Bench Press: 빵빵 치듯이 스피드감을 좀 줌(무게를 날린 것은 아님)\nBarbell OHP: 휴식 2:30 으로 늘리기(다른 날에도 수정 필요)\nLat Pull Down: 2분으로 늘려야하나 싶음 쉬는시간\nLateral Raise Machine: 슈퍼세트: Face Pull · 4×15 되면 한 칸\nFace Pull: 수평 당기기 느낌으로 바꿈 템포 좀 더 빠르게 외전 많이 안 걸고 진행\nArm Curl Machine: 슈퍼세트: Cable Push Down · 4×12 되면 한 칸",
   "id": "m0153"
@@ -1348,7 +1348,7 @@
  {
   "date": "2026-11-17",
   "session": "Weight Training",
-  "format": "Lower A",
+  "format": "Lower front",
   "workout": "Squat · 95kg × 8, 8, 8, 8\nLeg Press · 130kg × 12, 12, 12\nBulgarian Split Squat · 15kg × 12, 12, 12",
   "notes": "Squat: 4×8 + 무릎 OK면 +5kg\nLeg Press: 3×12 되면 +10kg\nBulgarian Split Squat: 17kg 없고 18kg만 있음. 이ㄹ단 15kg로 더 연습하고 넘어가자",
   "approx": true,
@@ -1357,38 +1357,22 @@
  {
   "date": "2026-11-18",
   "session": "Weight Training",
-  "format": "Upper A",
+  "format": "Upper",
   "workout": "Bench Press · 67.5kg × 6, 6, 6, 6\nT-Bar Row · 45kg × 10, 10, 10\nPull-Up · 맨몸 × 8, 6, 4\nLateral Raise Machine · 25kg × 15, 15, 15, 15\nLying Triceps Extension · 20kg × 12, 10, 7\nArm Curl Machine · 15kg × 15, 15",
   "notes": "Pull-Up: 가동범위 뭔가 짧아짐. 사ㅇ단구간 잘 안올라가짐.\nLateral Raise Machine: 스탠딩 머신 · 4×15 되면 한 칸\nLying Triceps Extension: 찌릿하면 즉시 Cable Push Down으로 교체 · 3×12 되면 +2.5kg\nArm Curl Machine: 생략 금지(팔 우선) · 3×15 되면 한 칸",
   "id": "m0155"
  },
  {
   "date": "2026-11-22",
-  "session": "Run",
-  "km": 1.02,
-  "pace": "4:59",
-  "minutes": 5.1,
-  "avg_hr": 149,
-  "max_hr": 163,
-  "brief": "한강 런짐 대회",
-  "id": "m0156"
- },
- {
-  "date": "2026-11-22",
-  "session": "Run",
+  "session": "Race",
+  "workout": "Hangangrungym race · 6km run + 6 stations",
+  "id": "m0158",
   "km": 6.59,
-  "pace": "5:45",
   "minutes": 37.9,
+  "pace": "5:45",
   "avg_hr": 162,
   "max_hr": 181,
-  "brief": "한강 런짐 대회",
-  "id": "m0157"
- },
- {
-  "date": "2026-11-22",
-  "session": "Race",
-  "workout": "Hangangrungym race (6km run + 6 stations)",
-  "id": "m0158"
+  "notes": "레이스 전 웜업 1.02km (4:59/km). 레이스 내내 Garmin을 켜두어 거리가 6.59km로 기록됨."
  },
  {
   "date": "2026-11-23",
