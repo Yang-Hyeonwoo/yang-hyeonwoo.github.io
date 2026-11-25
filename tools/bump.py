@@ -13,7 +13,7 @@ pages = [root / "index.html", *sorted((root / "training").glob("*.html"))]
 for page in pages:
     html = page.read_text(encoding="utf-8")
     new, n = re.subn(r"(assets/site\.(?:css|js))\?v=[0-9a-z]+", r"\1?v=" + label, html)
-    assert n == 2, (page, n)
+    assert n in (0, 2), (page, n)      # 0: a redirect stub with no assets
     page.write_text(new, encoding="utf-8", newline="\n")
 js = root / "assets" / "site.js"
 text, n = re.subn(r"const VERSION = '[0-9a-z]+';", "const VERSION = '%s';" % label, js.read_text(encoding="utf-8"))

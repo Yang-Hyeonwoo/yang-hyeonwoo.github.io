@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1126m';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1126n';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -520,6 +520,7 @@
           ${body}</div></article>`; });
       list.innerHTML = out || '<p class="note" style="padding:24px 0">기록이 없어요.</p>';
       if (recap && placed) recap.draw();
+      if (location.hash === '#wtRecap' && $('#wtRecap') && !render.jumped) { render.jumped = true; $('#wtRecap').scrollIntoView(); }
       $('#logCount').textContent = `${rows.length}건`;
       const gone = all.filter((e) => e.deleted).sort((a, b) => (a.deleted < b.deleted ? 1 : -1));
       $('#logTrash').innerHTML = canWrite() && gone.length ? `<details class="more"><summary>휴지통 · ${gone.length}건</summary><p class="note" style="margin:8px 0">지운 기록은 여기에 남아 있어요. 되살리면 원래 날짜 자리로 돌아가요.</p>${gone.map((e) =>
