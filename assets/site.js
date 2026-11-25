@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1126u';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1126v';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -641,7 +641,7 @@
           else { // an edit starts from the entry as it is stored now and changes only what was changed in the form;
             // a different session is a rewrite, so then every field follows the form
             const next = { ...arr[i] }; (changed.includes('session') ? FIELDS : changed).forEach((n) => { if (n in e) next[n] = e[n]; else delete next[n]; });
-            if (e.pace && !now.pace) next.pace = e.pace;
+            if (e.pace && !now.pace && (changed.includes('km') || changed.includes('minutes'))) next.pace = e.pace;   // worked out only when distance or time was edited: a day of jog + sprints keeps no overall pace
             if (changed.includes('date')) delete next.approx; if (changed.includes('notes')) delete next.brief;
             arr[i] = next; }
           arr.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)); return arr; }, `log: ${e.date} ${e.session}`); log = live(all);

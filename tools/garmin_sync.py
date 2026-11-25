@@ -5,12 +5,13 @@ them to data/log.json and data/daily.json through the same GitHub API the site i
 
 Rules, so it never fights with what was typed on the site:
   * nothing before SINCE is touched
-  * a run:   one log entry per watch record, so a jog and the strides recorded after it stay apart. The
-             longest is taken as the planned run and gets the plan's session name; another one is named
-             after the watch's mode (track -> Interval run). An entry typed or checked off on the site is
-             completed, never overwritten: only empty fields are filled.
-             Only on a "체육관 왕복 러닝" day do the runs go into ONE entry (the way there and the way back),
-             and the numbers this script wrote itself are updated when the second leg arrives.
+  * a run:   ONE log entry per day. Its top numbers are the day's totals (distance, time, heart rate);
+             when the watch has more than one record that day, each gets its own line in the workout text
+             ("조깅 8.0km · 6:21/km"), and no overall pace is written, since it would mix a jog with sprints.
+             Intervals (laps alternating fast and slow) are written the way the user writes them:
+             200/200(39"/98") × 4 · 3:15/8:10  (rep / recovery distance, average seconds, then the paces).
+             An entry typed or checked off on the site is completed, never overwritten: only empty fields
+             are filled. What this script wrote itself is updated when a later record of the day arrives.
   * a class: average / max heart rate are filled into the day's Hyrox entry, only when there is exactly
              one such entry and exactly one matching activity, and only where the entry has none
   * sleep:   bed, wake and the time between them, only for a day that has no sleep written yet
@@ -113,7 +114,7 @@ def session_for(day):
 
 
 def session_by_type(a):
-    """A run that is not the planned one is named after the watch's mode."""
+    """A run nobody planned is named after the watch's mode."""
     k = type_key(a)
     return 'Interval run' if k == 'track_running' else 'Trail run' if k == 'trail_running' else 'Run'
 
@@ -126,14 +127,111 @@ def empty(v):
     return v is None or v == ''
 
 
-def fill(entry, fields):
-    for k, v in fields.items():
-        if empty(entry.get(k)):
-            entry[k] = v
+# ---------- intervals, written the way the user writes them: 200/200(60"/100") × 4 · 5:00/8:20 ----------
+def nominal(m):
+    step = 50 if m < 1000 else 100
+    return int(round(m / step) * step)
 
 
-def merge_runs(log, plan_days, acts, seen):
-    """Adds the watch's runs to the log. Returns the lines to report."""
+def secs(s):
+    s = int(round(s))
+    return f'{s}"' if s < 120 else f"{s // 60}'{s % 60:02d}\""
+
+
+def per_km(dist_m, dur_s):
+    return clock(dur_s / (dist_m / 1000))
+
+
+def mean(xs):
+    return sum(xs) / len(xs)
+
+
+def median(xs):
+    xs = sorted(xs)
+    return xs[len(xs) // 2] if len(xs) % 2 else (xs[len(xs) // 2 - 1] + xs[len(xs) // 2]) / 2
+
+
+def interval_text(laps):
+    """The interval line, when the laps alternate fast and slow (the user presses lap, or the track mode does); else None."""
+    L = [lap for lap in laps if (lap.get('duration') or 0) > 0]
+    if len(L) < 3:
+        return None
+    sp = [(lap.get('distance') or 0) / lap['duration'] for lap in L]
+    hi, lo = max(sp), min(sp)
+    if hi <= 0 or hi < 1.3 * lo:                       # ordinary auto laps of a steady run (a jog's kms differ by ~15%)
+        return None
+    fast = [s >= (hi + lo) / 2 for s in sp]
+    a = b = 0                                          # the longest fast/slow/fast... stretch that starts fast
+    i = 0
+    while i < len(L):
+        if fast[i]:
+            j = i + 1
+            while j < len(L) and fast[j] != fast[j - 1]:
+                j += 1
+            if j - i > b - a:
+                a, b = i, j
+            i = j
+        else:
+            i += 1
+    F = [L[k] for k in range(a, b) if fast[k]]
+    S = [L[k] for k in range(a, b) if not fast[k]]
+    if len(F) < 2 or not S:
+        return None
+    same = lambda group, d: all(abs((x.get('distance') or 0) - d) <= max(30, 0.15 * d) for x in group)
+    fd = nominal(median([x.get('distance') or 0 for x in F]))
+    if fd <= 0 or not same(F, fd):
+        return None
+    ft = round(mean([x['duration'] for x in F]))      # the shown seconds and the shown pace agree with each other
+    st = round(mean([x['duration'] for x in S]))
+    if all((x.get('distance') or 0) < 50 for x in S):  # standing rest
+        core = f'{fd}({secs(ft)}) × {len(F)} · 휴식 {secs(st)} · {per_km(fd, ft)}'
+    else:
+        sd = nominal(median([x.get('distance') or 0 for x in S]))
+        if sd <= 0 or not same(S, sd):
+            return None
+        core = f'{fd}/{sd}({secs(ft)}/{secs(st)}) × {len(F)} · {per_km(fd, ft)}/{per_km(sd, st)}'
+    out = []
+    before = L[:a]
+    if sum(x.get('distance') or 0 for x in before) >= 100:
+        d, t = sum(x.get('distance') or 0 for x in before), sum(x['duration'] for x in before)
+        out.append(f'러닝 {d / 1000:.1f}km · {per_km(d, t)}/km' if d >= 3000 else f'워밍업 {d / 1000:.1f}km')
+    out.append(core)
+    after = L[b:]
+    if sum(x.get('distance') or 0 for x in after) >= 100:
+        out.append(f'쿨다운 {sum(x.get("distance") or 0 for x in after) / 1000:.1f}km')
+    return ' + '.join(out)
+
+
+def day_fields(acts, laps_of, planned):
+    """A day's runs as one entry: totals at the top, and a line per watch record when there is more than one
+    (or when it was intervals). The pace at the top would mix a jog with sprints, so it is left out then."""
+    f = run_fields(acts)
+    iv = {aid(a): interval_text(laps_of(a)) for a in acts}
+    if len(acts) == 1 and not iv[aid(acts[0])]:
+        return f
+    f.pop('pace', None)
+    longest = max(acts, key=lambda x: x.get('distance') or 0)
+    lines, legs = [], 0
+    for a in acts:
+        if iv[aid(a)]:
+            lines.append(iv[aid(a)])
+            continue
+        d, t = a.get('distance') or 0, a.get('duration') or 0
+        if planned == 'Run commute':
+            label = ('갈 때', '올 때')[legs] if legs < 2 else '러닝'
+        elif a is longest and planned == 'Jogging':
+            label = '조깅'
+        else:
+            label = '트레일' if type_key(a) == 'trail_running' else '러닝'
+        legs += 1
+        lines.append(f'{label} {d / 1000:.1f}km · {per_km(d, t)}/km' if d > 0 and t > 0 else label)
+    f['workout'] = '\n'.join(lines)
+    return f
+
+
+def merge_runs(log, plan_days, acts, seen, laps_of):
+    """Adds the watch's runs to the log: ONE entry per day, every record of the day written into it.
+    Returns the lines to report."""
     notes = []
     days = {}
     for a in sorted(acts, key=lambda x: x.get('startTimeLocal') or ''):
@@ -150,46 +248,37 @@ def merge_runs(log, plan_days, acts, seen):
         ids = [aid(a) for a in new]
         runs = [e for e in entries if e.get('session') in RUNS]
         planned = session_for(plan_days.get(d))
-        if planned == 'Run commute' or any(e.get('session') == 'Run commute' for e in runs):
-            # the way to the gym and the way back are one entry
-            pooled = next((e for e in runs if e.get('garmin')), None)
-            prev = [a for a in day if aid(a) in {str(i) for i in (pooled or {}).get('garmin', [])}]
-            mine = next((e for e in runs if not e.get('garmin')), None)
-            if pooled and len(prev) == len(pooled['garmin']):
-                # the second leg: add it, replacing only the numbers this script wrote
-                was, now = run_fields(prev), run_fields(prev + new)
-                for k, v in now.items():
-                    if empty(pooled.get(k)) or pooled.get(k) == was.get(k):
-                        pooled[k] = v
-                pooled['garmin'] = [str(i) for i in pooled['garmin']] + ids
-                notes.append(f'{d} run +{len(new)} -> {pooled.get("km")}km')
-            elif mine:                                 # typed or checked off on the site: fill only what is empty
-                fill(mine, run_fields(new))
+        if not planned and any(e.get('session') == 'Run commute' for e in runs):
+            planned = 'Run commute'
+        pooled = next((e for e in runs if e.get('garmin')), None)
+        if pooled:
+            # another record of a day the sync has written before: replace only what the sync itself wrote
+            had = {str(i) for i in pooled['garmin']}
+            prev = [a for a in day if aid(a) in had]
+            was = day_fields(prev, laps_of, planned) if len(prev) == len(had) else {}
+            now = day_fields(prev + new, laps_of, planned)
+            for k in set(was) | set(now):
+                if empty(pooled.get(k)) or pooled.get(k) == was.get(k):
+                    if k in now:
+                        pooled[k] = now[k]
+                    else:
+                        pooled.pop(k, None)
+            pooled['garmin'] = [str(i) for i in pooled['garmin']] + ids
+            notes.append(f'{d} run +{len(new)} -> {pooled.get("km")}km')
+        else:
+            f = day_fields(new, laps_of, planned)
+            free = [e for e in runs if not e.get('garmin')]
+            mine = next((e for e in free if e.get('session') == planned), None) or (free[0] if free else None)
+            if mine:                                   # typed or checked off on the site: fill only what is empty
+                for k, v in f.items():
+                    if empty(mine.get(k)):
+                        mine[k] = v
                 mine['garmin'] = ids
                 notes.append(f'{d} run filled {mine.get("km")}km')
             else:
-                f = run_fields(new)
-                log.append({'id': 'g' + ids[0], 'date': d, 'session': 'Run commute', **f, 'garmin': ids})
+                longest = max(new, key=lambda x: x.get('distance') or 0)
+                log.append({'id': 'g' + ids[0], 'date': d, 'session': planned or session_by_type(longest), **f, 'garmin': ids})
                 notes.append(f'{d} run new {f.get("km")}km')
-        else:
-            # any other day: one entry per watch record (a jog and the strides after it stay apart).
-            # The longest goes first: it is the planned run, and the entry checked off on the site is meant for it.
-            for a in sorted(new, key=lambda x: -(x.get('distance') or 0)):
-                f = run_fields([a])
-                free = [e for e in runs if not e.get('garmin')]
-                with_km = [e for e in free if not empty(e.get('km'))]
-                mine = (min(with_km, key=lambda e: abs(float(e['km']) - f.get('km', 0))) if with_km and len(with_km) == len(free)
-                        else next((e for e in free if empty(e.get('km'))), None))
-                if mine:
-                    fill(mine, f)
-                    mine['garmin'] = [aid(a)]
-                    notes.append(f'{d} run filled {f.get("km")}km')
-                else:
-                    first = not any(e.get('garmin') for e in runs)
-                    e = {'id': 'g' + aid(a), 'date': d, 'session': (planned if first and planned else session_by_type(a)), **f, 'garmin': [aid(a)]}
-                    log.append(e)
-                    runs.append(e)
-                    notes.append(f'{d} run new {f.get("km")}km')
         for i in ids:
             seen[i] = d
     return notes
@@ -389,7 +478,7 @@ def inspect(g, d):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--local', help='folder with copies of the data files, instead of GitHub')
-    ap.add_argument('--fixture', help='JSON file {"activities": [...], "sleep": {date: dailySleepDTO}} instead of Garmin')
+    ap.add_argument('--fixture', help='JSON file {"activities": [... each may carry "laps"], "sleep": {date: dailySleepDTO}} instead of Garmin')
     ap.add_argument('--now', help='pretend it is this time (ISO), for tests')
     ap.add_argument('--dry', action='store_true', help='report only, save nothing')
     ap.add_argument('--inspect', help='print the laps of the runs on this date (YYYY-MM-DD) and stop; for working out new rules')
@@ -411,6 +500,7 @@ def main():
     if a.fixture:
         fx = json.loads(Path(a.fixture).read_text(encoding='utf-8'))
         acts, sleeps = fx.get('activities', []), {d: fx.get('sleep', {}).get(d) for d in sleep_dates(daily, now)}
+        laps_of = lambda x: x.get('laps') or []
     else:
         from garminconnect import GarminConnectAuthenticationError
         try:
@@ -420,6 +510,12 @@ def main():
                 inspect(g, a.inspect)
                 return 0
             acts = g.get_activities_by_date(start, today)
+            cache = {}
+
+            def laps_of(x):                            # read only for days with a new run
+                if aid(x) not in cache:
+                    cache[aid(x)] = (g.get_activity_splits(aid(x)) or {}).get('lapDTOs') or []
+                return cache[aid(x)]
             sleeps = {d: (g.get_sleep_data(d) or {}).get('dailySleepDTO') for d in sleep_dates(daily, now)}
         except GarminConnectAuthenticationError as e:
             # say it once (a failed run sends a mail), then stay quiet until someone logs in again; the site shows a note meanwhile
@@ -437,7 +533,7 @@ def main():
     def log_change(log):
         seen.clear()
         seen.update(state['seen'])                    # start again from the stored state on every retry
-        return merge_runs(log, plan.get('days', {}), acts, seen) + merge_class_hr(log, acts, seen)
+        return merge_runs(log, plan.get('days', {}), acts, seen, laps_of) + merge_class_hr(log, acts, seen)
 
     out += update(store, 'log', log_change)
     out += update(store, 'daily', lambda d: merge_sleep(d, sleeps, now))
