@@ -7,6 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
+  const VERSION = '1126g';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -87,7 +88,7 @@
       <a class="brand" href="${ROOT}training/">Hyrox <em>Training</em></a>
       <nav class="nav" aria-label="Training 메뉴">
         <a href="${ROOT}training/"${t('training')}>Home</a><a href="${ROOT}training/plan.html"${t('plan')}>Training Plan</a>
-        <a href="${ROOT}training/log.html"${t('log')}>Log</a><a href="${ROOT}training/records.html"${t('records')}>Records</a>
+        <a href="${ROOT}training/log.html"${t('log')}>Training Log</a><a href="${ROOT}training/records.html"${t('records')}>Daily Records</a>
       </nav>
       <a class="back" href="${ROOT}">← Main</a>
       <button class="icon-btn${token() ? ' ok' : ''}" id="keyBtn" type="button" aria-label="입력 설정" title="입력 설정">
@@ -280,7 +281,6 @@
     if (it.k === 'run') return /기록 측정/.test(it.t) ? 'Time trial' : /조깅/.test(it.t) && !/세트/.test(it.t) ? 'Jogging' : /연속/.test(it.t) ? 'Tempo run' : 'Interval run';
     return '';
   }
-  const optChip = (it) => (it.opt && it.k !== 'free' ? ' <span class="chip">선택</span>' : '');
 
   // Today's check: a small round button to mark a session done, and the same mark filled in once it is.
   const CHECK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
@@ -293,7 +293,7 @@
       if (de) act = `${it.k === 'core' && de.result ? `<span class="small num muted">${esc(de.result)}</span>` : ''}<a class="small" href="log.html#edit=${encodeURIComponent(de.id)}">자세히</a>${ckOn}`;
       else if (canWrite() && it.k === 'core') act = `<input class="in sm" data-reps inputmode="text" placeholder="12, 10, 8" aria-label="세트별 개수">${ckBtn(i)}`;
       else if (canWrite() && sessionFor(it, TODAY)) act = ckBtn(i);
-      return `<div class="todo${it.key ? ' key' : ''}"><span class="kind">${m ? `<b class="num">${m[1]}</b>` : ''}${KIND[it.k] || ''}</span><div class="b"><div class="t">${esc(it.t)}${optChip(it)}</div><div class="d">${esc(m ? m[2] : it.d || '')}</div></div><div class="act">${act}</div></div>`; };
+      return `<div class="todo${it.key ? ' key' : ''}"><span class="kind">${m ? `<b class="num">${m[1]}</b>` : ''}${KIND[it.k] || ''}</span><div class="b"><div class="t">${esc(it.t)}</div><div class="d">${esc(m ? m[2] : it.d || '')}</div></div><div class="act">${act}</div></div>`; };
     const items = day ? day.items.map(row).join('') : '<p class="note">오늘은 정해진 계획이 없어요.</p>';
     const cell = (l, got, goal, unit) => `<div><div class="l">${l}</div><div class="v num">${n0(goal)}<small>${unit}</small></div><div class="s num">${got == null ? '아직 기록 전' : `기록 ${n0(got)}${unit}`}</div></div>`;
     const kv = day ? `<div class="kv">${cell('Calories', rec.kcal, day.kcal, 'kcal')}${cell('Carbs', rec.carb, day.carb, 'g')}${cell('Protein', rec.prot, day.prot, 'g')}${cell('Fat', rec.fat, day.fat, 'g')}</div>` : '';
@@ -313,7 +313,7 @@
       const did = log.filter((e) => e.date === d && kindOf(e) !== 'other'); const trained = did.length > 0;
       const its = off && trained ? did.map((e) => `<div class="it did">${doneMark}<span>${esc(e.session)}${e.km ? ` ${e.km}km` : ''}</span></div>`).join('')
         : day ? day.items.filter((it) => it.k !== 'core').map((it) => { const ok = isDone(it, d, log);
-          return `<div class="it${it.opt || it.k === 'free' ? ' optional' : ''}${ok ? ' did' : ''}">${ok ? doneMark : ''}<span>${esc(it.t)}${it.opt && it.k !== 'free' ? ' (선택)' : ''}</span></div>`; }).join('') : '';
+          return `<div class="it${it.opt || it.k === 'free' ? ' optional' : ''}${ok ? ' did' : ''}">${ok ? doneMark : ''}<span>${esc(it.t)}${it.opt && it.k !== 'free' ? ' (보너스)' : ''}</span></div>`; }).join('') : '';
       return `<div class="day${d === TODAY ? ' today' : ''}${trained ? ' done' : off ? ' off' : ''}"><div class="dn"><span>${KO[dt.getDay()]}</span>${trained ? '<i class="stamp">완료</i>' : ''}<b class="num">${dt.getDate()}</b></div><div>${its}</div></div>`; }).join('')}</div>`;
   }
 
@@ -402,10 +402,12 @@
     const phase = [...plan.roadmap].reverse().find((r) => r.from <= TODAY) || plan.roadmap[0];
     $('#road').innerHTML = `<div class="road" style="margin-top:0">${plan.roadmap.map((r) => `<div class="${r === phase ? 'now' : r.from < phase.from ? 'past' : ''}"><div class="m">${esc(r.m)}</div><div class="th">${esc(r.theme)}</div><div class="f">${esc(r.focus)}</div></div>`).join('')}</div>`;
     $('#weeks').innerHTML = plan.weeks.map((w) => { const mon = parse(w.start);
+      const li = (it, d) => `<li${it.k === 'free' || it.k === 'rest' ? ' class="soft"' : ''}><b>${esc(it.t)}</b>${it.d ? ` <span class="why">(${esc(it.d)})</span>` : ''}${it.key ? ' <span class="chip a">핵심</span>' : ''}${isDone(it, d, log) ? ` ${doneChip}` : ''}</li>`;
       const rows = [0, 1, 2, 3, 4, 5, 6].map((i) => { const dt = addDays(mon, i), d = iso(dt), day = plan.days[d];
-        return `<tr><td class="num" style="white-space:nowrap"><b>${KO[dt.getDay()]}</b> <span class="muted">${md(dt)}</span></td><td>${day.items.map((it) => `<div class="it" style="margin-bottom:6px"><span><b style="font-weight:${it.opt || it.k === 'free' ? 500 : 600};color:${it.opt || it.k === 'free' ? 'var(--muted)' : 'var(--ink)'}">${esc(it.t)}</b>${it.key ? ' <span class="chip a">핵심</span>' : ''}${optChip(it)}${isDone(it, d, log) ? ` ${doneChip}` : ''}<br><span class="small muted">${esc(it.d || '')}</span></span></div>`).join('')}</td><td class="r num" style="white-space:nowrap">${n0(day.kcal)} kcal<br><span class="small muted">탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}</span></td></tr>`; }).join('');
+        return `<tr><td class="num" style="white-space:nowrap"><b>${KO[dt.getDay()]}</b> <span class="muted">${md(dt)}</span></td><td><ul class="plan-items">${day.items.map((it) => li(it, d)).join('')}</ul></td><td class="r num" style="white-space:nowrap">${n0(day.kcal)} kcal<br><span class="small muted">탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}</span></td></tr>`; }).join('');
       return `<section class="plate plan-week${w.start === thisMon ? ' now' : ''}" id="w-${w.start}"><div class="hd"><h3>${esc(w.label)}</h3><span class="muted small num">${md(mon)}–${md(addDays(mon, 6))}</span>${w.recovery ? '<span class="chip w">회복 주</span>' : ''}${w.start === thisMon ? '<span class="chip a">이번 주</span>' : ''}
-        <span class="small muted" style="margin-left:auto">러닝 기본 <b class="num" style="color:var(--ink)">${w.run_km}km</b> (${esc(w.run_note)})${w.bonus_km ? ` · 선택 +${w.bonus_km}km` : ''}</span></div>
+        <span class="small muted" style="margin-left:auto">러닝 기본 <b class="num" style="color:var(--ink)">${w.run_km}km</b> (${esc(w.run_note)})${w.bonus_km ? ` · 보너스 +${w.bonus_km}km` : ''}</span></div>
+        ${w.concept ? `<p class="concept">${esc(w.concept)}</p>` : ''}
         <div class="scroll-x"><table class="t"><thead><tr><th style="width:5.5rem">Day</th><th>Training</th><th class="r" style="width:9.5rem">Nutrition</th></tr></thead><tbody>${rows}</tbody></table></div></section>`; }).join('');
     const now = document.getElementById(`w-${thisMon}`); if (now && location.hash === '#now') now.scrollIntoView();
 
@@ -568,4 +570,7 @@
   const fail = (e) => { console.error(e); const m = $('main'); if (m) m.prepend(el(`<div class="wrap"><div class="banner" style="margin-top:16px">기록을 불러오지 못했어요. 잠시 뒤 새로고침해 주세요. (${esc(e.message)})</div></div>`)); };
   const typing = () => !!document.querySelector('#logFormWrap:not([hidden]), #dayFormWrap:not([hidden]), dialog[open]') || /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || '');
   if (run) run().then(() => { performance.mark('site-drawn'); return Promise.all(pending.splice(0)); }).then((changed) => { settled = true; if (changed.some(Boolean) && !typing()) return run(); return null; }).catch(fail);
+  // Browsers keep each page for up to ten minutes. If the site has moved on since this copy was fetched, reload once to get the new one.
+  fetch(`${ROOT}version.txt?t=${Date.now()}`, { cache: 'no-store' }).then((r) => (r.ok ? r.text() : '')).then((v) => { const live = v.trim();
+    if (live && live !== VERSION && !typing() && sessionStorage.getItem('site.reloaded') !== live) { sessionStorage.setItem('site.reloaded', live); location.reload(); } }).catch(() => {});
 })();

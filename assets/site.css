@@ -390,3 +390,13 @@ tr.more-row td.wrap { background: var(--bg-soft); font-size: 0.78rem; }
 @media (max-width: 640px) { .cellbar { width: 3rem; } }
 .cellbar { width: 100%; max-width: 3.5rem; }
 table.days td.num { padding-left: 5px; padding-right: 5px; }
+
+/* ---- training plan: one bullet per thing to do, detail in brackets; a concept line per week ---- */
+.plan-items { margin: 0; padding-left: 1.1rem; }
+.plan-items li { margin: 3px 0; line-height: 1.55; color: var(--ink); }
+.plan-items li::marker { color: var(--accent); }
+.plan-items li b { font-weight: 600; }
+.plan-items .why { color: var(--muted); font-size: 0.86em; }
+.plan-items li.soft b { font-weight: 500; color: var(--muted); } .plan-items li.soft::marker { color: var(--faint); }
+.plan-week .concept { margin: -2px 0 14px; font-size: 0.98rem; font-weight: 600; color: var(--accent-strong); }
+@media (max-width: 640px) { .site-head.sub .nav a { font-size: 0.8rem; padding-left: 0.45rem; padding-right: 0.45rem; } }
