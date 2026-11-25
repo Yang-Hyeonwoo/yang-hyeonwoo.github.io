@@ -1411,5 +1411,14 @@
    "25193316182",
    "25193394939"
   ]
+ },
+ {
+  "id": "p1126",
+  "date": "2026-11-26",
+  "session": "Interval",
+  "format": "Interval",
+  "minutes": 43,
+  "workout": "Norwegian Interval\n10 min Easy Machine\n4 sets\n  4 min Hard\n  3 min Easy\nCool down 5 min",
+  "planned": true
  }
 ]
