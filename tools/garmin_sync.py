@@ -5,10 +5,12 @@ them to data/log.json and data/daily.json through the same GitHub API the site i
 
 Rules, so it never fights with what was typed on the site:
   * nothing before SINCE is touched
-  * a run:   all of a day's runs go into ONE log entry (the way to the gym and the way back are one
-             "체육관 왕복 러닝"). An entry typed or checked off on the site is completed, never overwritten:
-             only empty fields are filled. Numbers this script wrote itself are updated when a second run
-             of the day arrives.
+  * a run:   one log entry per watch record, so a jog and the strides recorded after it stay apart. The
+             longest is taken as the planned run and gets the plan's session name; another one is named
+             after the watch's mode (track -> Interval run). An entry typed or checked off on the site is
+             completed, never overwritten: only empty fields are filled.
+             Only on a "체육관 왕복 러닝" day do the runs go into ONE entry (the way there and the way back),
+             and the numbers this script wrote itself are updated when the second leg arrives.
   * a class: average / max heart rate are filled into the day's Hyrox entry, only when there is exactly
              one such entry and exactly one matching activity, and only where the entry has none
   * sleep:   bed, wake and the time between them, only for a day that has no sleep written yet
@@ -99,7 +101,7 @@ def run_fields(acts):
 
 
 def session_for(day):
-    """The log session a planned run becomes: the same choice the site makes for its check button."""
+    """The log session a planned run becomes: the same choice the site makes for its check button ('' = no run planned)."""
     for it in (day or {}).get('items', []):
         t = it.get('t', '')
         if it.get('k') == 'commute':
@@ -107,7 +109,13 @@ def session_for(day):
         if it.get('k') == 'run':
             return ('Time trial' if '기록 측정' in t else 'Jogging' if '조깅' in t and '세트' not in t
                     else 'Tempo run' if '연속' in t else 'Interval run')
-    return 'Run'
+    return ''
+
+
+def session_by_type(a):
+    """A run that is not the planned one is named after the watch's mode."""
+    k = type_key(a)
+    return 'Interval run' if k == 'track_running' else 'Trail run' if k == 'trail_running' else 'Run'
 
 
 def linked_ids(log):
@@ -116,6 +124,12 @@ def linked_ids(log):
 
 def empty(v):
     return v is None or v == ''
+
+
+def fill(entry, fields):
+    for k, v in fields.items():
+        if empty(entry.get(k)):
+            entry[k] = v
 
 
 def merge_runs(log, plan_days, acts, seen):
@@ -135,28 +149,47 @@ def merge_runs(log, plan_days, acts, seen):
             continue
         ids = [aid(a) for a in new]
         runs = [e for e in entries if e.get('session') in RUNS]
-        pooled = next((e for e in runs if e.get('garmin')), None)
-        prev = [a for a in day if aid(a) in {str(i) for i in (pooled or {}).get('garmin', [])}]
-        if pooled and len(prev) == len(pooled['garmin']):
-            # a second run of the day: add it to the entry, replacing only the numbers this script wrote
-            was, now = run_fields(prev), run_fields(prev + new)
-            for k, v in now.items():
-                if empty(pooled.get(k)) or pooled.get(k) == was.get(k):
-                    pooled[k] = v
-            pooled['garmin'] = [str(i) for i in pooled['garmin']] + ids
-            notes.append(f'{d} run +{len(new)} -> {pooled.get("km")}km')
-        else:
-            f = run_fields(new)
+        planned = session_for(plan_days.get(d))
+        if planned == 'Run commute' or any(e.get('session') == 'Run commute' for e in runs):
+            # the way to the gym and the way back are one entry
+            pooled = next((e for e in runs if e.get('garmin')), None)
+            prev = [a for a in day if aid(a) in {str(i) for i in (pooled or {}).get('garmin', [])}]
             mine = next((e for e in runs if not e.get('garmin')), None)
-            if mine:                                   # typed or checked off on the site: fill only what is empty
-                for k, v in f.items():
-                    if empty(mine.get(k)):
-                        mine[k] = v
+            if pooled and len(prev) == len(pooled['garmin']):
+                # the second leg: add it, replacing only the numbers this script wrote
+                was, now = run_fields(prev), run_fields(prev + new)
+                for k, v in now.items():
+                    if empty(pooled.get(k)) or pooled.get(k) == was.get(k):
+                        pooled[k] = v
+                pooled['garmin'] = [str(i) for i in pooled['garmin']] + ids
+                notes.append(f'{d} run +{len(new)} -> {pooled.get("km")}km')
+            elif mine:                                 # typed or checked off on the site: fill only what is empty
+                fill(mine, run_fields(new))
                 mine['garmin'] = ids
-                notes.append(f'{d} run filled {f.get("km")}km')
+                notes.append(f'{d} run filled {mine.get("km")}km')
             else:
-                log.append({'id': 'g' + ids[0], 'date': d, 'session': session_for(plan_days.get(d)), **f, 'garmin': ids})
+                f = run_fields(new)
+                log.append({'id': 'g' + ids[0], 'date': d, 'session': 'Run commute', **f, 'garmin': ids})
                 notes.append(f'{d} run new {f.get("km")}km')
+        else:
+            # any other day: one entry per watch record (a jog and the strides after it stay apart).
+            # The longest goes first: it is the planned run, and the entry checked off on the site is meant for it.
+            for a in sorted(new, key=lambda x: -(x.get('distance') or 0)):
+                f = run_fields([a])
+                free = [e for e in runs if not e.get('garmin')]
+                with_km = [e for e in free if not empty(e.get('km'))]
+                mine = (min(with_km, key=lambda e: abs(float(e['km']) - f.get('km', 0))) if with_km and len(with_km) == len(free)
+                        else next((e for e in free if empty(e.get('km'))), None))
+                if mine:
+                    fill(mine, f)
+                    mine['garmin'] = [aid(a)]
+                    notes.append(f'{d} run filled {f.get("km")}km')
+                else:
+                    first = not any(e.get('garmin') for e in runs)
+                    e = {'id': 'g' + aid(a), 'date': d, 'session': (planned if first and planned else session_by_type(a)), **f, 'garmin': [aid(a)]}
+                    log.append(e)
+                    runs.append(e)
+                    notes.append(f'{d} run new {f.get("km")}km')
         for i in ids:
             seen[i] = d
     return notes
