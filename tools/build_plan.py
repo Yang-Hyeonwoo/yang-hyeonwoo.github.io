@@ -19,7 +19,7 @@ def week_label(monday):
 
 HYROX = {0: ("Functional", "RPE 8–9"), 1: ("Double", "RPE 8 · 한두 개 여유"),
          3: ("Interval / Strength", "RPE 8–9"), 4: ("Single", "전력")}
-HOLIDAYS = {D(2026, 12, 25): "성탄절", D(2027, 1, 1): "신정"}
+HOLIDAYS = {D(2026, 12, 11): "Hyrox Training 없음", D(2026, 12, 25): "성탄절", D(2027, 1, 1): "신정"}   # days HY5 is closed or has no class
 MAINTENANCE = (D(2026, 12, 24), D(2027, 1, 1))   # year-end week: no deficit
 
 # monday: (gym round-trip run weekdays, bonus gym round-trip run weekdays, Wednesday run, Wednesday detail, recovery week?)

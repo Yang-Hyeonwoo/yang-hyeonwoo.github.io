@@ -274,6 +274,7 @@ def merge_runs(log, plan_days, acts, seen, laps_of):
                     if empty(mine.get(k)):
                         mine[k] = v
                 mine['garmin'] = ids
+                mine.pop('planned', None)
                 notes.append(f'{d} run filled {mine.get("km")}km')
             else:
                 longest = max(new, key=lambda x: x.get('distance') or 0)
@@ -304,6 +305,7 @@ def merge_class_hr(log, acts, seen):
                 e[k] = int(round(v))
                 filled.append(k)
         e['garmin'] = [aid(a)]
+        e.pop('planned', None)                         # written ahead, and now the watch says it happened
         seen[aid(a)] = d
         if filled:
             notes.append(f'{d} class heart rate')

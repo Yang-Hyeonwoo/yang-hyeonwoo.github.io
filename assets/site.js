@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1126w';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1126x';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -153,6 +153,10 @@
   const weekRun = (mon, plan, log) => ({ km: runSum(log, iso(mon), iso(addDays(mon, 6))).km, meta: plan.weeks.find((w) => w.start === iso(mon)) });
   const hyroxCount = (log, a, b) => log.filter((e) => e.date >= a && e.date <= b && HYROX.includes(e.session)).length;
   const live = (arr) => arr.filter((e) => !e.deleted);   // a deleted entry stays in the file, flagged: that is the trash can
+  // An entry written ahead (a class's WOD posted the day before) carries planned: true. It counts as done once an
+  // outcome is in it (result, RPE, notes, or heart rate from the watch), or once it is checked off on Home.
+  const ahead = (e) => !!e.planned && !['result', 'rpe', 'avg_hr', 'notes'].some((k) => e[k] != null && e[k] !== '');
+  const done = (arr) => live(arr).filter((e) => !ahead(e));
   const avgOf = (a) => (a.length ? a.reduce((s, v) => s + v, 0) / a.length : null);
   // A run always reads the same way: distance, pace, then a few words on how it went (full adds the kind and the time).
   const briefOf = (e) => e.brief || String(e.notes || '').split('\n')[0].slice(0, 28);
@@ -272,7 +276,7 @@
   const MONTH0 = `${TODAY.slice(0, 8)}01`;
 
   async function hub() {
-    const [plan, log, daily] = await Promise.all([load('plan'), load('log').then(live), load('daily')]);
+    const [plan, log, daily] = await Promise.all([load('plan'), load('log').then(done), load('daily')]);
     $('#hubDday').textContent = ddayText(dday(plan));
     $('#hubHyrox').textContent = `${hyroxCount(log, MONTH0, TODAY)}회`;
     $('#hubRun').textContent = `${runSum(log, MONTH0, TODAY).km.toFixed(1)}km`;
@@ -339,7 +343,7 @@
   }
 
   async function training() {
-    const [plan, daily] = await Promise.all([load('plan'), load('daily')]); let log = await load('log').then(live);
+    const [plan, daily] = await Promise.all([load('plan'), load('daily')]); let log = await load('log').then(done);
     const cur = [...plan.roadmap].reverse().find((r) => r.from <= TODAY) || plan.roadmap[0];
     const wkNow = plan.weeks.find((w) => w.start === iso(monday(NOW)) && w.concept);
     $('#goals').innerHTML = `<div class="dday"><div class="count"><div class="t">${esc(plan.race.name)} · ${esc(plan.race.division)}</div><div class="n num">${ddayText(dday(plan)).replace('-', '<i class="dash"></i>')}</div>
@@ -364,7 +368,9 @@
       const e = { id: `e${Date.now().toString(36)}`, date: TODAY, session }; if (format) e.format = format;
       if (it.k === 'core') { e.workout = '행잉 레그레이즈'; const reps = $('[data-reps]', b.parentElement).value.trim(); if (reps) e.result = reps; }
       b.disabled = true;
-      try { log = live(await save('log', (arr) => { arr.push(e); arr.sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0)); return arr; }, `log: ${e.date} ${e.session}`)); paint(); }
+      try { log = done(await save('log', (arr) => { const pre = arr.find((x) => x.date === TODAY && !x.deleted && ahead(x) && kindOf(x) === kindOf(e));
+          if (pre) { delete pre.planned; if (e.result && !pre.result) pre.result = e.result; } else arr.push(e);
+          arr.sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0)); return arr; }, `log: ${e.date} ${e.session}`)); paint(); }
       catch (err) { alert(err.message); b.disabled = false; } };
     // ---- Training / Nutrition / Recovery charts ----
     // The four weekly charts share one x-axis: the same weeks, in the same positions, with the same labels.
@@ -419,7 +425,7 @@
   }
 
   async function planPage() {
-    const [plan, log] = await Promise.all([load('plan'), load('log').then(live)]);
+    const [plan, log] = await Promise.all([load('plan'), load('log').then(done)]);
     const thisMon = iso(monday(NOW));
     const phase = [...plan.roadmap].reverse().find((r) => r.from <= TODAY) || plan.roadmap[0];
     $('#road').innerHTML = `<div class="road" style="margin-top:0">${plan.roadmap.map((r) => `<div class="${r === phase ? 'now' : r.from < phase.from ? 'past' : ''}"><div class="m">${esc(r.m)}</div><div class="th">${esc(r.theme)}</div><div class="f">${esc(r.focus)}</div></div>`).join('')}</div>`;
@@ -582,7 +588,7 @@
         else if (n) { if (e.brief) { shown += `<div class="pre sum q">${esc(e.brief)}</div>`; vis.push(e.brief); } hidden += block('Notes', n); parts.push('메모'); }
         if (hidden) hidden = `<div class="cols">${hidden}</div>`; label = parts.join(' · '); }
       const openIt = ws.length > 0 && hidden && !hit(vis.filter(Boolean).join('\n').toLowerCase(), ws);
-      return `<article class="entry"><div class="when">${fmtDate(e.date)}</div><div><div class="top"><span class="ttl">${esc(e.session)}</span>${e.format ? `<span class="fmt">${esc(e.format)}</span>` : ''}${tools(e.id)}</div>
+      return `<article class="entry"><div class="when">${fmtDate(e.date)}</div><div><div class="top"><span class="ttl">${esc(e.session)}</span>${e.format ? `<span class="fmt">${esc(e.format)}</span>` : ''}${ahead(e) ? ' <span class="chip a">예정</span>' : ''}${tools(e.id)}</div>
         ${meta.length ? `<p class="meta num${k === 'run' ? ' fact' : ''}">${meta.join(' · ')}</p>` : ''}${shown}${hidden ? `<details class="ed"${openIt ? ' open' : ''}><summary>${label}</summary>${hidden}</details>` : ''}</div></article>`; };
     const KN = { hyrox: 'Hyrox', run: 'Running', weights: 'Weight' };
     const render = () => { const ws = words();
@@ -593,9 +599,9 @@
         if (!g || g.key !== key) { g = { key, rows: [] }; groups.push(g); } g.rows.push(e); });
       const isOpen = (g, i) => (ws.length ? true : list._open ? list._open.has(g.key) : i < 2);
       const split = (g) => groups.some((x) => x !== g && x.key.slice(0, 7) === g.key.slice(0, 7));
-      const head = (g) => { const ym = g.key.slice(0, 7); const n = {}; g.rows.forEach((e) => { const k = kindOf(e); n[k] = (n[k] || 0) + 1; });
+      const head = (g) => { const ym = g.key.slice(0, 7); const n = {}; const real = g.rows.filter((e) => !ahead(e)); real.forEach((e) => { const k = kindOf(e); n[k] = (n[k] || 0) + 1; });
         const kinds = filter === 'all' ? Object.keys(KN).filter((k) => n[k]).map((k) => `${KN[k]} ${n[k]}`).join(' · ') : '';
-        return `<summary><span class="mo-t">${ym.slice(0, 4)}년 ${+ym.slice(5)}월${split(g) ? `<small>${g.key.endsWith('h') ? 'Hyrox 시작 후' : 'Hyrox 시작 전'}</small>` : ''}</span><span class="mo-n num">${g.rows.length}건${kinds ? ` · ${kinds}` : ''}</span></summary>`; };
+        return `<summary><span class="mo-t">${ym.slice(0, 4)}년 ${+ym.slice(5)}월${split(g) ? `<small>${g.key.endsWith('h') ? 'Hyrox 시작 후' : 'Hyrox 시작 전'}</small>` : ''}</span><span class="mo-n num">${real.length}건${real.length < g.rows.length ? ` + 예정 ${g.rows.length - real.length}` : ''}${kinds ? ` · ${kinds}` : ''}</span></summary>`; };
       let out = ''; let placed = false; const bodies = {};
       groups.forEach((g, i) => { if (recap && !placed && g.key.endsWith('w')) { out += recap.html; placed = true; }
         bodies[g.key] = () => g.rows.map((e) => entry(e, ws)).join('');
@@ -656,7 +662,7 @@
 
   // Records: every day since the first record, newest first, with the form to add or fix a day.
   async function recordsPage() {
-    let daily = await load('daily'); const [plan, log] = await Promise.all([load('plan'), load('log').then(live)]); let body = await load('inbody');
+    let daily = await load('daily'); const [plan, log] = await Promise.all([load('plan'), load('log').then(done)]); let body = await load('inbody');
     const form = $('#dayForm'), msg = $('#dayMsg'); const f = form.elements;
     const NUM = ['weight', 'kcal', 'carb', 'prot', 'fat'], TXT = ['bed', 'wake', 'note'], MEALS = ['breakfast', 'lunch', 'snack', 'dinner', 'late'];
     const OLD = { kcal: 2000, carb: 226, prot: 150, fat: 55 };          // the tracker's goals before this plan started

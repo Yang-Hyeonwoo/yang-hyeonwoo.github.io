@@ -565,18 +565,13 @@
    "week": "12월 둘째 주",
    "items": [
     {
-     "k": "hyrox",
-     "t": "Hyrox Training · Single",
-     "d": "17:50 · 전력",
-     "key": true
-    },
-    {
-     "k": "core",
-     "t": "행잉 레그레이즈 3–4세트"
+     "k": "rest",
+     "t": "휴무 · Hyrox Training 없음",
+     "d": "대체 훈련 없음"
     }
    ],
-   "kcal": 2300,
-   "carb": 270,
+   "kcal": 2000,
+   "carb": 200,
    "prot": 155,
    "fat": 65
   },
