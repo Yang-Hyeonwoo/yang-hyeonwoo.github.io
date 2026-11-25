@@ -7,6 +7,11 @@ on:
   schedule:
     - cron: '23 * * * *'        # every hour; GitHub may start it some minutes late
   workflow_dispatch:
+    inputs:
+      inspect:
+        description: 'print the laps of this date (YYYY-MM-DD) instead of syncing'
+        required: false
+        default: ''
 
 permissions:
   contents: write               # save data/*.json
@@ -37,7 +42,8 @@ jobs:
         env:
           GARMINTOKENS: ${{ secrets.GARMIN_TOKENS }}
           GITHUB_TOKEN: ${{ github.token }}
-        run: python tools/garmin_sync.py --tokens-out "$RUNNER_TEMP/garmin_tokens.json"
+          INSPECT: ${{ inputs.inspect }}
+        run: python tools/garmin_sync.py --tokens-out "$RUNNER_TEMP/garmin_tokens.json" ${INSPECT:+--inspect "$INSPECT"}
       - name: Keep the new login tokens
         # Garmin may replace the refresh token when it is used. Saving it back needs a token that may write
         # this repository's secrets (SECRET_WRITER); the workflow's own token is not allowed to.

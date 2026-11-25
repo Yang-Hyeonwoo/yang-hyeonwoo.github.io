@@ -368,12 +368,31 @@ def keep_tokens(g, tokens, path):
         print('::warning::Garmin replaced the login tokens during this run and there is nowhere to keep the new ones.')
 
 
+def inspect(g, d):
+    """Only training numbers are printed (the log is public): no names, places or GPS."""
+    for a in g.get_activities_by_date(d, d):
+        print('activity', type_key(a), 'dist', a.get('distance'), 'dur', a.get('duration'))
+        laps = (g.get_activity_splits(aid(a)) or {}).get('lapDTOs') or []
+        if laps:
+            print('  lap keys:', sorted(k for k in laps[0] if not any(x in k.lower() for x in ('lat', 'lon', 'name'))))
+        for l in laps:
+            print('  lap', l.get('lapIndex'), 'dist', l.get('distance'), 'dur', l.get('duration'), 'mov', l.get('movingDuration'),
+                  'spd', l.get('averageSpeed'), 'hr', l.get('averageHR'), 'int', l.get('intensityType'), 'trig', l.get('lapTrigger') or l.get('triggerMethod'))
+        try:
+            ts = g.get_activity_typed_splits(aid(a)) or {}
+            for s in (ts.get('splits') or [])[:30]:
+                print('  typed', s.get('type'), 'dist', s.get('distance'), 'dur', s.get('duration'), 'spd', s.get('averageSpeed'))
+        except Exception as e:
+            print('  typed splits:', type(e).__name__)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--local', help='folder with copies of the data files, instead of GitHub')
     ap.add_argument('--fixture', help='JSON file {"activities": [...], "sleep": {date: dailySleepDTO}} instead of Garmin')
     ap.add_argument('--now', help='pretend it is this time (ISO), for tests')
     ap.add_argument('--dry', action='store_true', help='report only, save nothing')
+    ap.add_argument('--inspect', help='print the laps of the runs on this date (YYYY-MM-DD) and stop; for working out new rules')
     ap.add_argument('--tokens-out', help='write the tokens here when Garmin replaced them during this run')
     a = ap.parse_args()
     now = datetime.fromisoformat(a.now).astimezone(TZ) if a.now else datetime.now(TZ)
@@ -397,6 +416,9 @@ def main():
         try:
             g = garmin_login(tokens)
             keep_tokens(g, tokens, a.tokens_out)       # straight away, in case anything below fails
+            if a.inspect:
+                inspect(g, a.inspect)
+                return 0
             acts = g.get_activities_by_date(start, today)
             sleeps = {d: (g.get_sleep_data(d) or {}).get('dailySleepDTO') for d in sleep_dates(daily, now)}
         except GarminConnectAuthenticationError as e:
