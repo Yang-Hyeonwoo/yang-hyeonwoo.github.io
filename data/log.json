@@ -1401,6 +1401,27 @@
  {
   "id": "emww37bp4",
   "date": "2026-11-25",
-  "session": "Jogging"
+  "session": "Jogging",
+  "km": 8.0,
+  "minutes": 50.8,
+  "pace": "6:21",
+  "avg_hr": 147,
+  "max_hr": 163,
+  "garmin": [
+   "25193316182"
+  ]
+ },
+ {
+  "id": "g25193394939",
+  "date": "2026-11-25",
+  "session": "Interval run",
+  "km": 1.59,
+  "minutes": 9.1,
+  "pace": "5:44",
+  "avg_hr": 178,
+  "max_hr": 192,
+  "garmin": [
+   "25193394939"
+  ]
  }
 ]
