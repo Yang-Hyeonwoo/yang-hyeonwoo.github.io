@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1126q';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1126r';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -403,6 +403,10 @@
     const thisMon = iso(monday(NOW));
     const phase = [...plan.roadmap].reverse().find((r) => r.from <= TODAY) || plan.roadmap[0];
     $('#road').innerHTML = `<div class="road" style="margin-top:0">${plan.roadmap.map((r) => `<div class="${r === phase ? 'now' : r.from < phase.from ? 'past' : ''}"><div class="m">${esc(r.m)}</div><div class="th">${esc(r.theme)}</div><div class="f">${esc(r.focus)}</div></div>`).join('')}</div>`;
+    // the weeks at a glance, under the roadmap: number, dates, what the week is for, its Wednesday run, base running distance
+    $('#weekTable').innerHTML = `<div class="scroll-x"><table class="t"><thead><tr><th>주차</th><th>기간</th><th>콘셉트</th><th>수요일 러닝</th><th class="r">러닝 기본</th></tr></thead><tbody>${plan.weeks.map((w, i) => { const mon = parse(w.start);
+      const wed = plan.days[iso(addDays(mon, 2))]; const run = wed && wed.items.find((it) => it.k === 'run');
+      return `<tr${w.start === thisMon ? ' class="now"' : ''}><td class="num" style="white-space:nowrap"><a href="#w-${w.start}"><b>${i + 1}주차</b></a></td><td style="white-space:nowrap"><b>${esc(w.label)}</b><br><span class="small muted num">${md(mon)}–${md(addDays(mon, 6))}</span></td><td>${esc(w.concept || '')}${w.recovery ? ' <span class="chip w">회복 주</span>' : ''}</td><td>${run ? esc(run.t) : '–'}</td><td class="r num" style="white-space:nowrap">${w.run_km}km${w.bonus_km ? `<br><span class="small muted">보너스 +${w.bonus_km}km</span>` : ''}</td></tr>`; }).join('')}</tbody></table></div>`;
     const raceMon = monday(parse(plan.race.date)); const totalWeeks = Math.round((raceMon - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
     const nowNo = Math.round((monday(NOW) - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
     $('#weekTotal').textContent = `대회 주까지 총 ${totalWeeks}주${nowNo >= 1 && nowNo <= totalWeeks ? ` · 지금 ${nowNo}주차` : ''}`;

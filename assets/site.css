@@ -427,3 +427,6 @@ table.days td.num { padding-left: 5px; padding-right: 5px; }
 .tone-run { color: #1a7f4b; } .tone-wt { color: #8a5a00; } .tone-core { color: var(--ink); }
 .dday .count .r .lbl { display: block; margin-bottom: 2px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.62); }
 .recap .lead { line-height: 1.8; }
+
+table.t tr.now td { background: var(--accent-soft); }
+#weekTable td { vertical-align: middle; }
