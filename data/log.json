@@ -1413,6 +1413,14 @@
   ]
  },
  {
+  "date": "2026-11-25",
+  "session": "Weight Training",
+  "format": "Upper",
+  "workout": "Bench Press · 70kg × 6, 6, 6, 6\nT-Bar Row · 47.5kg × 8, 8\nPull-Up · 맨몸 × 6, 6\nLateral Raise Machine · 30kg × 15, 15, 13, 12\nHanging Leg Raise · 맨몸 × 16, 11, 8",
+  "notes": "Bench Press: 70kg 4×6 달성 · 4×6 → +2.5kg\nT-Bar Row: 2세트 · 3×10 되면 +2.5kg\nLateral Raise Machine: 30kg 첫 시도 · 4×15 되면 한 칸",
+  "id": "w1125"
+ },
+ {
   "id": "p1126",
   "date": "2026-11-26",
   "session": "Interval",
