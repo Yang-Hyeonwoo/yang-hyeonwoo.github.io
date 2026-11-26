@@ -584,8 +584,11 @@
       if (rows) { const sum = rows.map((m) => (m[2] && /\d/.test(m[2]) ? `${m[1]} ${m[2]}` : m[1])).join(' · '); vis.push(sum);
         shown = `<p class="sum clamp">${esc(sum)}</p>`; hidden = liftTable(e); label = '세트 기록'; }
       else { const w = e.workout, n = e.notes; const parts = [];
-        if (e.result) { shown += `<div class="res"><h4>Result</h4><div class="pre">${esc(e.result)}</div></div>`; vis.push(e.result); }
-        if (short(w)) { shown += `<div class="pre sum">${esc(w)}</div>`; vis.push(w); } else if (w) { hidden += block('Workout', w); parts.push('운동 내용'); }
+        // the WOD is what the day was about: always shown in full, with the result beside it (under it on a phone)
+        const res = e.result ? `<div class="res"><h4>Result</h4><div class="pre">${esc(e.result)}</div></div>` : '';
+        if (w && res) shown += `<div class="wod"><div><h4>${k === 'hyrox' ? 'WOD' : 'Workout'}</h4><div class="pre">${esc(w)}</div></div>${res}</div>`;
+        else if (w) shown += `<div class="pre sum">${esc(w)}</div>`; else shown += res;
+        vis.push(w, e.result);
         if (short(n)) { shown += `<div class="pre sum q">${esc(n)}</div>`; vis.push(n); }
         else if (n) { if (e.brief) { shown += `<div class="pre sum q">${esc(e.brief)}</div>`; vis.push(e.brief); } hidden += block('Notes', n); parts.push('메모'); }
         if (hidden) hidden = `<div class="cols">${hidden}</div>`; label = parts.join(' · '); }
