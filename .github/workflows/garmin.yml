@@ -5,7 +5,8 @@ name: Garmin sync
 
 on:
   schedule:
-    - cron: '23 * * * *'        # every hour; GitHub may start it some minutes late
+    - cron: '23 * * * *'        # every hour; GitHub may start it late or skip it
+    - cron: '53 * * * *'        # a second slot: GitHub drops many scheduled runs
   workflow_dispatch:
     inputs:
       inspect:

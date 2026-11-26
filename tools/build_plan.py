@@ -63,17 +63,19 @@ CONCEPT = {
     D(2027, 1, 25): "회복 주 · 5km 재측정으로 두 달 점검",
 }
 
-COMMUTE_KM = 8                                   # gym is 4 km from home one way (measured 2026-11-26)
+COMMUTE_OUT, COMMUTE_BACK = 4, 4.3               # home -> gym and gym -> home by the running routes (measured 2026-11-26)
+COMMUTE_KM = COMMUTE_OUT + COMMUTE_BACK
+km = lambda x: "%g" % round(x, 1)
 FIRST_DAY = D(2026, 11, 23)                      # the first Hyrox Training: week 1 starts here
 NO_CORE = {D(2026, 11, 23), D(2026, 11, 24)}     # days the hanging leg raises were not part of the session
 
 days, weeks = {}, []
 for monday, (commute, bonus, wed_run, wed_detail, recovery) in sorted(WEEKS.items()):
     label = week_label(monday)
-    run_km = WED_KM[monday] + COMMUTE_KM * len(commute)
+    run_km = round(WED_KM[monday] + COMMUTE_KM * len(commute), 1)
     weeks.append({"label": label, "start": monday.isoformat(), "concept": CONCEPT[monday], "recovery": recovery, "run_km": run_km,
-                  "run_note": "왕복 러닝 %d회 %dkm + 수요일 %dkm" % (len(commute), COMMUTE_KM * len(commute), WED_KM[monday]),
-                  "bonus_km": COMMUTE_KM * len(bonus)})
+                  "run_note": "왕복 러닝 %d회 %skm + 수요일 %dkm" % (len(commute), km(COMMUTE_KM * len(commute)), WED_KM[monday]),
+                  "bonus_km": round(COMMUTE_KM * len(bonus), 1)})
     for wd in range(7):
         d = monday + dt.timedelta(days=wd)
         items, kcal, carb = [], 2000, 200
@@ -87,10 +89,10 @@ for monday, (commute, bonus, wed_run, wed_detail, recovery) in sorted(WEEKS.item
                 items[-1]["first"] = True
             kcal, carb = 2300, 270
             if wd in commute:
-                items.append({"k": "commute", "t": "체육관 왕복 러닝 %dkm" % COMMUTE_KM, "d": "편도 %dkm · 심박 150 이하" % (COMMUTE_KM // 2) + (" · 끝에 " + STRIDES if wd == 0 else "")})
+                items.append({"k": "commute", "t": "체육관 왕복 러닝 %skm" % km(COMMUTE_KM), "d": "갈 때 %skm · 올 때 %skm · 심박 150 이하" % (km(COMMUTE_OUT), km(COMMUTE_BACK)) + (" · 끝에 " + STRIDES if wd == 0 else "")})
                 kcal, carb = 2500, 320
             elif wd in bonus:
-                items.append({"k": "commute", "t": "체육관 왕복 러닝 %dkm" % COMMUTE_KM, "d": "보너스 · 컨디션 좋은 날만, 아니면 자전거", "opt": True})
+                items.append({"k": "commute", "t": "체육관 왕복 러닝 %skm" % km(COMMUTE_KM), "d": "보너스 · 컨디션 좋은 날만, 아니면 자전거", "opt": True})
             if d not in NO_CORE:
                 items.append({"k": "core", "t": "행잉 레그레이즈 3–4세트"})
         elif wd == 2:
@@ -139,4 +141,4 @@ with open(out_dir + "/plan.json", "w", encoding="utf-8", newline="\n") as f:
     json.dump(plan, f, ensure_ascii=False, indent=1)
 print("plan.json:", len(weeks), "weeks,", len(days), "days")
 for w in weeks:
-    print(" ", w["label"], w["start"], w["run_km"], "km", "(+%d)" % w["bonus_km"], "회복" if w["recovery"] else "")
+    print(" ", w["label"], w["start"], w["run_km"], "km", "(+%g)" % w["bonus_km"], "회복" if w["recovery"] else "")
