@@ -531,8 +531,11 @@ table.body-all td, table.body-all th { white-space: nowrap; }
 
 /* ---- daily records: the date opens that day in the form; a small pencil says so ---- */
 .dbtn { display: inline-flex; align-items: center; gap: 3px; }
-.dbtn .pen { display: inline-flex; color: var(--faint); }
-.dbtn:hover .pen { color: var(--accent); }
+/* the pencil shows only while the row is under the pointer (or the date has keyboard focus); its space is kept so nothing moves.
+   On a touch screen there is no hover: the line above the table says the date opens that day. */
+.dbtn .pen { display: inline-flex; color: var(--accent); opacity: 0; transition: opacity 150ms var(--ease); }
+table.days tbody tr:hover .dbtn .pen, .dbtn:focus-visible .pen { opacity: 1; }
+@media (hover: none) { table.days tbody tr:hover .dbtn .pen { opacity: 0; } }
 
 /* ---- InBody: the rest of the latest sheet, segmental lean and composition, the 970 sheets side by side ---- */
 .body-h span.chip { display: inline-block; margin: 0 4px; vertical-align: 1px; }
