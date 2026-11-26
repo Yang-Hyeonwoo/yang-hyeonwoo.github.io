@@ -1447,5 +1447,14 @@
    "25203725523"
   ],
   "workout": "갈 때 4.0km · 6:13/km\n올 때 4.3km · 6:31/km"
+ },
+ {
+  "id": "p1127",
+  "date": "2026-11-27",
+  "session": "Hyrox Single",
+  "format": "AMRAP",
+  "minutes": 30,
+  "workout": "AMRAP 30 min\n#1 Burpee to Box · 5 - 10 - 15 - 20…\n#2 Wall Ball Shot 9kg · 10 - 20 - 30 - 40…\n#3 Machine · 150 - 300 - 450 - 600m…",
+  "planned": true
  }
 ]
