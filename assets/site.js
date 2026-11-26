@@ -243,6 +243,30 @@
     });
   }
   // One bar per kind (Hyrox, Running, Weight) in each group. cats: [{ label, tip, v: [hyrox, run, weights] }]
+  // Days trained per month, the way the old tracker drew it: one column per month as tall as the days trained (out of the
+  // month's 31-day scale), split by kind in proportion to how many days each kind had, each part labelled with its count.
+  // A day with two kinds counts in both, so the parts can add up to more than the total on top.
+  function daysChart(box, cats, o) {
+    const W = 520, H = o.h || 210, L = 26, R = 8, T = 22, B = 22; const top = 31;
+    const gw = (W - L - R) / cats.length, bw = Math.min(40, gw * 0.56); const Y = (v) => T + (1 - v / top) * (H - T - B);
+    const grid = [0, 10, 20, 30].map((v) => `<line x1="${L}" x2="${W - R}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="rgba(0,0,0,${v ? 0.06 : 0.14})"/><text class="ax" x="${L - 6}" y="${(Y(v) + 3.5).toFixed(1)}" text-anchor="end">${v}</text>`).join('');
+    const marks = cats.map((c, i) => { const x = L + i * gw + (gw - bw) / 2; const sum = c.v.reduce((a, b) => a + b, 0); let y = H - B; let out = '';
+      const parts = c.v.map((v, k) => ({ v, k })).filter((q) => q.v);
+      parts.forEach((q, j) => { const h = sum ? (q.v / sum) * (H - B - Y(c.total)) : 0; const y0 = y - h; const last = j === parts.length - 1; const r = last ? Math.min(4, h, bw / 2) : 0; const gap = j ? 1 : 0;
+        out += `<path d="M${x.toFixed(1)} ${(y - gap).toFixed(1)}V${(y0 + r).toFixed(1)}${r ? `q0-${r} ${r}-${r}h${(bw - 2 * r).toFixed(1)}q${r} 0 ${r} ${r}` : `h${bw.toFixed(1)}`}V${(y - gap).toFixed(1)}z" fill="${KINDS[q.k].color}"/>`;
+        if (h >= 13) out += `<text class="vl in" x="${(x + bw / 2).toFixed(1)}" y="${(y0 + h / 2 + 3.5).toFixed(1)}" text-anchor="middle">${q.v}</text>`;
+        y = y0; });
+      out += c.total ? `<text class="vl tot" x="${(x + bw / 2).toFixed(1)}" y="${(Y(c.total) - 5).toFixed(1)}" text-anchor="middle">${c.total}</text>` : '';
+      return `${out}<rect data-i="${i}" x="${(L + i * gw).toFixed(1)}" y="0" width="${gw.toFixed(1)}" height="${H - B}" fill="transparent"/>`; }).join('');
+    const xl = cats.map((c, i) => `<text class="ax" x="${(L + i * gw + gw / 2).toFixed(1)}" y="${H - 5}" text-anchor="middle">${c.label}</text>`).join('');
+    box.innerHTML = `<div class="legend">${KINDS.map((q) => `<span><i style="background:${q.color}"></i>${q.name}</span>`).join('')}</div>
+      <svg class="days-ch" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label)}">${grid}${marks}${xl}</svg><div class="tip"></div>`;
+    const tip = $('.tip', box), svg = $('svg', box);
+    box.querySelectorAll('rect[data-i]').forEach((r) => { const i = +r.dataset.i, c = cats[i];
+      const show = () => { tip.innerHTML = `${c.tip || c.label} · <b>${c.total}</b>일 운동 · ${KINDS.map((q, k) => `${q.name} ${c.v[k]}`).join(' · ')}`; tip.style.left = `${Math.min(72, Math.max(28, (L + (i + 0.5) * gw) / W * 100))}%`;
+        tip.style.top = `${svg.offsetTop + Y(c.total) / H * svg.getBoundingClientRect().height - 12}px`; tip.style.opacity = 1; };
+      r.addEventListener('mouseenter', show); r.addEventListener('touchstart', show, { passive: true }); r.addEventListener('mouseleave', () => { tip.style.opacity = 0; }); });
+  }
   function kindChart(box, cats, o) {
     const W = 520, H = o.h || 170, L = 28, R = 12, T = 20, B = 22; const K = KINDS.length;
     const top = Math.max(2, Math.ceil(Math.max(...cats.map((c) => Math.max(...c.v))) / 2) * 2);
@@ -411,8 +435,9 @@
       const by = {}; const KEYS = ['hyrox', 'run', 'weights'];
       Object.values(ix).forEach((x) => { const k = x.date.slice(0, 7); const a = (by[k] = by[k] || { ym: k, v: [0, 0, 0], any: 0, days: 0 }); KEYS.forEach((key, i) => { if (x[key]) a.v[i]++; }); if (x.any) a.any++; a.days++; });
       const thisYm = TODAY.slice(0, 7); const months = Object.values(by).filter((a) => a.days >= 7 || a.ym === thisYm).sort((a, b) => (a.ym < b.ym ? -1 : 1));
-      $('#nowMD').innerHTML = `${(by[thisYm] || { any: 0 }).any}<small>일 · ${MON[NOW.getMonth()]} 운동한 날</small>`;
-      kindChart($('#chMD'), months.map((a) => ({ label: MON[+a.ym.slice(5) - 1], v: a.v })), { label: '월별 운동한 날', unit: '일', h: 200 });
+      const mNow = by[thisYm] || { any: 0, v: [0, 0, 0] };
+      $('#nowMD').innerHTML = `${mNow.any}<small>일 · ${NOW.getMonth() + 1}월 운동한 날</small><span class="chip num">${KINDS.map((q, k) => `${q.name} ${mNow.v[k]}`).join(' · ')}</span>`;
+      daysChart($('#chMD'), months.map((a) => ({ label: `${+a.ym.slice(5)}월`, tip: `${a.ym.slice(0, 4)}년 ${+a.ym.slice(5)}월`, v: a.v, total: a.any })), { label: '월별 운동한 날', h: 210 });
       // Recovery: the last four weeks in numbers
       const from = iso(addDays(NOW, -27)); const rec = daily.filter((r) => r.date >= from && r.date <= TODAY && mins(r.sleep) != null);
       const late = (t) => { const v = mins(t); return v == null ? null : v < 18 * 60 ? v + 1440 : v; };      // 1:30 counts as later than 23:30
