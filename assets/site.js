@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1126y';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1126z';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -146,6 +146,7 @@
   const isDone = (item, date, log) => !!doneEntry(item, date, log);
   const KIND = { hyrox: 'Hyrox', commute: 'Run', run: 'Run', weights: 'Weight', core: 'Core', rest: 'Rest', free: 'Free' };
   const doneChip = '<span class="chip g">완료</span>';
+  const ICON_PEN = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
   const doneMark = '<span class="tick" role="img" aria-label="완료">✓</span>';
 
   // ---------- sums ----------
@@ -685,13 +686,13 @@
         const part = (l, t) => (t ? `<div><b>${l}</b><span>${esc(t)}</span></div>` : '');
         const detail = part('Hyrox', x.hyrox) + part('Running', x.runFull) + part('Weight', wt) + part('Sleep', r.bed ? `${r.sleep || ''} (${r.bed} → ${r.wake || ''})` : '')
           + part('Nutrition', r.kcal != null ? `${n0(r.kcal)}kcal · 탄 ${r.carb ?? '–'}g · 단 ${r.prot ?? '–'}g · 지 ${r.fat ?? '–'}g` : '') + part('Note', noteT);
-        out += `<tr><td class="num">${canWrite() ? `<button class="dbtn" type="button" data-edit="${ds}" title="이 날 기록 고치기">${dayLabel}</button>` : dayLabel}</td>
+        out += `<tr><td class="num">${canWrite() ? `<button class="dbtn" type="button" data-edit="${ds}" title="이 날 기록 고치기" aria-label="${ds} 기록 고치기">${dayLabel}<span class="pen">${ICON_PEN}</span></button>` : dayLabel}</td>
           <td class="num">${sl == null ? '' : bar(esc(r.sleep), sl / sleepGoal * 100)}</td><td class="num muted d-only">${r.bed ? `${esc(r.bed)} → ${esc(r.wake || '')}` : ''}</td>
           ${clip(x.hyrox)}${clip(x.run)}${clip(wt)}<td class="m-only clip">${esc(allT)}</td><td class="num">${r.weight != null ? r.weight.toFixed(2) : ''}</td>
           <td class="num">${kc}</td><td class="num d-only">${mac('carb')}</td><td class="num d-only">${mac('prot')}</td><td class="num d-only">${mac('fat')}</td>${clip(noteT)}
           <td class="m-only"><button class="xp" type="button" aria-expanded="false" aria-label="${md(dt)} 자세히 보기">▾</button></td></tr>
           <tr class="more-row" hidden><td colspan="12" class="wrap">${detail || '<span class="muted">추가 기록 없음</span>'}</td></tr>`; }
-      $('#dayCount').textContent = `${count}일`;
+      $('#dayCount').textContent = `${count}일${canWrite() ? ' · 날짜를 누르면 그날 기록을 고쳐요' : ''}`;
       $('#dayList').innerHTML = `<div class="scroll-x"><table class="t days"><thead><tr><th class="tl" style="width:8%">Date</th><th style="width:7%">Sleep</th><th class="d-only" style="width:9%">Bed → Wake</th><th class="d-only tl" style="width:11%">Hyrox</th><th class="d-only tl" style="width:17%">Running</th><th class="d-only tl" style="width:8%">Weight</th><th class="m-only tl">운동</th><th style="width:6%">Body kg</th><th style="width:7%">kcal</th><th class="d-only" style="width:5.5%">Carb</th><th class="d-only" style="width:5.5%">Prot</th><th class="d-only" style="width:5.5%">Fat</th><th class="d-only tl">Meals · Note</th><th class="m-only"></th></tr></thead><tbody>${out || '<tr><td colspan="12" class="muted">기록이 없어요.</td></tr>'}</tbody></table></div>`;
     }
     // The form remembers what it showed when it was filled. Saving writes only the fields changed since then, so a form left open

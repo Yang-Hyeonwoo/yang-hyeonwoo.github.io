@@ -528,3 +528,8 @@ table.body-all td, table.body-all th { white-space: nowrap; }
 .go-c { width: 1.4rem; padding-left: 0 !important; text-align: right; color: var(--faint); font-size: 1.1rem; line-height: 1; }
 .wk .h .go-c { width: auto; margin-left: 2px; }
 .plan-week .hd .up { margin-left: auto; font-size: 0.8rem; font-weight: 600; color: var(--accent); white-space: nowrap; }
+
+/* ---- daily records: the date opens that day in the form; a small pencil says so ---- */
+.dbtn { display: inline-flex; align-items: center; gap: 3px; }
+.dbtn .pen { display: inline-flex; color: var(--faint); }
+.dbtn:hover .pen { color: var(--accent); }
