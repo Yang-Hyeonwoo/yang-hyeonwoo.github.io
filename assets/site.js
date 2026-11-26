@@ -301,23 +301,29 @@
 
   // Today's check: a small round button to mark a session done, and the same mark filled in once it is.
   const CHECK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
-  const ckBtn = (i) => `<button class="ck" type="button" data-done="${i}" title="완료로 표시" aria-label="완료로 표시">${CHECK}</button>`;
+  const ckBtn = (key) => `<button class="ck" type="button" data-done="${key}" title="완료로 표시" aria-label="완료로 표시">${CHECK}</button>`;
   const ckOn = `<span class="ck on" role="img" aria-label="완료">${CHECK}</span>`;
   function todayCard(plan, log, daily) {
     const day = plan.days[TODAY]; const rec = daily.find((r) => r.date === TODAY) || {};
     // One tap marks a session done; distance, time and notes can be added later from "자세히".
-    const row = (it, i) => { const m = /^(\d{1,2}:\d{2})\s*·?\s*(.*)$/.exec(it.d || ''); const de = doneEntry(it, TODAY, log); let act = '';
+    const row = (it, i, d = TODAY) => { const m = /^(\d{1,2}:\d{2})\s*·?\s*(.*)$/.exec(it.d || ''); const de = doneEntry(it, d, log); let act = ''; const key = `${d}|${i}`;
       if (de) act = `${it.k === 'core' && de.result ? `<span class="small num muted">${esc(de.result)}</span>` : ''}<a class="small" href="log.html#edit=${encodeURIComponent(de.id)}">자세히</a>${ckOn}`;
-      else if (canWrite() && it.k === 'core') act = `<input class="in sm" data-reps inputmode="text" placeholder="12, 10, 8" aria-label="세트별 개수">${ckBtn(i)}`;
-      else if (canWrite() && sessionFor(it, TODAY)) act = ckBtn(i);
+      else if (canWrite() && it.k === 'core') act = `<input class="in sm" data-reps inputmode="text" placeholder="12, 10, 8" aria-label="세트별 개수">${ckBtn(key)}`;
+      else if (canWrite() && sessionFor(it, d)) act = ckBtn(key);
       return `<div class="todo${it.key ? ' key' : ''}"><span class="kind">${m ? `<b class="num">${m[1]}</b>` : ''}${KIND[it.k] || ''}</span><div class="b"><div class="t">${esc(it.t)}</div><div class="d">${esc(m ? m[2] : it.d || '')}</div></div><div class="act">${act}</div></div>`; };
-    const items = day ? day.items.map(row).join('') : '<p class="note">오늘은 정해진 계획이 없어요.</p>';
+    const items = day ? day.items.map((it, i) => row(it, i)).join('') : '<p class="note">오늘은 정해진 계획이 없어요.</p>';
+    // The last three days' planned sessions not checked yet, so a session logged the next day is still one tap (owner only).
+    // Runs and classes the Garmin sync already filled count as done and don't show here.
+    const back = canWrite() ? [1, 2, 3].map((n) => iso(addDays(parse(TODAY), -n))).map((d) => ({ d, rows: ((plan.days[d] || {}).items || [])
+      .map((it, i) => (it.opt || it.k === 'free' || it.k === 'rest' || isDone(it, d, log) || !(it.k === 'core' || sessionFor(it, d)) ? '' : row(it, i, d))).join('') })).filter((x) => x.rows) : [];
+    const past = back.length ? `<div class="past"><div class="past-h">아직 체크 안 한 지난 운동</div>${back.map((x) => { const dt = parse(x.d);
+      return `<div class="past-d num">${md(dt)} <span class="muted">${KO[dt.getDay()]}요일</span></div>${x.rows}`; }).join('')}</div>` : '';
     const cell = (l, got, goal, unit) => `<div><div class="l">${l}</div><div class="v num">${n0(goal)}<small>${unit}</small></div><div class="s num">${got == null ? '아직 기록 전' : `기록 ${n0(got)}${unit}`}</div></div>`;
     const kv = day ? `<div class="kv">${cell('Calories', rec.kcal, day.kcal, 'kcal')}${cell('Carbs', rec.carb, day.carb, 'g')}${cell('Protein', rec.prot, day.prot, 'g')}${cell('Fat', rec.fat, day.fat, 'g')}</div>` : '';
     const slept = mins(rec.sleep);
     return `<div class="grid g2"><div class="plate today">
         <div class="chips">${day ? `<span class="chip a">${esc(day.week)}</span>` : ''}</div>
-        <h3 class="date">${NOW.getMonth() + 1}월 ${NOW.getDate()}일 <em>${KO[NOW.getDay()]}요일</em></h3>${items}
+        <h3 class="date">${NOW.getMonth() + 1}월 ${NOW.getDate()}일 <em>${KO[NOW.getDay()]}요일</em></h3>${items}${past}
         <div class="form-foot"><a class="btn" href="log.html#new">운동 기록</a><a class="btn line" href="records.html#new">식단 · 체중 기록</a></div></div>
       <div class="soft"><h3 style="font-size:.95rem;color:var(--ink);margin-bottom:12px">Today's Targets <span class="muted" style="font-weight:500">· 오늘 목표</span></h3>${kv}
       <div class="kv" style="margin-top:8px;grid-template-columns:repeat(2,minmax(0,1fr))"><div><div class="l">Bedtime · 오늘 취침</div><div class="v num">${plan.targets.bed}</div><div class="s">기상 ${plan.targets.wake} · ${plan.targets.sleep} 수면</div></div>
@@ -365,11 +371,11 @@
     };
     paint();
     $('#today').onclick = async (ev) => { const b = ev.target.closest('[data-done]'); if (!b) return;
-      const it = plan.days[TODAY].items[+b.dataset.done]; const [session, format] = (it.k === 'core' ? 'Core' : sessionFor(it, TODAY)).split('~');
-      const e = { id: `e${Date.now().toString(36)}`, date: TODAY, session }; if (format) e.format = format;
+      const [d, i] = b.dataset.done.split('|'); const it = plan.days[d].items[+i]; const [session, format] = (it.k === 'core' ? 'Core' : sessionFor(it, d)).split('~');
+      const e = { id: `e${Date.now().toString(36)}`, date: d, session }; if (format) e.format = format;
       if (it.k === 'core') { e.workout = '행잉 레그레이즈'; const reps = $('[data-reps]', b.parentElement).value.trim(); if (reps) e.result = reps; }
       b.disabled = true;
-      try { log = done(await save('log', (arr) => { const pre = arr.find((x) => x.date === TODAY && !x.deleted && ahead(x) && kindOf(x) === kindOf(e));
+      try { log = done(await save('log', (arr) => { const pre = arr.find((x) => x.date === d && !x.deleted && ahead(x) && kindOf(x) === kindOf(e));
           if (pre) { delete pre.planned; if (e.result && !pre.result) pre.result = e.result; } else arr.push(e);
           arr.sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : 0)); return arr; }, `log: ${e.date} ${e.session}`)); paint(); }
       catch (err) { alert(err.message); b.disabled = false; } };
