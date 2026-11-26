@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1126za';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1126zb';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -710,8 +710,8 @@
         + cell('식단을 기록한 날', `${kc.length}<small>일</small>`, kc.length ? `평균 ${Math.round(avgOf(kc.map((r) => r.kcal))).toLocaleString('en-US')}kcal` : '')
         + cell('하루 평균 단백질', pr.length ? `${Math.round(avgOf(pr.map((r) => r.prot)))}<small>g</small>` : '–', pr.length && bw.length ? `체중 1kg당 ${(avgOf(pr.map((r) => r.prot)) / avgOf(bw.map((r) => r.weight))).toFixed(1)}g` : ''); };
     // InBody: the latest measurement first, each number with its change since the one before; then every measurement as plain numbers
-    // InBody: the latest sheet first (the four main numbers, then the rest of the sheet, each with its change since the
-    // last measurement that had it), then every measurement since 2018, then the InBody 970 sheets side by side.
+    // InBody (970 sheets only, the user's rule): the latest sheet first (the four main numbers, then the rest of the sheet,
+    // each with its change since the last sheet that had it), then every sheet side by side.
     const BX = { weight: ['체중', 'kg', 1, 0], muscle: ['골격근량', 'kg', 1, 1], fat: ['체지방량', 'kg', 1, -1], fat_pct: ['체지방률', '%', 1, -1],
       score: ['인바디 점수', '점', 0, 1], vfa: ['내장지방', 'cm²', 1, -1], waist: ['허리둘레', 'cm', 1, -1], bmr: ['기초대사량', 'kcal', 0, 0],
       bmi: ['BMI', '', 1, 0], smi: ['SMI', 'kg/m²', 1, 1], ecw_ratio: ['세포외수분비', '', 3, 0], phase: ['위상각', '°', 1, 1],
@@ -739,27 +739,22 @@
       const comp = [['tbw', '체수분'], ['protein', '단백질'], ['mineral', '무기질'], ['ffm', '제지방량']].filter(([k]) => cur[k] != null);
       const ctrl = cur.target != null ? `<p class="body-ctrl num">적정 체중 <b>${cur.target.toFixed(1)}kg</b> · 지방 조절 <b>${sg(cur.fat_ctrl ?? 0)}kg</b> · 근육 조절 <b>${sg(cur.muscle_ctrl ?? 0)}kg</b></p>` : '';
       const side = comp.length || ctrl ? `<div class="body-box"><h4>체성분</h4><dl class="body-dl">${comp.map(([k, n]) => `<dt>${n}</dt><dd class="num">${fmt(k, cur[k])}<small>${BX[k][1]}</small></dd>`).join('')}</dl>${ctrl}</div>` : '';
-      const KEEP = 6;
-      const sheets = rows.filter((r) => r.score != null || r.vfa != null);
-      const cmpKeys = ['weight', 'muscle', 'fat_pct', 'score', 'vfa', 'waist', 'bmr', 'bmi', 'smi', 'tbw', 'protein', 'mineral', 'ecw_ratio', 'phase'].filter((k) => sheets.some((r) => r[k] != null));
-      const cmp = sheets.length > 1 ? `<details class="more body-cmp"><summary>InBody 970 결과지 비교 <span class="muted num">· ${sheets.length}회</span></summary><div class="scroll-x"><table class="t body-all"><thead><tr><th></th>${sheets.map((r) => `<th class="r num">${md(parse(r.date))}<br><span class="muted">${r.date.slice(0, 4)}</span></th>`).join('')}</tr></thead><tbody>${cmpKeys.map((k) =>
-        `<tr><td>${BX[k][0]} <small>${BX[k][1]}</small></td>${sheets.map((r) => `<td class="r num">${fmt(k, val(r, k))}</td>`).join('')}</tr>`).join('')}</tbody></table></div></details>` : '';
+      // every InBody 970 sheet side by side, newest first: the only measurements the user compares
+      const cmpKeys = ['weight', 'muscle', 'fat', 'fat_pct', 'score', 'vfa', 'waist', 'bmr', 'bmi', 'smi', 'tbw', 'protein', 'mineral', 'ecw_ratio', 'phase'].filter((k) => rows.some((r) => r[k] != null));
+      const cmp = rows.length > 1 ? `<h4 class="body-hist">InBody 970 결과지 비교 <span class="muted num">· ${rows.length}회 · ${dot(rows[rows.length - 1].date)}부터</span></h4><div class="scroll-x body-cmp"><table class="t body-all"><thead><tr><th></th>${rows.map((r) => `<th class="r num">${md(parse(r.date))}<br><span class="muted">${r.date.slice(0, 4)}</span></th>`).join('')}</tr></thead><tbody>${cmpKeys.map((k) =>
+        `<tr${['weight', 'muscle', 'fat', 'fat_pct'].includes(k) ? ' class="key"' : ''}><td>${BX[k][0]} <small>${BX[k][1]}</small></td>${rows.map((r) => `<td class="r num">${fmt(k, val(r, k))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : '';
       $('#bodyTable').innerHTML = `<p class="body-h">최근 측정 <b class="num">${dot(cur.date)}</b>${cur.device ? ` <span class="chip num">InBody ${esc(cur.device)}</span>` : ''}${prev ? `<span class="num">화살표는 직전 측정(${dot(prev.date)}) 대비</span>` : ''}</p>
         <div class="kv body-now">${['weight', 'muscle', 'fat', 'fat_pct'].map(tile).join('')}</div>
         ${more.length ? `<div class="kv body-more">${more.map(tile).join('')}</div>` : ''}
         ${seg || side ? `<div class="body-two">${seg}${side}</div>` : ''}
-        <h4 class="body-hist">전체 측정 기록 <span class="muted num">· ${rows.length}회 · ${dot(rows[rows.length - 1].date).slice(0, 4)}년부터</span></h4>
-        <table class="t body-all"><thead><tr><th>측정일</th><th class="r">체중 <small>kg</small></th><th class="r">골격근 <small>kg</small></th><th class="r">체지방 <small>kg</small></th><th class="r">체지방률 <small>%</small></th></tr></thead><tbody>${rows.map((r, i) =>
-          `<tr${i >= KEEP ? ' class="old" hidden' : ''}><td class="num"><span class="cc">${r.date.slice(0, 2)}</span>${dot(r.date).slice(2)}</td><td class="r num">${r.weight.toFixed(1)}</td><td class="r num"><b>${r.muscle.toFixed(1)}</b></td><td class="r num">${r.fat.toFixed(1)}</td><td class="r num">${(r.fat_pct * 100).toFixed(1)}</td></tr>`).join('')}</tbody></table>
-        ${rows.length > KEEP ? `<button class="btn line sm" type="button" id="bodyMore" style="margin-top:10px">이전 측정 ${rows.length - KEEP}회 더 보기</button>` : ''}
         ${cmp}`;
-      const mb = $('#bodyMore'); if (mb) mb.onclick = () => { document.querySelectorAll('#bodyTable tr.old').forEach((tr) => { tr.hidden = false; }); mb.remove(); }; };
+    };
 
     const bf = $('#bodyForm'); $('#bodyNew').hidden = !canWrite();
     $('#bodyNew').onclick = () => { bf.elements.date.value = TODAY; bf.hidden = false; }; $('#bodyCancel').onclick = () => { bf.hidden = true; };
     bf.onsubmit = async (ev) => { ev.preventDefault(); const e = bf.elements; const v = (k) => numOrNull(e[k].value); const m = $('#bodyMsg');
       if ([v('weight'), v('muscle'), v('fat'), v('fat_pct')].some((x) => x == null)) { m.textContent = '위의 네 칸은 숫자로 채워주세요.'; return; }
-      const row = { date: e.date.value, weight: v('weight'), muscle: v('muscle'), fat: v('fat'), fat_pct: Math.round(v('fat_pct') * 10) / 1000 };
+      const row = { date: e.date.value, device: '970', weight: v('weight'), muscle: v('muscle'), fat: v('fat'), fat_pct: Math.round(v('fat_pct') * 10) / 1000 };
       ['score', 'vfa', 'waist', 'bmr', 'smi', 'ecw_ratio', 'phase'].forEach((k) => { if (v(k) != null) row[k] = v(k); });     // the rest of the sheet, when it is typed in
       m.textContent = '저장하는 중…';
       // a measurement already stored for that day keeps what this form does not ask for (segmental lean, phase angle...)
