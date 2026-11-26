@@ -461,17 +461,16 @@
     const thisMon = iso(monday(NOW));
     const phase = [...plan.roadmap].reverse().find((r) => r.from <= TODAY) || plan.roadmap[0];
     $('#road').innerHTML = `<div class="road" style="margin-top:0">${plan.roadmap.map((r) => `<div class="${r === phase ? 'now' : r.from < phase.from ? 'past' : ''}"><div class="m">${esc(r.m)}</div><div class="th">${esc(r.theme)}</div><div class="f">${esc(r.focus)}</div></div>`).join('')}</div>`;
-    // the weeks at a glance, under the roadmap: number, dates, what the week is for, its Wednesday run, base running distance
-    const wedRun = (w) => { const wed = plan.days[iso(addDays(parse(w.start), 2))]; const r = wed && wed.items.find((it) => it.k === 'run'); return r ? r.t : ''; };
-    $('#weekTable').innerHTML = `<div class="scroll-x wk-table"><table class="t"><thead><tr><th>주차</th><th>기간</th><th>콘셉트</th><th>수요일 러닝</th><th class="r">러닝 기본</th><th class="go-c"></th></tr></thead><tbody>${plan.weeks.map((w, i) => { const mon = parse(w.start);
-      return `<tr class="go${w.start === thisMon ? ' now' : ''}" data-go="#w-${w.start}"><td class="num" style="white-space:nowrap"><a href="#w-${w.start}"><b>${i + 1}주차</b></a></td><td style="white-space:nowrap"><b>${esc(w.label)}</b><br><span class="small muted num">${md(mon)}–${md(addDays(mon, 6))}</span></td><td>${esc(w.concept || '')}${w.recovery ? ' <span class="chip w">회복 주</span>' : ''}</td><td>${esc(wedRun(w)) || '–'}</td><td class="r num" style="white-space:nowrap">${w.run_km}km${w.bonus_km ? `<br><span class="small muted">보너스 +${w.bonus_km}km</span>` : ''}</td><td class="go-c" aria-hidden="true">›</td></tr>`; }).join('')}</tbody></table></div>
-      <div class="wk-list">${plan.weeks.map((w, i) => { const mon = parse(w.start); const now = w.start === thisMon;
-        return `<a class="wk${now ? ' now' : ''}" href="#w-${w.start}"><div class="h"><b class="num">${i + 1}주차</b><span>${esc(w.label)}</span>${now ? '<span class="chip a">이번 주</span>' : ''}${w.recovery ? '<span class="chip w">회복 주</span>' : ''}<span class="d num">${md(mon)}–${md(addDays(mon, 6))}</span><span class="go-c" aria-hidden="true">›</span></div>
-          <div class="c">${esc(w.concept || '')}</div>
-          <dl><dt>수요일</dt><dd>${esc(wedRun(w)) || '–'}</dd><dt>러닝 기본</dt><dd class="num">${w.run_km}km${w.bonus_km ? ` · 보너스 +${w.bonus_km}km` : ''}</dd></dl></a>`; }).join('')}</div>`;
+    // the weeks at a glance, under the roadmap: one small card per week (what it is for and its base running distance, with a bar
+    // to compare weeks). The Wednesday session and the day-by-day detail are in the week's own plan below; a card opens it.
+    const kmTop = Math.max(...plan.weeks.map((w) => w.run_km + (w.bonus_km || 0)));
+    $('#weekTable').innerHTML = `<div class="wk-grid">${plan.weeks.map((w, i) => { const mon = parse(w.start); const now = w.start === thisMon;
+      return `<a class="wkc${now ? ' now' : ''}${w.recovery ? ' rec' : ''}" href="#w-${w.start}"><div class="n"><b class="num">${i + 1}주차</b><span class="num">${md(mon)}–${md(addDays(mon, 6))}</span></div>
+        <div class="t">${esc(w.label)}${now ? ' <span class="chip a">이번 주</span>' : ''}${w.recovery ? ' <span class="chip w">회복</span>' : ''}</div>
+        <div class="c">${esc(w.concept || '')}</div>
+        <div class="km"><span class="num"><b>${w.run_km}</b>km${w.bonus_km ? `<small> · 보너스 +${w.bonus_km}</small>` : ''}</span><i><s style="width:${(w.run_km / kmTop * 100).toFixed(1)}%"></s>${w.bonus_km ? `<u style="width:${(w.bonus_km / kmTop * 100).toFixed(1)}%"></u>` : ''}</i></div></a>`; }).join('')}</div>`;
     const raceMon = monday(parse(plan.race.date)); const totalWeeks = Math.round((raceMon - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
     const nowNo = Math.round((monday(NOW) - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
-    $('#weekTable').onclick = (ev) => { const tr = ev.target.closest('tr[data-go]'); if (!tr || ev.target.closest('a')) return; location.hash = tr.dataset.go; };
     $('#weekTotal').textContent = `대회 주까지 총 ${totalWeeks}주${nowNo >= 1 && nowNo <= totalWeeks ? ` · 지금 ${nowNo}주차` : ''}`;
     $('#weeks').innerHTML = plan.weeks.map((w, wi) => { const mon = parse(w.start);
       const tone = (it) => (it.k === 'commute' ? 'run' : it.k);     // bullet colour: the same three kinds as the charts
