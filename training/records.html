@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&amp;family=Noto+Serif+KR:wght@600;700&amp;display=swap">
-<link rel="stylesheet" href="../assets/site.css?v=1126z">
+<link rel="stylesheet" href="../assets/site.css?v=1126za">
 </head>
 <body data-root="../" data-page="records">
 <main>
@@ -42,6 +42,16 @@
             <div class="c1"><label for="bd-f">체지방량 kg</label><input class="in" id="bd-f" name="fat" type="number" inputmode="decimal" step="0.1" min="0"></div>
             <div class="c1"><label for="bd-p">체지방률 %</label><input class="in" id="bd-p" name="fat_pct" type="number" inputmode="decimal" step="0.1" min="0" max="100"></div>
           </div>
+          <details class="more" style="margin-top:10px"><summary>결과지 나머지 칸 <span class="muted">· 있으면</span></summary>
+          <div class="form" style="margin-top:10px">
+            <div class="c1"><label for="bd-sc">인바디 점수</label><input class="in" id="bd-sc" name="score" type="number" inputmode="numeric" step="1" min="0"></div>
+            <div class="c1"><label for="bd-vf">내장지방 cm²</label><input class="in" id="bd-vf" name="vfa" type="number" inputmode="decimal" step="0.1" min="0"></div>
+            <div class="c1"><label for="bd-wa">허리둘레 cm</label><input class="in" id="bd-wa" name="waist" type="number" inputmode="decimal" step="0.1" min="0"></div>
+            <div class="c1"><label for="bd-bm">기초대사량 kcal</label><input class="in" id="bd-bm" name="bmr" type="number" inputmode="numeric" step="1" min="0"></div>
+            <div class="c1"><label for="bd-sm">SMI kg/m²</label><input class="in" id="bd-sm" name="smi" type="number" inputmode="decimal" step="0.1" min="0"></div>
+            <div class="c1"><label for="bd-ec">세포외수분비</label><input class="in" id="bd-ec" name="ecw_ratio" type="number" inputmode="decimal" step="0.001" min="0"></div>
+            <div class="c1"><label for="bd-ph">위상각 °</label><input class="in" id="bd-ph" name="phase" type="number" inputmode="decimal" step="0.1" min="0"></div>
+          </div></details>
           <div class="form-foot"><button class="btn" type="submit">저장</button><button class="btn line" id="bodyCancel" type="button">닫기</button><span class="note" id="bodyMsg" role="status"></span></div>
         </form></div>
     </section>
@@ -81,6 +91,6 @@
     </section>
   </div>
 </main>
-<script src="../assets/site.js?v=1126z"></script>
+<script src="../assets/site.js?v=1126za"></script>
 </body>
 </html>
