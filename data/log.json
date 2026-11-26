@@ -1403,7 +1403,7 @@
   "date": "2026-11-25",
   "session": "Jogging",
   "km": 9.59,
-  "minutes": 60.0,
+  "minutes": 60,
   "avg_hr": 152,
   "max_hr": 192,
   "workout": "조깅 8.0km · 6:21/km\n200/200(39\"/98\") × 4 · 3:15/8:10",
@@ -1426,8 +1426,7 @@
   "session": "Interval",
   "format": "Interval",
   "minutes": 43,
-  "workout": "Norwegian Interval\n10 min Easy Machine\n4 sets\n  4 min Hard\n  3 min Easy\nCool down 5 min",
-  "planned": true
+  "workout": "Norwegian Interval\n10 min Easy Machine\n4 sets\n  4 min Hard\n  3 min Easy\nCool down 5 min"
  },
  {
   "id": "g25202982700",
