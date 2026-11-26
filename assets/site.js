@@ -136,7 +136,8 @@
   const KINDS = [{ k: 'hyrox', name: 'Hyrox', color: '#2b59c3' }, { k: 'run', name: 'Running', color: '#2a9d8f' }, { k: 'weights', name: 'Weight', color: '#d9731a' }];   // checked for colour-blind separation
   // The log entry that makes a plan item count as done (none = not done yet).
   function doneEntry(item, date, log) {
-    const es = log.filter((e) => e.date === date);
+    const next = item.wk ? iso(addDays(parse(date), 1)) : '';      // the weekend run may be done on Sunday instead
+    const es = log.filter((e) => e.date === date || e.date === next);
     if (item.k === 'hyrox') return es.find((e) => HYROX.includes(e.session));
     if (item.k === 'run' || item.k === 'commute') return es.find(isRun);
     if (item.k === 'weights') return es.find((e) => e.session === 'Weight Training');

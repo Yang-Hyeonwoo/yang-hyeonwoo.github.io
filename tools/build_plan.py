@@ -40,6 +40,8 @@ WEEKS = {
     D(2027, 1, 18): ([0, 3], [1], "1000/400(4'10\"/2'30\") × 5 · 4:10/6:15", "빠르게 총 5km · 회복은 400m 조깅 · 앞뒤 조깅 1.5km씩 · 총 10km", False),
     D(2027, 1, 25): ([0, 3], [], "5km 기록 측정 (재측정)", "회복 주 · 앞뒤 조깅 2km씩 · 총 9km · 10km 목표 시기를 여기서 판단", True),
 }
+# Weekend easy run (Saturday, or Sunday instead), added 2026-11-27 to make up for the shorter gym run; none in recovery weeks.
+WEEKEND_KM = {D(2026, 11, 30): 6, D(2026, 12, 7): 8, D(2026, 12, 14): 8, D(2026, 12, 28): 10, D(2027, 1, 4): 10, D(2027, 1, 11): 12, D(2027, 1, 18): 12}
 WED_KM = {D(2026, 11, 23): 10, D(2026, 11, 30): 9, D(2026, 12, 7): 9, D(2026, 12, 14): 11, D(2026, 12, 21): 7,
           D(2026, 12, 28): 9, D(2027, 1, 4): 8, D(2027, 1, 11): 9, D(2027, 1, 18): 10, D(2027, 1, 25): 9}
 
@@ -72,9 +74,10 @@ NO_CORE = {D(2026, 11, 23), D(2026, 11, 24)}     # days the hanging leg raises w
 days, weeks = {}, []
 for monday, (commute, bonus, wed_run, wed_detail, recovery) in sorted(WEEKS.items()):
     label = week_label(monday)
-    run_km = round(WED_KM[monday] + COMMUTE_KM * len(commute), 1)
+    wknd = WEEKEND_KM.get(monday, 0)
+    run_km = round(WED_KM[monday] + COMMUTE_KM * len(commute) + wknd, 1)
     weeks.append({"label": label, "start": monday.isoformat(), "concept": CONCEPT[monday], "recovery": recovery, "run_km": run_km,
-                  "run_note": "왕복 러닝 %d회 %skm + 수요일 %dkm" % (len(commute), km(COMMUTE_KM * len(commute)), WED_KM[monday]),
+                  "run_note": "왕복 러닝 %d회 %skm + 수요일 %dkm" % (len(commute), km(COMMUTE_KM * len(commute)), WED_KM[monday]) + (" + 주말 %dkm" % wknd if wknd else ""),
                   "bonus_km": round(COMMUTE_KM * len(bonus), 1)})
     for wd in range(7):
         d = monday + dt.timedelta(days=wd)
@@ -99,6 +102,11 @@ for monday, (commute, bonus, wed_run, wed_detail, recovery) in sorted(WEEKS.item
             items.append({"k": "run", "t": wed_run, "d": "17:50 트랙 · " + wed_detail, "key": True})
             items.append({"k": "weights", "t": "상체 웨이트 45분", "d": "22:30 헬스장 · 23:30까지"})
             kcal, carb = 2500, 320
+        elif wd == 5 and wknd:
+            items.append({"k": "run", "t": "주말 조깅 %dkm" % wknd, "d": "심박 150 이하 · 평지 · 일요일에 뛰어도 돼요 · 못 뛰면 보충 없음", "wk": True})
+            kcal, carb = 2300, 270
+        elif wd == 6 and wknd:
+            items.append({"k": "free", "t": "휴식", "d": "토요일에 못 뛰었으면 오늘 주말 조깅", "opt": True})
         else:
             items.append({"k": "free", "t": "자유", "d": "뛰고 싶은 날만 조깅 · 한 달에 두 번쯤 롱런 10–12km", "opt": True})
         if MAINTENANCE[0] <= d <= MAINTENANCE[1]:
@@ -107,7 +115,7 @@ for monday, (commute, bonus, wed_run, wed_detail, recovery) in sorted(WEEKS.item
         days[d.isoformat()] = {"week": label, "items": items, "kcal": kcal, "carb": carb, "prot": 155, "fat": 65}
 
 plan = {
-    "updated": "2026-11-26",
+    "updated": "2026-11-27",
     "race": {"name": "HYROX Incheon", "division": "Pro Single", "date": "2027-05-13",      # opening day of the event
              "date_note": "5/13 개막일 기준 · 대회 5/13–16 예정 · 출전일 미정"},
     "goals": [
@@ -117,7 +125,7 @@ plan = {
     ],
     "roadmap": [
         {"m": "12월", "from": "2026-11-23", "theme": "적응 + 페이스 찾기", "focus": "체육관 왕복 러닝으로 거리 쌓기 · 5km 기록 측정 · 프로 무게 시작"},
-        {"m": "1월", "from": "2027-01-04", "theme": "거리 + 스피드", "focus": "주 25–35km · 인터벌과 템포 번갈아 · 5km 재측정"},
+        {"m": "1월", "from": "2027-01-04", "theme": "거리 + 스피드", "focus": "주 35–40km · 인터벌과 템포 번갈아 · 5km 재측정"},
         {"m": "2월", "from": "2027-02-01", "theme": "10K 대비 + 프로 무게", "focus": "1km 반복과 역치주 · 전 종목 프로 무게 · 감량 마무리"},
         {"m": "3월", "from": "2027-03-01", "theme": "10K 대회", "focus": "목표 페이스 훈련 · 하프 시뮬레이션 · 식사량 올리기"},
         {"m": "4월", "from": "2027-04-05", "theme": "레이스 리허설", "focus": "1km + 스테이션 반복 · 4/17 즈음 풀 리허설"},
