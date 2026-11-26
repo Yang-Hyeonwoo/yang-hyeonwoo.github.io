@@ -1426,19 +1426,25 @@
   "session": "Interval",
   "format": "Interval",
   "minutes": 43,
-  "workout": "Norwegian Interval\n10 min Easy Machine\n4 sets\n  4 min Hard\n  3 min Easy\nCool down 5 min"
+  "workout": "Norwegian Interval\n10 min Easy Machine\n4 sets\n  4 min Hard\n  3 min Easy\nCool down 5 min",
+  "avg_hr": 166,
+  "max_hr": 190,
+  "garmin": [
+   "25203723513"
+  ]
  },
  {
   "id": "g25202982700",
   "date": "2026-11-26",
   "session": "Run commute",
-  "km": 3.95,
-  "minutes": 24.6,
-  "pace": "6:13",
-  "avg_hr": 153,
-  "max_hr": 170,
+  "km": 8.23,
+  "minutes": 52.4,
+  "avg_hr": 155,
+  "max_hr": 174,
   "garmin": [
-   "25202982700"
-  ]
+   "25202982700",
+   "25203725523"
+  ],
+  "workout": "갈 때 4.0km · 6:13/km\n올 때 4.3km · 6:31/km"
  }
 ]
