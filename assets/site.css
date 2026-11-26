@@ -601,3 +601,8 @@ svg.days-ch text.vl.tot { fill: var(--ink); font-size: 12px; font-weight: 700; }
 .wkc .km s { display: block; background: #2a9d8f; } .wkc .km u { display: block; background: #2a9d8f; opacity: 0.35; }
 @media (max-width: 1000px) { .wk-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { #weekTable { padding: 0; } .wk-grid { gap: 8px; } .wkc { padding: 12px; } .wkc .c { font-size: 0.78rem; } }
+
+/* ---- plan week cards: run so far (solid) over the week's base plan (light) ---- */
+.wkc .km i { position: relative; }
+.wkc .km u, .wkc .km s { position: absolute; left: 0; top: 0; bottom: 0; }
+.wkc .km u { background: #2a9d8f; opacity: 0.25; } .wkc .km s { background: #2a9d8f; opacity: 1; }

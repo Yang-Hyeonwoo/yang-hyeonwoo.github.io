@@ -220,7 +220,7 @@
   }
   // o.zoom = step: start the axis just under the smallest value, so small differences show (values are printed on the bars).
   function barChart(box, bars, o) {
-    const W = 520, H = o.h || 170, L = 36, R = 14, T = o.labels ? 20 : 12, B = 22;
+    const W = o.wide && box.clientWidth > 700 ? 1040 : 520, H = o.h || 170, L = 36, R = 14, T = o.labels ? 20 : 12, B = 22;
     const vals = bars.filter((b) => b.y > 0).map((b) => b.y); let base = 0, ticks;
     if (o.zoom && vals.length) { const st = o.zoom, mn = Math.min(...vals); base = Math.floor(mn / st) * st; if (mn - base < st * 0.2) base -= st; base = Math.max(0, base);
       const top = Math.ceil(Math.max(...vals) / st) * st; ticks = []; for (let v = base; v <= top; v += st) ticks.push(v);
@@ -230,7 +230,7 @@
     const bw = (W - L - R) / bars.length; const Y = (v) => T + (1 - (v - base) / (hi - base)) * (H - T - B);
     const grid = ticks.map((v) => `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="rgba(0,0,0,.06)"/><text class="ax" x="${L - 6}" y="${Y(v) + 3.5}" text-anchor="end">${o.fmt ? o.fmt(v) : v}</text>`).join('');
     const marks = bars.map((b, i) => { const pad = Math.min(8, bw * 0.16), x = L + i * bw + pad, w = Math.max(bw - 2 * pad, 2), y = Y(b.y), hgt = H - B - y, rr = Math.min(4, hgt, w / 2);
-      const bar = b.y > 0 ? `<path d="M${x} ${H - B}V${y + rr}q0-${rr} ${rr}-${rr}h${w - 2 * rr}q${rr} 0 ${rr} ${rr}V${H - B}z" fill="${o.color || 'var(--accent)'}"/>${o.labels ? vl(x + w / 2, y - 4, o.vfmt ? o.vfmt(b.y) : b.y) : ''}` : '';
+      const bar = b.y > 0 ? `<path d="M${x} ${H - B}V${y + rr}q0-${rr} ${rr}-${rr}h${w - 2 * rr}q${rr} 0 ${rr} ${rr}V${H - B}z" fill="${o.color || 'var(--accent)'}"${b.cur ? ' fill-opacity="0.45"' : ''}/>${o.labels ? vl(x + w / 2, y - 4, o.vfmt ? o.vfmt(b.y) : b.y) : ''}` : '';
       const plan = b.plan ? `<line x1="${x - 2}" x2="${x + w + 2}" y1="${Y(b.plan)}" y2="${Y(b.plan)}" stroke="#111827" stroke-width="2"/>` : '';
       return `${bar}${plan}<rect data-i="${i}" x="${L + i * bw}" y="0" width="${bw}" height="${H - B}" fill="transparent"/>`; }).join('');
     const every = o.xevery || (o.labels ? 1 : Math.ceil(bars.length / 6));
@@ -243,7 +243,6 @@
       r.addEventListener('mouseenter', show); r.addEventListener('touchstart', show, { passive: true }); r.addEventListener('mouseleave', () => { tip.style.opacity = 0; });
     });
   }
-  // One bar per kind (Hyrox, Running, Weight) in each group. cats: [{ label, tip, v: [hyrox, run, weights] }]
   // Days trained per month, the way the old tracker drew it: one column per month as tall as the days trained (out of the
   // month's 31-day scale), split by kind in proportion to how many days each kind had, each part labelled with its count.
   // A day with two kinds counts in both, so the parts can add up to more than the total on top.
@@ -268,6 +267,7 @@
         tip.style.top = `${svg.offsetTop + Y(c.total) / H * svg.getBoundingClientRect().height - 12}px`; tip.style.opacity = 1; };
       r.addEventListener('mouseenter', show); r.addEventListener('touchstart', show, { passive: true }); r.addEventListener('mouseleave', () => { tip.style.opacity = 0; }); });
   }
+  // One bar per kind (Hyrox, Running, Weight) in each group. cats: [{ label, tip, v: [hyrox, run, weights] }]
   function kindChart(box, cats, o) {
     const W = 520, H = o.h || 170, L = 28, R = 12, T = 20, B = 22; const K = KINDS.length;
     const top = Math.max(2, Math.ceil(Math.max(...cats.map((c) => Math.max(...c.v))) / 2) * 2);
@@ -427,11 +427,6 @@
       lineChart($('#chW'), w, { ...opt, label: '주 평균 체중', fmt: (v) => v.toFixed(1), unit: 'kg', color: C.weight });
       lineChart($('#chS'), sl, { ...opt, label: '주 평균 수면', fmt: (v) => hm(v * 60), target: mins(plan.targets.sleep) / 60, color: C.sleep });
       lineChart($('#chK'), kc, { ...opt, label: '주 평균 섭취 칼로리', fmt: kcal, unit: 'kcal', color: C.kcal });
-      const bars = wk.map((a) => { const st = weekRun(a.m, plan, log); return { label: weekLabel(a.m), tipx: a.tip, y: st.km, plan: st.meta ? st.meta.run_km : 0 }; });
-      const sum = bars.reduce((s, b) => s + b.y, 0);
-      $('#nowR').innerHTML = `${sum.toFixed(0)}<small>km</small><span class="chip num">${bars.length}주 합계 · 이번 주 ${bars[bars.length - 1].y.toFixed(1)}km</span>`;
-      barChart($('#chR'), bars, { label: '주간 러닝 거리', labels: bars.length <= 14, h: 200, color: C.run, xevery: Math.ceil(n / 6), vfmt: (v) => (v >= 10 ? v.toFixed(0) : v.toFixed(1)),
-        tip: (b) => `${b.tipx} · <b>${b.y.toFixed(1)}</b>km${b.plan ? ` (기본 계획 ${b.plan}km)` : ''}` });
       // Training: days per month, by kind
       const by = {}; const KEYS = ['hyrox', 'run', 'weights'];
       Object.values(ix).forEach((x) => { const k = x.date.slice(0, 7); const a = (by[k] = by[k] || { ym: k, v: [0, 0, 0], any: 0, days: 0 }); KEYS.forEach((key, i) => { if (x[key]) a.v[i]++; }); if (x.any) a.any++; a.days++; });
@@ -439,6 +434,11 @@
       const mNow = by[thisYm] || { any: 0, v: [0, 0, 0] };
       $('#nowMD').innerHTML = `${mNow.any}<small>일 · ${NOW.getMonth() + 1}월 운동한 날</small><span class="chip num">${KINDS.map((q, k) => `${q.name} ${mNow.v[k]}`).join(' · ')}</span>`;
       daysChart($('#chMD'), months.map((a) => ({ label: `${+a.ym.slice(5)}월`, tip: `${a.ym.slice(0, 4)}년 ${+a.ym.slice(5)}월`, v: a.v, total: a.any })), { label: '월별 운동한 날', h: 210 });
+      // running distance per month, same months as the chart beside it
+      const mk = months.map((a) => { const [y, m] = a.ym.split('-').map(Number); return { label: `${m}월`, tip: `${y}년 ${m}월`, y: runSum(log, `${a.ym}-01`, iso(new Date(y, m, 0))).km, cur: a.ym === thisYm }; });
+      const mPrev = mk.length > 1 ? mk[mk.length - 2] : null;
+      $('#nowRM').innerHTML = `${mk.length ? mk[mk.length - 1].y.toFixed(1) : '0'}<small>km · ${NOW.getMonth() + 1}월 러닝</small>${mPrev ? `<span class="chip num">${mPrev.label} ${mPrev.y.toFixed(1)}km</span>` : ''}`;
+      barChart($('#chRM'), mk, { label: '월별 러닝 거리', labels: true, h: 210, color: C.run, vfmt: (v) => v.toFixed(0), tip: (b) => `${b.tip} · <b>${b.y.toFixed(1)}</b>km${b.cur ? ' (진행 중)' : ''}` });
       // Recovery: the last four weeks in numbers
       const from = iso(addDays(NOW, -27)); const rec = daily.filter((r) => r.date >= from && r.date <= TODAY && mins(r.sleep) != null);
       const late = (t) => { const v = mins(t); return v == null ? null : v < 18 * 60 ? v + 1440 : v; };      // 1:30 counts as later than 23:30
@@ -450,6 +450,16 @@
         + cell('평균 기상', wakes.length ? hm(avgOf(wakes)) : '–', `목표 ${plan.targets.wake}`) : '<p class="note">최근 4주 수면 기록이 없어요.</p>';
     };
     draw(0);   // the whole record by default: the long view is the point of this section
+    // Running mileage, the number the user follows week to week: the last 12 weeks, every bar labelled, the plan's base distance
+    // as a black tick, this week drawn lighter while it is still going.
+    const runWeeks = () => { const bars = []; for (let i = 11; i >= 0; i--) { const m = addDays(mon, -7 * i); const st = weekRun(m, plan, log);
+        bars.push({ label: md(m), tipx: `${weekLabel(m)} (${md(m)}–${md(addDays(m, 6))})`, y: st.km, plan: st.meta ? st.meta.run_km : 0, cur: i === 0 }); }
+      const done4 = bars.slice(-5, -1); const avg4 = done4.reduce((a, b) => a + b.y, 0) / done4.length; const cur = bars[bars.length - 1];
+      $('#nowR').innerHTML = `${cur.y.toFixed(1)}<small>km · 이번 주${cur.plan ? ` / 기본 계획 ${cur.plan}km` : ''}</small><span class="chip num">지난 4주 평균 ${avg4.toFixed(1)}km</span>`;
+      barChart($('#chR'), bars, { label: '주간 러닝 거리', labels: true, wide: true, h: 220, color: C.run, vfmt: (v) => (v >= 10 ? v.toFixed(0) : v.toFixed(1)),
+        tip: (b) => `${b.tipx} · <b>${b.y.toFixed(1)}</b>km${b.plan ? ` (기본 계획 ${b.plan}km)` : ''}${b.cur ? ' · 진행 중' : ''}` }); };
+    runWeeks(); let rwW = $('#chR').clientWidth;
+    window.addEventListener('resize', () => { const w = $('#chR').clientWidth; if ((w > 700) !== (rwW > 700)) { rwW = w; runWeeks(); } });
     document.querySelectorAll('#range button').forEach((b) => { b.onclick = () => { document.querySelectorAll('#range button').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); draw(+b.dataset.w); }; });
     // races, newest first; the fastest result of each event gets a PB mark
     const secsOf = (t) => t.split(':').reduce((acc, v) => acc * 60 + Number(v), 0); const best = {};
@@ -469,7 +479,9 @@
       return `<a class="wkc${now ? ' now' : ''}${w.recovery ? ' rec' : ''}" href="#w-${w.start}"><div class="n"><b class="num">${i + 1}주차</b><span class="num">${md(mon)}–${md(addDays(mon, 6))}</span></div>
         <div class="t">${esc(w.label)}${now ? ' <span class="chip a">이번 주</span>' : ''}${w.recovery ? ' <span class="chip w">회복</span>' : ''}</div>
         <div class="c">${esc(w.concept || '')}</div>
-        <div class="km"><span class="num"><b>${w.run_km}</b>km${w.bonus_km ? `<small> · 보너스 +${w.bonus_km}</small>` : ''}</span><i><s style="width:${(w.run_km / kmTop * 100).toFixed(1)}%"></s>${w.bonus_km ? `<u style="width:${(w.bonus_km / kmTop * 100).toFixed(1)}%"></u>` : ''}</i></div></a>`; }).join('')}</div>`;
+        ${w.start <= thisMon ? (() => { const got = runSum(log, w.start, iso(addDays(mon, 6))).km;
+          return `<div class="km run"><span class="num"><b>${got.toFixed(1)}</b> / ${w.run_km}km${now ? '<small> · 진행 중</small>' : ''}</span><i><u style="width:${(w.run_km / kmTop * 100).toFixed(1)}%"></u><s style="width:${(Math.min(got, kmTop) / kmTop * 100).toFixed(1)}%"></s></i></div>`; })()
+          : `<div class="km"><span class="num"><b>${w.run_km}</b>km${w.bonus_km ? `<small> · 보너스 +${w.bonus_km}</small>` : ''}</span><i><u style="width:${(w.run_km / kmTop * 100).toFixed(1)}%"></u></i></div>`}</a>`; }).join('')}</div>`;
     const raceMon = monday(parse(plan.race.date)); const totalWeeks = Math.round((raceMon - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
     const nowNo = Math.round((monday(NOW) - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
     $('#weekTotal').textContent = `대회 주까지 총 ${totalWeeks}주${nowNo >= 1 && nowNo <= totalWeeks ? ` · 지금 ${nowNo}주차` : ''}`;
