@@ -1428,5 +1428,18 @@
   "minutes": 43,
   "workout": "Norwegian Interval\n10 min Easy Machine\n4 sets\n  4 min Hard\n  3 min Easy\nCool down 5 min",
   "planned": true
+ },
+ {
+  "id": "g25202982700",
+  "date": "2026-11-26",
+  "session": "Run commute",
+  "km": 3.95,
+  "minutes": 24.6,
+  "pace": "6:13",
+  "avg_hr": 153,
+  "max_hr": 170,
+  "garmin": [
+   "25202982700"
+  ]
  }
 ]
