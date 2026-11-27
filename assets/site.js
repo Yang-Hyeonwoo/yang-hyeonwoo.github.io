@@ -229,6 +229,8 @@
   }
 
   // ---------- charts ----------
+  // each " · " chunk stays on one line, so a line breaks between chunks and never inside one
+  const coach = (title, lines) => `<b>${title}</b><ul>${lines.filter(Boolean).map((l) => `<li>${l.split(' · ').map((x) => `<span class="nb">${x}</span>`).join(' · ')}</li>`).join('')}</ul>`;
   // The plan's running for a month: weekly base km of its weeks (by the Thursday rule), recovery weeks set apart
   const kmMonth = (plan, ym) => { const ws = plan.weeks.filter((w) => iso(addDays(parse(w.start), 3)).slice(0, 7) === ym); const main = ws.filter((w) => !w.recovery).map((w) => w.run_km);
     return ws.length ? { lo: Math.round(Math.min(...main)), hi: Math.round(Math.max(...main)), total: Math.round(ws.reduce((a, w) => a + w.run_km, 0) / 10) * 10 } : null; };
@@ -245,10 +247,10 @@
     if (!noteEl) return;
     const nxt = plan.weeks.find((w) => w.start === iso(addDays(mon, 7))); const left = cur.plan ? Math.max(0, cur.plan - cur.y) : 0;
     const rec = plan.weeks.filter((w) => w.recovery && w.start > iso(mon)).map((w) => `${md(parse(w.start))} 주 ${Math.round(w.run_km)}km`).join(', ');
-    noteEl.innerHTML = `<b>이번 주 ${cur.y.toFixed(1)} / ${cur.plan || '–'}km${cur.plan ? (left > 0.05 ? ` · ${left.toFixed(1)}km 남음` : ' · 계획 달성') : ''}${nxt ? ` · 다음 주 목표 ${nxt.run_km}km` : ''}.</b> `
-      + `웨이트 시즌에는 주 0–25km로 들쭉날쭉했어요. 이제는 끊기지 않게 쌓는 게 핵심이에요. `
-      + `${nxt && cur.plan && nxt.run_km > cur.plan * 1.3 ? `이번 주는 대회 직후라 줄여 둔 주이고, 다음 주부터 기본 계획 거리로 올라가요. 그 뒤로는 ` : ''}한 주에 2–3km씩(10% 이내) 올리고, 3주 올린 뒤 1주는 줄여요${rec ? ` (${rec})` : ''}. `
-      + `비나 일정으로 왕복 러닝을 놓치면 보충하지 말고, 수요일 포인트 훈련만은 지켜요.`;
+    noteEl.innerHTML = coach(`이번 주 ${cur.y.toFixed(1)} / ${cur.plan || '–'}km${cur.plan ? (left > 0.05 ? ` · ${left.toFixed(1)}km 남음` : ' · 계획 달성') : ''}${nxt ? ` · 다음 주 ${nxt.run_km}km` : ''}`, [
+      nxt && cur.plan && nxt.run_km > cur.plan * 1.3 ? '이번 주는 대회 직후라 줄인 주 · 다음 주부터 기본 계획 거리' : '',
+      `그 뒤로 한 주 +2–3km · 3주 올리고 1주 줄이기${rec ? ` · 회복 주 ${rec.replace(/ 주 /g, ' ')}` : ''}`,
+      '왕복 러닝은 놓쳐도 보충 없이 · 수요일 포인트 훈련은 꼭']);
   }
   // Small monthly charts print their values on the marks (o.labels), like the old spreadsheet; every chart also has a hover tooltip.
   const vl = (x, y, t, anchor = 'middle') => `<text class="vl" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}">${t}</text>`;
@@ -523,12 +525,14 @@
       const ymAt = (n) => { const d = new Date(NOW.getFullYear(), NOW.getMonth() + n, 1); return iso(d).slice(0, 7); };
       const pre = mk.filter((m) => { const ym = months[mk.indexOf(m)].ym; return ym < HYROX_START.slice(0, 7); }); const lastW = pre[pre.length - 1];
       const n1 = kmMonth(plan, ymAt(1)), n2 = kmMonth(plan, ymAt(2)); const mon1 = +ymAt(1).slice(5), mon2 = +ymAt(2).slice(5);
-      if ($('#noteMD')) $('#noteMD').innerHTML = `<b>지금 집중할 것: Hyrox와 러닝을 늘리고, 웨이트는 주 1회로.</b> 11/22부터 Hyrox 시즌이에요. 웨이트 시즌에는 한 달 15–25일 중 대부분이 웨이트였지만, `
-        + `이제 한 달 기준은 Hyrox 16일 안팎(주 4회) · 러닝 16일 안팎(수요일 포인트 · 왕복 2회 · 주말) · 웨이트 4일(수요일 상체)이에요. `
-        + `${NOW.getMonth() + 1}월 지금까지 Hyrox ${mNow.v[0]}일 · 러닝 ${mNow.v[1]}일 · 웨이트 ${mNow.v[2]}일. 일정이 꼬이면 금요일 Single과 수요일 러닝부터 지켜요.`;
-      if ($('#noteRM')) $('#noteRM').innerHTML = `<b>러닝 거리를 지금의 두 배 이상으로.</b> 웨이트 시즌에는 한 달 ${lastW ? `${Math.round(lastW.y)}km 안팎(${lastW.label})` : '70km 안팎'}이었어요. `
-        + `Hyrox Pro는 지친 상태로 1km를 8번 뛰는 경기라, 꾸준한 거리가 기록을 좌우해요. `
-        + `${n1 ? `${mon1}월은 주 ${n1.lo}–${n1.hi}km(한 달 약 ${n1.total}km)` : ''}${n2 ? `, ${mon2}월은 주 ${n2.lo}–${n2.hi}km` : ''}가 목표이고, 10K 37:59를 위해 2월부터는 주 40km 이상으로 올려요.`;
+      if ($('#noteMD')) $('#noteMD').innerHTML = coach('Hyrox와 러닝을 늘리고, 웨이트는 주 1회로', [
+        '한 달 기준 Hyrox 16일 · 러닝 16일 · 웨이트 4일',
+        `${NOW.getMonth() + 1}월 지금까지 Hyrox ${mNow.v[0]}일 · 러닝 ${mNow.v[1]}일 · 웨이트 ${mNow.v[2]}일`,
+        '일정이 꼬이면 금요일 Single · 수요일 러닝부터']);
+      if ($('#noteRM')) $('#noteRM').innerHTML = coach('러닝 거리를 꾸준히 두 배로', [
+        `웨이트 시즌 월 ${lastW ? `${Math.round(lastW.y)}km 안팎` : '70km 안팎'} · 이제 그 두 배`,
+        [n1 && `${mon1}월 주 ${n1.lo}–${n1.hi}km`, n2 && `${mon2}월 주 ${n2.lo}–${n2.hi}km`].filter(Boolean).join(' · '),
+        '2월부터 주 40km 이상 · 10K 37:59 준비']);
       barChart($('#chRM'), mk, { label: '월별 러닝 거리', labels: true, h: 210, color: C.run, vfmt: (v) => v.toFixed(0), tip: (b) => `${b.tip} · <b>${b.y.toFixed(1)}</b>km${b.cur ? ' (진행 중)' : ''}` });
       // Recovery: the last four weeks in numbers
       const from = iso(addDays(NOW, -27)); const rec = daily.filter((r) => r.date >= from && r.date <= TODAY && mins(r.sleep) != null);
@@ -540,7 +544,36 @@
         + cell('평균 취침', beds.length ? hm(avgOf(beds) % 1440) : '–', `목표 ${plan.targets.bed}`)
         + cell('평균 기상', wakes.length ? hm(avgOf(wakes)) : '–', `목표 ${plan.targets.wake}`) : '<p class="note">최근 4주 수면 기록이 없어요.</p>';
     };
+    // Nutrition and recovery: is it going the way the plan wants, and what to do about it (always the recent weeks, whatever the range)
+    const notes2 = () => {
+      const back = (n) => iso(addDays(NOW, -n)); const recent = (n) => daily.filter((r) => r.date > back(n) && r.date <= TODAY);
+      const r14 = recent(14), r28 = recent(28); const planned = r14.filter((r) => plan.days[r.date] && r.kcal != null);
+      const k = (v) => Math.round(v).toLocaleString('en-US');
+      if ($('#noteK')) { if (planned.length >= 3) { const avg = avgOf(planned.map((r) => r.kcal)), tgt = avgOf(planned.map((r) => plan.days[r.date].kcal)); const d = avg - tgt;
+          const pr = planned.filter((r) => r.prot != null).map((r) => r.prot);
+          $('#noteK').innerHTML = coach(Math.abs(d) <= 150 ? '계획대로 먹고 있어요 · 이대로 유지' : d > 0 ? `목표보다 하루 ${k(d)}kcal 많아요 · 간식부터 줄이기` : `목표보다 하루 ${k(-d)}kcal 적어요 · 훈련 날은 채우기`,
+            [`최근 ${planned.length}일 평균 ${k(avg)}kcal · 목표 평균 ${k(tgt)}kcal`, pr.length ? `단백질 평균 ${Math.round(avgOf(pr))}g · 목표 155g` : '']); }
+        else $('#noteK').innerHTML = coach('식단 기록을 쌓는 중이에요', ['계획 시작 후 3일 이상 기록하면 목표와 비교해요', '훈련 날 2,300–2,500kcal · 단백질 155g']); }
+      if ($('#noteW')) { const wt = (a, b) => { const v = daily.filter((r) => r.date > back(a) && r.date <= back(b) && r.weight != null).map((r) => r.weight); return v.length ? avgOf(v) : null; };
+        const now = wt(7, 0), then = wt(28, 21); const rate = now != null && then != null ? (now - then) / 3 : null; const left = now != null ? now - 68 : null;
+        $('#noteW').innerHTML = coach(rate == null ? '체중을 꾸준히 재 주세요' : rate <= -0.7 ? '너무 빨리 빠져요 · 하루 +200kcal' : rate <= -0.2 ? '감량 속도가 좋아요 · 이대로' : '정체예요 · 2주 더 그대로면 하루 −150kcal',
+          [now != null ? `지금 7일 평균 ${now.toFixed(1)}kg${rate != null ? ` · 최근 4주 주당 ${rate > 0 ? '+' : rate < 0 ? '−' : ''}${Math.abs(rate).toFixed(1)}kg` : ''}` : '',
+            left != null && left > 0 ? `목표 67–68kg까지 ${left.toFixed(1)}kg · 2월 말까지 주 0.3–0.5kg` : '목표 체중 범위 안이에요 · 3월부터 퍼포먼스 식단']); }
+      const sl14 = r14.map((r) => mins(r.sleep)).filter((v) => v != null); const goal = mins(plan.targets.sleep);
+      const late = (t) => { const v = mins(t); return v == null ? null : v < 18 * 60 ? v + 1440 : v; };
+      if ($('#noteS')) { if (sl14.length) { const avg = avgOf(sl14); const short = sl14.filter((v) => v < 360).length; const beds = r14.map((r) => late(r.bed)).filter((v) => v != null);
+          $('#noteS').innerHTML = coach(avg >= goal - 15 ? '수면은 충분해요 · 이대로' : avg >= 390 ? '조금 부족해요 · 취침을 30분 당기기' : '부족해요 · 회복이 먼저',
+            [`최근 2주 평균 ${hm(avg)} · 목표 ${plan.targets.sleep}`, `6시간 미만 ${short}일${beds.length ? ` · 평균 취침 ${hm(avgOf(beds) % 1440)} (목표 ${plan.targets.bed})` : ''}`]); }
+        else $('#noteS').innerHTML = coach('수면 기록이 없어요', ['가민 수면이 자동으로 들어와요', `목표 ${plan.targets.sleep} · 취침 ${plan.targets.bed}`]); }
+      if ($('#noteL')) { const short28 = r28.map((r) => mins(r.sleep)).filter((v) => v != null && v < 360).length;
+        $('#noteL').innerHTML = coach(short28 >= 6 ? `짧게 잔 날이 ${short28}일 · 강도 조절 필요` : '회복 기준', ['6시간 미만 잔 다음 날 · 왕복 러닝은 자전거로', '통증 3/10 넘으면 휴식 · 다음 날까지 남으면 러닝 하나 줄이기']); }
+      // side-by-side notes get the same height, so the boxes line up
+      const even = () => document.querySelectorAll('.grid.g2').forEach((g) => { const ns = [...g.querySelectorAll(':scope > * > .note.coach')]; ns.forEach((n) => { n.style.minHeight = ''; });
+        if (ns.length === 2 && matchMedia('(min-width: 861px)').matches) { const h = Math.max(...ns.map((n) => n.offsetHeight)); ns.forEach((n) => { n.style.minHeight = `${h}px`; }); } });
+      even(); if (!notes2.bound) { notes2.bound = true; window.addEventListener('resize', even); }
+    };
     draw(0);   // the whole record by default: the long view is the point of this section
+    notes2();
     document.querySelectorAll('#range button').forEach((b) => { b.onclick = () => { document.querySelectorAll('#range button').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); draw(+b.dataset.w); }; });
     // races, newest first; the fastest result of each event gets a PB mark
     const secsOf = (t) => t.split(':').reduce((acc, v) => acc * 60 + Number(v), 0); const best = {};

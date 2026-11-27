@@ -963,3 +963,16 @@ body[data-page="log"] .run-wk { margin-top: 28px; }
 /* ---- coaching notes under the training charts ---- */
 .note.coach { margin-top: 10px; padding: 11px 13px; border-radius: var(--r-md); background: var(--bg-soft); font-size: 0.8rem; line-height: 1.65; color: var(--text); text-wrap: pretty; }
 .note.coach b { display: block; margin-bottom: 2px; color: var(--ink); font-weight: 700; }
+
+/* ---- coaching notes: a bold line and three short lines; side by side they sit at the same height ---- */
+.note.coach ul { margin: 4px 0 0; padding: 0; list-style: none; }
+.note.coach li { position: relative; padding-left: 12px; line-height: 1.7; }
+.note.coach li::before { content: ""; position: absolute; left: 1px; top: 0.78em; width: 4px; height: 4px; border-radius: 50%; background: var(--faint, #b0b0b8); }
+.grid.g2 > .chart-card { display: flex; flex-direction: column; }
+.grid.g2 > .chart-card .note.coach { margin-top: auto; }
+.grid.g2 > .chart-card .chart { margin-bottom: 12px; }
+.note.coach .nb { white-space: nowrap; } .note.coach { word-break: keep-all; }
+/* the Last 4 Weeks box: its note at the bottom, on white so it shows on the grey box */
+.recov-box { display: flex; flex-direction: column; border: 1px solid transparent; }     /* same box as the chart card beside it */
+.recov-box .note.coach { margin-top: auto; background: #fff; }
+.recov-box .kv { margin-bottom: 12px; }
