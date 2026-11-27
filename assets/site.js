@@ -214,8 +214,7 @@
     log.forEach((e) => { at(e.date).log.push(e); });
     Object.values(ix).forEach((x) => { const of = (k) => x.log.filter((e) => kindOf(e) === k);
       x.hyrox = of('hyrox').map((e) => (e.session === 'Hyrox Training' || e.session === 'Race' ? e.workout || e.session : e.session)).join(', ');
-      x.hyroxL = of('hyrox').map((e) => (e.session === 'Hyrox Training' || e.session === 'Race' ? e.workout || e.session
-        : /^hyrox/i.test(e.session) ? e.session : `Hyrox ${e.session === 'Functional Training' ? 'Functional' : e.session}`)).join(', ');
+      x.hyroxL = of('hyrox').map((e) => (e.session === 'Hyrox Training' ? e.workout || e.session : hyLabel(e))).join(', ');
       x.runL = of('run').map(runLabel).join(' + ');
       x.run = of('run').map((e) => runText(e)).join(' + '); x.runFull = of('run').map((e) => runText(e, true)).join(' + ');
       x.weights = of('weights').map((e) => e.format || 'Weight').join(', ');
@@ -812,9 +811,9 @@
           <td class="m-only"><button class="xp" type="button" aria-expanded="false" aria-label="${md(dt)} 자세히 보기">▾</button></td></tr>
           <tr class="more-row" hidden><td colspan="14" class="wrap">${detail || '<span class="muted">추가 기록 없음</span>'}</td></tr>`; }
       return { out, count }; }
-    const tableOf = (body, hy) => `<div class="scroll-x"><table class="t days"><colgroup>${[8.5, 7, 5.5, 5.5, 6.5, 7.5, 6, 6, 6, 20.75, 20.75].map((w) => `<col style="width:${w}%">`).join('')}</colgroup>
+    const tableOf = (body, hy) => `<div class="scroll-x"><table class="t days"><colgroup>${[11, 7, 5.5, 5.5, 7, 8.5, 7, 7, 7, 17, 17.5].map((w) => `<col style="width:${w}%">`).join('')}</colgroup>
       <thead><tr class="grp"><th></th><th colspan="3" class="gs g-sl">Sleep</th><th colspan="5" class="gs g-nu">Body · Nutrition</th><th colspan="2" class="gs g-wo">Workout</th></tr>
-      <tr><th class="tl">Date</th><th class="gs"><span class="dt">Total</span><span class="mt">수면</span></th><th class="d-only">Bed</th><th class="d-only">Wake</th>
+      <tr><th>Date</th><th class="gs"><span class="dt">Total</span><span class="mt">수면</span></th><th class="d-only">Bed</th><th class="d-only">Wake</th>
         <th class="gs">체중</th><th>kcal</th><th class="d-only">Carb</th><th class="d-only">Prot</th><th class="d-only">Fat</th>
         <th class="d-only gs">${hy ? 'Hyrox' : 'Weight'}</th><th class="d-only">${hy ? 'Running &amp; Weight' : 'Cardio'}</th><th class="m-only tl">운동</th><th class="m-only"></th></tr></thead>
       <tbody>${body || '<tr><td colspan="14" class="muted">기록이 없어요.</td></tr>'}</tbody></table></div>`;

@@ -718,3 +718,35 @@ a.cal-d.hy:hover { background: color-mix(in srgb, var(--accent) 8%, #fff); }
   .cal-m svg { display: none; }
   .cal-lg { font-size: 0.64rem; gap: 4px 10px; } .cal-lg .m:first-of-type { margin-left: 0; }
 }
+
+/* ---- records table, final pass: every cell centred both ways, one row height, smaller type, quieter lines ---- */
+table.days { font-size: 0.78rem; }
+table.days th, table.days td, table.days td:first-child, table.days td.clip { text-align: center; vertical-align: middle; }
+table.days td { height: 34px; padding: 0 6px; line-height: 1.2; border-bottom: 1px solid #f0f0f3; }
+table.days tbody tr:not(.month-row):not(.more-row):hover td { background: #f8f8fb; }
+table.days tr.grp th { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 10px 6px 7px; }
+table.days tr.grp th.g-sl { box-shadow: inset 0 -2px 0 #1f6fd1; } table.days tr.grp th.g-nu { box-shadow: inset 0 -2px 0 #c2610f; } table.days tr.grp th.g-wo { box-shadow: inset 0 -2px 0 #1e8a4c; }
+table.days thead tr:last-child th { font-size: 0.7rem; font-weight: 600; color: #6e6e76; padding: 8px 6px; border-bottom: 1px solid var(--line); }
+table.days th.gs, table.days td.gs { border-left: 1px solid #ececf0; }
+table.days tr.month-row td { text-align: left; font-size: 0.74rem; height: 36px; padding: 12px 8px 6px; }
+/* date: the day and the weekday in two fixed columns, so every row lines up, the pair centred in the cell */
+table.days td:first-child .dbtn, table.days td:first-child > b { vertical-align: middle; }
+table.days .dbtn { position: relative; display: inline-grid; grid-template-columns: 3.1em 2.6em; align-items: center; gap: 0; margin: 0; padding: 2px 4px; }
+table.days td:first-child b { text-align: right; font-weight: 700; color: var(--ink); }
+table.days .wd { min-width: 0; margin-left: 0; padding-left: 0.6em; text-align: left; font-size: 0.72rem; }
+table.days td:first-child > b, table.days td:first-child > .wd { display: inline-block; }
+table.days td:first-child > b { width: 3.1em; } table.days td:first-child > .wd { width: 2.6em; }
+table.days .dbtn .pen { position: absolute; right: -14px; top: 50%; transform: translateY(-50%); }
+/* bars: slimmer, the number centred on them */
+table.days .cellbar { padding: 3px 0; line-height: 1.3; border-radius: 3px; }
+table.days td.sl .cellbar, table.days td.kc .cellbar { font-size: 0.78rem; }
+table.days .cellbar.g { font-size: 0.75rem; }
+table.days td.bw { font-size: 0.8rem; }
+table.days td.clip { color: var(--ink); font-weight: 500; }
+table.days td.muted { font-size: 0.75rem; }
+@media (max-width: 640px) {
+  table.days { font-size: 0.76rem; } table.days td { height: 34px; padding: 0 3px; }
+  table.days .dbtn { grid-template-columns: 2.9em 2.3em; padding: 2px 0; }
+  table.days td:first-child > b { width: 2.9em; } table.days td:first-child > .wd { width: 2.3em; }
+  table.days td.m-only.clip { text-align: left; }
+}
