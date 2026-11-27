@@ -911,3 +911,25 @@ svg.days-ch .sel { fill: rgba(0, 0, 0, 0.035); }
 table.days thead th small { display: block; font-size: 0.62rem; font-weight: 500; color: #9a9aa2; margin-top: 1px; }
 /* phone calendar: Cycle shares the burgundy family with Hyrox, so its bar is also shorter */
 @media (max-width: 640px) { .cal-d .p.k-cycle { width: 40%; } }
+
+/* ---- Training Log: its own kind colours for thin marks (blue, emerald, blue-grey, charcoal); Home keeps the chart palette ---- */
+body[data-page="log"] .k-hyrox { --kc: #153594; } body[data-page="log"] .k-run { --kc: #16724b; }
+body[data-page="log"] .k-weights { --kc: #465d78; } body[data-page="log"] .k-cycle { --kc: #4b5058; }
+body[data-page="log"] .entry .item.k-hyrox .ttl::before { background: #153594; } body[data-page="log"] .entry .item.k-run .ttl::before { background: #16724b; }
+body[data-page="log"] .entry .item.k-weights .ttl::before { background: #465d78; }
+body[data-page="log"] .cal-d .p { background: color-mix(in srgb, var(--kc) 8%, #fff); box-shadow: inset 3px 0 0 var(--kc); }
+body[data-page="log"] .cal-d .p.k-weights { background: color-mix(in srgb, var(--kc) 8%, #fff); }
+body[data-page="log"] .cal-d .p.k-cycle { background: #fff; box-shadow: inset 3px 0 0 var(--kc), inset 0 0 0 1px #e6e7ea; }
+body[data-page="log"] .cal-d .p.plan { background: #fff; box-shadow: inset 3px 0 0 var(--kc), inset 0 0 0 1px color-mix(in srgb, var(--kc) 30%, #fff); }
+.cal-d .p svg { width: 11px; height: 11px; vertical-align: -1px; margin-right: 3px; color: var(--kc); }
+.cal-d .p .ls { display: none; }
+@media (max-width: 640px) {
+  /* phones: a short kind name per session, a 3px colour line at its left, a very light tint */
+  body[data-page="log"] .cal-d .p, body[data-page="log"] .cal-d .p.k-weights, body[data-page="log"] .cal-d .p.k-cycle {
+    display: flex; align-items: center; justify-content: flex-start; width: 100%; height: auto; padding: 1px 2px 1px 5px; font-size: 0.56rem; font-weight: 700; line-height: 1.35;
+    border-radius: 2px; color: var(--ink); letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; }
+  body[data-page="log"] .cal-d .p .lf { display: none; } body[data-page="log"] .cal-d .p .ls { display: inline; }
+  body[data-page="log"] .cal-d .p svg { width: 8px; height: 8px; margin-right: 2px; flex: none; }
+  body[data-page="log"] .cal-d .p.k-cycle { width: 100%; font-weight: 600; }
+  body[data-page="log"] .cal-ps { align-items: stretch; padding: 0 1px; }
+}

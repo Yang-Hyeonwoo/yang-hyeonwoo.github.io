@@ -707,7 +707,9 @@
     const NAMES = { hyrox: 'Hyrox training', run: 'Running', weights: 'Weight training' };
     // Calendar names: "Hyrox Single", "Jogging 8.3km 5:45", the weight split; core work is not shown.
     const tagText = (e) => { const k = kindOf(e); return k === 'run' ? runLabel(e) : k === 'weights' ? (e.format || 'Weight') : k === 'hyrox' ? hyLabel(e) : e.workout || e.session; };
-    const tag = (e) => `<span class="p k-${kindOf(e)}${ahead(e) ? ' plan' : ''}" title="${esc(e.session)}${e.format ? ` · ${esc(e.format)}` : ''}">${esc(tagText(e))}</span>`;
+    const SHORTK = { hyrox: 'Hyrox', run: '러닝', weights: '웨이트', other: '기타' };
+    const tag = (e) => `<span class="p k-${kindOf(e)}${ahead(e) ? ' plan' : ''}" title="${esc(e.session)}${e.format ? ` · ${esc(e.format)}` : ''}"><span class="lf">${esc(tagText(e))}</span><span class="ls">${SHORTK[kindOf(e)]}</span></span>`;
+    const BIKE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5.5" cy="17" r="3.5"/><circle cx="18.5" cy="17" r="3.5"/><path d="M5.5 17 9 9h6l3.5 8M9 9l3 8h-1M14 6h2.5"/></svg>';
     const MOON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 1.8a6.3 6.3 0 1 0 3.7 10.6A5.2 5.2 0 0 1 10.5 1.8Z" fill="currentColor"/></svg>';
     const FORK = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5v5a1.7 1.7 0 0 0 1.2 1.6V14.5h1.4V8.1A1.7 1.7 0 0 0 7.8 6.5v-5H6.8v4.3H6.2V1.5H5.4v4.3h-.6V1.5Zm6.6 0c-1.3.6-2 2.3-2 4.2 0 1.2.5 2.2 1.3 2.6v6.2h1.4v-13Z" fill="currentColor"/></svg>';
     const ymAdd = (ym, n) => { const [y, m] = ym.split('-').map(Number); const d = new Date(y, m - 1 + n, 1); return iso(d).slice(0, 7); };
@@ -719,7 +721,7 @@
       const cyc = cycled(ds, log.filter((e) => e.date === ds)) && (filter === 'all' || filter === 'cycle');
       const cls = ['cal-d', ds === TODAY && 'today', ds > TODAY && 'future', (es.length || cyc) && 'has', wd === 6 && 'sat', wd === 0 && 'sun'].filter(Boolean).join(' '); const mark = '';
       const meta = sl != null || r.kcal != null ? `<span class="cal-m num">${sl != null ? `<span class="sl${sl < 360 ? ' low' : ''}" title="수면 ${esc(r.sleep)}">${MOON}${esc(r.sleep)}</span>` : ''}${r.kcal != null ? `<span class="kc" title="섭취 ${n0(r.kcal)}kcal">${FORK}${n0(r.kcal)}</span>` : ''}</span>` : '';
-      const chips = es.map(tag).join('') + (cyc ? `<span class="p k-cycle" title="체육관까지 자전거 왕복">Cycle ${CYCLE_KM}km</span>` : '');
+      const chips = es.map(tag).join('') + (cyc ? `<span class="p k-cycle" title="체육관까지 자전거 왕복">${BIKE}<span class="lf">Cycle ${CYCLE_KM}km</span><span class="ls">라이딩</span></span>` : '');
       const inner = `<span class="cal-top"><span class="dn num">${dt.getDate()}</span></span>${mark}<span class="cal-ps">${chips}</span>${meta}`;
       return !adj && es.length ? `<a class="${cls}" href="#d-${ds}" data-day="${ds}">${inner}</a>` : `<span class="${cls}">${inner}</span>`; };
     // the month's numbers: days trained, days (and for runs times and kilometres) per kind, average sleep and food
