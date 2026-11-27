@@ -708,7 +708,8 @@
     // Calendar names: "Hyrox Single", "Jogging 8.3km 5:45", the weight split; core work is not shown.
     const tagText = (e) => { const k = kindOf(e); return k === 'run' ? runLabel(e) : k === 'weights' ? (e.format || 'Weight') : k === 'hyrox' ? hyLabel(e) : e.workout || e.session; };
     const SHORTK = { hyrox: 'Hyrox', run: '러닝', weights: '웨이트', other: '기타' };
-    const tag = (e) => `<span class="p k-${kindOf(e)}${ahead(e) ? ' plan' : ''}" title="${esc(e.session)}${e.format ? ` · ${esc(e.format)}` : ''}"><span class="lf">${esc(tagText(e))}</span><span class="ls">${SHORTK[kindOf(e)]}</span></span>`;
+    const DUMB = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>';
+    const tag = (e) => `<span class="p k-${kindOf(e)}${ahead(e) ? ' plan' : ''}" title="${esc(e.session)}${e.format ? ` · ${esc(e.format)}` : ''}">${kindOf(e) === 'weights' ? DUMB : ''}<span class="lf">${esc(tagText(e))}</span><span class="ls">${SHORTK[kindOf(e)]}</span></span>`;
     const BIKE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5.5" cy="17" r="3.5"/><circle cx="18.5" cy="17" r="3.5"/><path d="M5.5 17 9 9h6l3.5 8M9 9l3 8h-1M14 6h2.5"/></svg>';
     const MOON = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 1.8a6.3 6.3 0 1 0 3.7 10.6A5.2 5.2 0 0 1 10.5 1.8Z" fill="currentColor"/></svg>';
     const FORK = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5v5a1.7 1.7 0 0 0 1.2 1.6V14.5h1.4V8.1A1.7 1.7 0 0 0 7.8 6.5v-5H6.8v4.3H6.2V1.5H5.4v4.3h-.6V1.5Zm6.6 0c-1.3.6-2 2.3-2 4.2 0 1.2.5 2.2 1.3 2.6v6.2h1.4v-13Z" fill="currentColor"/></svg>';
