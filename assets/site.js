@@ -703,10 +703,9 @@
     let curYM = TODAY.slice(0, 7);
     // one day of the calendar: number, a chip per session (in the order they were done), a Cycle chip on a biked class day,
     // the start of Hyrox training and the end of the weight year, and that day's sleep and kcal together at the foot
-    const dayCell = (dt, by, adj) => { const ds = iso(dt); const es = by[ds] || []; const wd = dt.getDay(); const r = dayRec[ds] || {}; const sl = mins(r.sleep);
+    const dayCell = (dt, by, adj) => { if (adj) return '<span class="cal-d adj"></span>'; const ds = iso(dt); const es = by[ds] || []; const wd = dt.getDay(); const r = dayRec[ds] || {}; const sl = mins(r.sleep);
       const cyc = cycled(ds, log.filter((e) => e.date === ds)) && (filter === 'all' || filter === 'cycle');
-      const cls = ['cal-d', adj && 'adj', ds === TODAY && 'today', ds > TODAY && 'future', (es.length || cyc) && 'has', wd === 6 && 'sat', wd === 0 && 'sun', ds === HYROX_START && 'start', ds === WEIGHT_END && 'wend'].filter(Boolean).join(' ');
-      const mark = ds === HYROX_START ? '<span class="mk mk-h">Hyrox training starts</span>' : ds === WEIGHT_END ? '<span class="mk mk-w">Weight training ends</span>' : '';
+      const cls = ['cal-d', ds === TODAY && 'today', ds > TODAY && 'future', (es.length || cyc) && 'has', wd === 6 && 'sat', wd === 0 && 'sun'].filter(Boolean).join(' '); const mark = '';
       const meta = sl != null || r.kcal != null ? `<span class="cal-m num">${sl != null ? `<span class="sl${sl < 360 ? ' low' : ''}" title="수면 ${esc(r.sleep)}">${MOON}${esc(r.sleep)}</span>` : ''}${r.kcal != null ? `<span class="kc" title="섭취 ${n0(r.kcal)}kcal">${FORK}${n0(r.kcal)}</span>` : ''}</span>` : '';
       const chips = es.map(tag).join('') + (cyc ? `<span class="p k-cycle" title="체육관까지 자전거 왕복">Cycle ${CYCLE_KM}km</span>` : '');
       const inner = `<span class="cal-top"><span class="dn num">${dt.getDate()}</span></span>${mark}<span class="cal-ps">${chips}</span>${meta}`;
@@ -719,16 +718,16 @@
       const cyc = filter === 'all' || filter === 'cycle' ? dates.filter((d) => cycled(d, log.filter((e) => e.date === d))).length : 0;
       const trained = new Set(inM.map((e) => e.date).concat(dates.filter((d) => cyc && cycled(d, log.filter((e) => e.date === d))))).size;
       const recs = dates.map((d) => dayRec[d]).filter(Boolean); const sl = recs.map((r) => mins(r.sleep)).filter((v) => v != null); const kc = recs.filter((r) => r.kcal != null).map((r) => r.kcal);
-      const cell = (cls, l, v, u, sub = '') => `<div class="cs ${cls}"><span class="l">${l}</span><span class="v num">${v}<small>${u}</small>${sub ? `<em>${sub}</em>` : ''}</span></div>`;
-      return `<div class="cal-stats">${cell('all', '운동한 날', trained, '일')}${cell('k-hyrox', NAMES.hyrox, daysOf('hyrox'), '일')}${cell('k-run', NAMES.run, new Set(runs.map((e) => e.date)).size, '회', km ? `(${km.toFixed(1)}km)` : '')}${cell('k-weights', NAMES.weights, daysOf('weights'), '일')}${cyc ? cell('k-cycle', 'Cycle', cyc, '회', `(${(cyc * CYCLE_KM).toFixed(1)}km)`) : ''}`
-        + `${cell('sleep', '평균 수면', sl.length ? hm(avgOf(sl)) : '–', '')}${cell('food', '평균 섭취', kc.length ? n0(Math.round(avgOf(kc))) : '–', kc.length ? 'kcal' : '')}</div>`; };
+      const it = (cls, l, v) => `<span class="cs ${cls}"><i></i>${l} <b class="num">${v}</b></span>`;
+      return `<div class="cal-stats"><span class="cs-g">${it('k-hyrox', NAMES.hyrox, `${daysOf('hyrox')}일`)}${it('k-run', NAMES.run, `${new Set(runs.map((e) => e.date)).size}회${km ? ` (${km.toFixed(1)}km)` : ''}`)}${it('k-weights', NAMES.weights, `${daysOf('weights')}일`)}${cyc ? it('k-cycle', 'Cycle', `${cyc}회 (${(cyc * CYCLE_KM).toFixed(1)}km)`) : ''}</span>`
+        + `<span class="cs-g sub"><span class="cs">운동한 날 <b class="num">${trained}일</b></span><span class="cs">평균 수면 <b class="num">${sl.length ? hm(avgOf(sl)) : '–'}</b></span><span class="cs">평균 섭취 <b class="num">${kc.length ? `${n0(Math.round(avgOf(kc)))}kcal` : '–'}</b></span></span></div>`; };
     const cal = (ym, rows) => { const [y, mo] = ym.split('-').map(Number); const first = new Date(y, mo - 1, 1), last = new Date(y, mo, 0);
       const by = {}; rows.filter((e) => e.session !== 'Core').slice().sort((a2, b2) => (a2.date < b2.date ? -1 : a2.date > b2.date ? 1 : 0)).forEach((e) => { (by[e.date] = by[e.date] || []).push(e); });
       // file order within a day is the order things were done; the sort above is stable, so it keeps it
       const start = addDays(first, -((first.getDay() + 6) % 7)); const end = addDays(last, (7 - last.getDay()) % 7); let cells = '';
       for (let dt = start; dt <= end; dt = addDays(dt, 1)) cells += dayCell(dt, by, dt.getMonth() !== mo - 1);
       const lo = minYM(), hi = maxYM();
-      const notes = [ym === HYROX_START.slice(0, 7) && '<b class="h">11/22 Hyrox training starts</b> · Hyrox Mini Race부터', ym === WEIGHT_END.slice(0, 7) && '<b class="w">11/18 Weight training ends</b> · 웨이트 트레이닝에 집중한 시기의 마지막 날'].filter(Boolean);
+      const notes = [];
       return `<div class="calbox"><div class="cal-head"><button class="cal-nav" type="button" data-go="-1" aria-label="이전 달"${ym <= lo ? ' disabled' : ''}>‹</button><h3 class="cal-title">${ymText(ym)}</h3>
           <button class="cal-nav" type="button" data-go="1" aria-label="다음 달"${ym >= hi ? ' disabled' : ''}>›</button>${ym !== TODAY.slice(0, 7) ? '<button class="btn line sm cal-today" type="button" data-go="0">이번 달</button>' : ''}</div>
         ${stats(ym, rows)}

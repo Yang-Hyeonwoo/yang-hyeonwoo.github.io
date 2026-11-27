@@ -804,3 +804,20 @@ details.mo-log .entry:last-child { border-bottom: 0; }
 @media (min-width: 641px) { table.days tbody tr:not(.month-row):not(.more-row) { cursor: default; } table.days tr.more-row { display: none; } }
 table.days tr.more-row td.wrap { text-align: left; height: auto; padding: 10px 12px 12px; }
 tr.more-row td.wrap > div { justify-content: flex-start; text-align: left; } tr.more-row td.wrap b { text-align: left; }
+
+/* ---- calendar, quieter: a one-line summary, blank days outside the month, today as a soft dot ---- */
+.cal-stats { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px; margin: 0 2px 12px; border: 0; border-radius: 0; background: none; overflow: visible; }
+.cs-g { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; }
+.cs { display: inline-flex; align-items: center; gap: 6px; padding: 0; border: 0; position: static; flex-direction: row; font-size: 0.78rem; color: var(--muted); white-space: nowrap; }
+.cs b { font-weight: 700; color: var(--ink); }
+.cs i { width: 8px; height: 8px; border-radius: 2px; background: var(--kc); }
+.cs[class*="k-"]::before { content: none; }
+.cs-g.sub .cs { font-size: 0.74rem; } .cs-g.sub .cs b { font-weight: 600; color: var(--text); }
+.cal-d.adj { opacity: 1; background: #fcfcfd; }
+.cal-d.today { box-shadow: none; }
+.cal-d.today .dn { min-width: 24px; padding: 0 7px; border-radius: var(--r-full); background: var(--accent-soft); color: var(--accent-strong); text-align: center; }
+@media (max-width: 640px) {
+  .cal-stats { flex-direction: column; gap: 6px; } .cs.all { grid-column: auto; }
+  .cs-g { gap: 4px 12px; } .cs { font-size: 0.72rem; padding: 0; border: 0; } .cs-g.sub .cs { font-size: 0.68rem; }
+  .cal-d.today .dn { min-width: 20px; padding: 0 4px; }
+}
