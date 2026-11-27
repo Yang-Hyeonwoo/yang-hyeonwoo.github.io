@@ -652,25 +652,6 @@ section.mo + section.mo, .recap + section.mo { border-top: 1px solid var(--line)
 .mo-ks { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
 .mo-k { font-size: 0.76rem; font-weight: 600; padding: 3px 9px; border-radius: var(--r-full); color: var(--kc); background: color-mix(in srgb, var(--kc) 10%, #fff); }
 .k-hyrox { --kc: #2b59c3; } .k-run { --kc: #2a9d8f; } .k-weights { --kc: #d9731a; } .k-other { --kc: #8a8a93; }
-.cal { border: 1px solid var(--line-soft); border-radius: var(--r-lg); overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03); }
-.cal-w, .cal-g { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
-.cal-w span { padding: 8px 10px; font-size: 0.72rem; font-weight: 600; color: var(--muted); background: var(--bg-soft); border-bottom: 1px solid var(--line-soft); }
-.cal-w .sat, .cal-d.sat .dn { color: var(--accent); } .cal-w .sun, .cal-d.sun .dn { color: #c62828; }
-.cal-d { position: relative; display: flex; flex-direction: column; gap: 3px; min-width: 0; min-height: 88px; padding: 6px 7px 8px; color: inherit;
-  border-right: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); transition: background 150ms var(--ease); }
-.cal-g > :nth-child(7n) { border-right: 0; }
-.cal-g > :nth-last-child(-n+7) { border-bottom: 0; }
-.cal-d.out { background: #fbfbfc; }
-a.cal-d:hover { background: var(--bg-soft); color: inherit; }
-.cal-d .dn { font-size: 0.78rem; font-weight: 600; color: var(--ink); line-height: 22px; }
-.cal-d.today .dn { align-self: flex-start; min-width: 22px; padding: 0 6px; border-radius: var(--r-full); background: var(--accent); color: #fff; text-align: center; }
-.cal-d.hy { background: color-mix(in srgb, var(--accent) 4%, #fff); }
-a.cal-d.hy:hover { background: color-mix(in srgb, var(--accent) 8%, #fff); }
-.cal-d.start { box-shadow: inset 3px 0 0 var(--accent); }
-.cal-d .st { position: absolute; top: 8px; right: 7px; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em; color: var(--accent-strong); }
-.cal-d .p { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.7rem; font-weight: 600; line-height: 1.35; padding: 2px 6px;
-  border-radius: 5px; color: var(--kc); background: color-mix(in srgb, var(--kc) 11%, #fff); }
-.cal-d .p.plan { background: none; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--kc) 55%, #fff); }
 .cal-note { margin: 10px 2px 0; font-size: 0.8rem; color: var(--muted); }
 .cal-note b { color: var(--accent-strong); }
 section.mo .mo-b { margin-top: 8px; }
@@ -680,13 +661,6 @@ section.mo .mo-b { margin-top: 8px; }
 @media (max-width: 640px) {
   section.mo { padding-top: 28px; }
   .mo-h .mo-t { font-size: 1.4rem; } .mo-ks { margin-left: 0; width: 100%; }
-  .cal-w span { padding: 6px 0; text-align: center; font-size: 0.68rem; }
-  .cal-d { min-height: 50px; padding: 4px 3px 5px; align-items: center; gap: 2px; }
-  .cal-d .dn { font-size: 0.74rem; line-height: 20px; }
-  .cal-d.today .dn { align-self: center; min-width: 20px; padding: 0 4px; }
-  .cal-d .st { position: static; font-size: 0.52rem; letter-spacing: 0; line-height: 1; }
-  .cal-d .p { width: 70%; height: 4px; padding: 0; font-size: 0; border-radius: 2px; background: var(--kc); }
-  .cal-d .p.plan { background: none; box-shadow: inset 0 0 0 1px var(--kc); }
 }
 @media (prefers-reduced-motion: reduce) { .entry:target { animation: none; } }
 
@@ -696,3 +670,51 @@ section.mo .mo-b { margin-top: 8px; }
 .dl-h.second { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--line); }
 table.days .wd { display: inline-block; min-width: 2.1em; margin-left: 10px; font-size: 0.8rem; font-weight: 500; }
 @media (max-width: 640px) { table.days .wd { margin-left: 6px; font-size: 0.74rem; } .dl-h { font-size: 1.2rem; } }
+
+/* ---- training log calendar: day number, a chip per session, sleep and kcal at the foot ---- */
+.cal { border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; background: #fff; }
+.cal-w, .cal-g { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.cal-w span { padding: 9px 10px 8px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--line); }
+.cal-w .sat, .cal-d.sat .dn { color: var(--accent); } .cal-w .sun, .cal-d.sun .dn { color: #c62828; }
+.cal-d { display: flex; flex-direction: column; gap: 4px; min-width: 0; min-height: 112px; padding: 8px 8px 7px; color: inherit;
+  border-right: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); transition: background 150ms var(--ease); }
+.cal-g > :nth-child(7n) { border-right: 0; }
+.cal-g > :nth-last-child(-n+7) { border-bottom: 0; }
+.cal-d.out { background: repeating-linear-gradient(135deg, #fafafb 0 6px, #f4f4f6 6px 7px); }
+.cal-d.future .dn { color: var(--faint, #b0b0b8); }
+a.cal-d:hover { background: var(--bg-soft); color: inherit; }
+.cal-top { display: flex; align-items: center; justify-content: space-between; gap: 4px; min-height: 22px; }
+.cal-d .dn { font-size: 0.82rem; font-weight: 700; color: var(--ink); line-height: 22px; }
+.cal-d.today .dn { min-width: 24px; padding: 0 7px; border-radius: var(--r-full); background: var(--ink); color: #fff; text-align: center; }
+.cal-d.today { box-shadow: inset 0 0 0 2px var(--ink); }
+.cal-d.hy { background: color-mix(in srgb, var(--accent) 3.5%, #fff); }
+a.cal-d.hy:hover { background: color-mix(in srgb, var(--accent) 8%, #fff); }
+.cal-d.start { box-shadow: inset 3px 0 0 var(--accent); }
+.cal-d .st { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.02em; color: #fff; background: var(--accent); padding: 2px 6px; border-radius: var(--r-full); white-space: nowrap; }
+.cal-ps { display: flex; flex-direction: column; gap: 3px; }
+.cal-d .p { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.69rem; font-weight: 600; line-height: 1.3;
+  padding: 3px 6px 3px 7px; border-radius: 4px; color: var(--ink); background: color-mix(in srgb, var(--kc) 9%, #fff); box-shadow: inset 2.5px 0 0 var(--kc); word-break: keep-all; }
+.cal-d .p.plan { background: #fff; box-shadow: inset 2.5px 0 0 var(--kc), inset 0 0 0 1px color-mix(in srgb, var(--kc) 35%, #fff); color: var(--muted); }
+.cal-m { display: flex; justify-content: space-between; gap: 4px; margin-top: auto; padding-top: 4px; font-size: 0.64rem; color: var(--muted); white-space: nowrap; }
+.cal-m > span { display: inline-flex; align-items: center; gap: 2px; }
+.cal-m svg { width: 9px; height: 9px; flex: none; opacity: 0.75; }
+.cal-m .sl { color: #3f6fb5; } .cal-m .sl.low { color: #c2610f; }
+.cal-lg { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 9px 12px; border-top: 1px solid var(--line); font-size: 0.7rem; color: var(--muted); background: #fcfcfd; }
+.cal-lg span { display: inline-flex; align-items: center; gap: 5px; }
+.cal-lg i { width: 9px; height: 9px; border-radius: 2px; background: var(--kc); }
+.cal-lg .m { gap: 3px; } .cal-lg svg { width: 9px; height: 9px; }
+.cal-lg .m:first-of-type { margin-left: auto; color: #3f6fb5; }
+@media (max-width: 640px) {
+  .cal-w span { padding: 7px 0 6px; text-align: center; font-size: 0.6rem; letter-spacing: 0.04em; }
+  .cal-d { min-height: 74px; padding: 4px 2px 4px; align-items: center; gap: 3px; }
+  .cal-top { justify-content: center; flex-direction: column; gap: 1px; min-height: 0; }
+  .cal-d .dn { font-size: 0.74rem; line-height: 20px; }
+  .cal-d.today .dn { min-width: 20px; padding: 0 4px; }
+  .cal-d .st { font-size: 0.5rem; padding: 1px 4px; }
+  .cal-ps { width: 100%; align-items: center; gap: 2px; }
+  .cal-d .p { display: block; width: 72%; height: 4px; padding: 0; font-size: 0; border-radius: 2px; background: var(--kc); box-shadow: none; }
+  .cal-d .p.plan { background: none; box-shadow: inset 0 0 0 1px var(--kc); }
+  .cal-m { flex-direction: column; align-items: center; gap: 0; padding-top: 2px; font-size: 0.56rem; line-height: 1.35; }
+  .cal-m svg { display: none; }
+  .cal-lg { font-size: 0.64rem; gap: 4px 10px; } .cal-lg .m:first-of-type { margin-left: 0; }
+}

@@ -96,8 +96,6 @@ for monday, (commute, bonus, wed_run, wed_detail, recovery) in sorted(WEEKS.item
                 kcal, carb = 2500, 320
             elif wd in bonus:
                 items.append({"k": "commute", "t": "체육관 왕복 러닝 %skm" % km(COMMUTE_KM), "d": "보너스 · 컨디션 좋은 날만, 아니면 자전거", "opt": True})
-            if d not in NO_CORE:
-                items.append({"k": "core", "t": "행잉 레그레이즈 3–4세트"})
         elif wd == 2:
             items.append({"k": "run", "t": wed_run, "d": "17:50 트랙 · " + wed_detail, "key": True})
             items.append({"k": "weights", "t": "상체 웨이트 45분", "d": "22:30 헬스장 · 23:30까지"})
