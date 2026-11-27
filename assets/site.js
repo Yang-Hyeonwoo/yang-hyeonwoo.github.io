@@ -242,7 +242,7 @@
       bars.push({ label: md(m), tipx: `${weekLabel(m)} (${md(m)}–${md(addDays(m, 6))})`, y: st.km, plan: st.meta ? st.meta.run_km : 0, cur: i === 0 }); }
     const done4 = bars.slice(-5, -1); const avg4 = done4.reduce((a, b) => a + b.y, 0) / done4.length; const cur = bars[bars.length - 1];
     nowEl.innerHTML = `${cur.y.toFixed(1)}<small>km · 이번 주${cur.plan ? ` / 기본 계획 ${cur.plan}km` : ''}</small><span class="chip num">지난 4주 평균 ${avg4.toFixed(1)}km</span>`;
-    barChart(chartEl, bars, { label: '주간 러닝 거리', labels: true, wide: true, h: 220, color: PAGE === 'log' ? '#2e8b57' : KINDS[1].color, vfmt: (v) => (v >= 10 ? v.toFixed(0) : v.toFixed(1)),
+    barChart(chartEl, bars, { label: '주간 러닝 거리', labels: true, wide: true, h: 220, color: PAGE === 'log' ? '#3567cf' : KINDS[1].color, vfmt: (v) => (v >= 10 ? v.toFixed(0) : v.toFixed(1)),
       tip: (b) => `${b.tipx} · <b>${b.y.toFixed(1)}</b>km${b.plan ? ` (기본 계획 ${b.plan}km)` : ''}${b.cur ? ' · 진행 중' : ''}` });
     if (!noteEl) return;
     const nxt = plan.weeks.find((w) => w.start === iso(addDays(mon, 7))); const left = cur.plan ? Math.max(0, cur.plan - cur.y) : 0;
