@@ -679,24 +679,42 @@
         ${meta.length ? `<p class="meta num${k === 'run' ? ' fact' : ''}">${meta.join(' · ')}</p>` : ''}${shown}${hidden ? `<details class="ed"${openIt ? ' open' : ''}><summary>${label}</summary>${hidden}</details>` : ''}</div>`; };
     // a day is one row: the date once on the left, each session of that day stacked on the right
     const days = (rows, ws) => { const out = []; rows.forEach((e) => { const d = out[out.length - 1]; if (d && d.date === e.date) d.rows.push(e); else out.push({ date: e.date, rows: [e] }); });
-      return out.map((d) => `<article class="entry${d.rows.length > 1 ? ' multi' : ''}"><div class="when">${fmtDate(d.date)}${d.rows.length > 1 ? `<span class="n num">${d.rows.length}개</span>` : ''}</div><div class="items">${d.rows.map((e) => item(e, ws)).join('')}</div></article>`).join(''); };
-    const KN = { hyrox: 'Hyrox', run: 'Running', weights: 'Weight' };
+      return out.map((d) => `<article class="entry${d.rows.length > 1 ? ' multi' : ''}" id="d-${d.date}"><div class="when">${fmtDate(d.date)}${d.rows.length > 1 ? `<span class="n num">${d.rows.length}개</span>` : ''}</div><div class="items">${d.rows.map((e) => item(e, ws)).join('')}</div></article>`).join(''); };
+    const KN = { hyrox: 'Hyrox', run: 'Running', weights: 'Weight' }; let recap = null;
+    const SHORT = { 'Functional Training': 'Functional', 'Hyrox Double': 'Double', 'Hyrox Single': 'Single', 'Hyrox Training': 'Hyrox', 'Weight Training': 'Weight' };
+    const tag = (e) => { const k = kindOf(e); const t = k === 'run' ? (e.km != null ? `${+Number(e.km).toFixed(1)}km` : e.session) : k === 'weights' ? (e.format || 'Weight') : (SHORT[e.session] || e.session);
+      return `<span class="p k-${k}${ahead(e) ? ' plan' : ''}" title="${esc(e.session)}${e.format ? ` · ${esc(e.format)}` : ''}">${esc(t)}</span>`; };
+    const cal = (ym, rows) => { const [y, mo] = ym.split('-').map(Number); const first = new Date(y, mo - 1, 1), last = new Date(y, mo, 0);
+      const by = {}; rows.slice().reverse().forEach((e) => { (by[e.date] = by[e.date] || []).push(e); });
+      const lead = (first.getDay() + 6) % 7; let cells = '';
+      for (let i = 0; i < lead; i++) cells += '<span class="cal-d out"></span>';
+      for (let d = 1; d <= last.getDate(); d++) { const ds = `${ym}-${pad(d)}`; const es = by[ds] || []; const wd = new Date(y, mo - 1, d).getDay();
+        const cls = [ds === TODAY && 'today', ds === HYROX_START && 'start', ym === HYROX_START.slice(0, 7) && ds >= HYROX_START && 'hy', es.length && 'has', wd === 6 && 'sat', wd === 0 && 'sun'].filter(Boolean).join(' ');
+        const inner = `<span class="dn num">${d}</span>${ds === HYROX_START ? '<span class="st">Hyrox 시작</span>' : ''}${es.map(tag).join('')}`;
+        cells += es.length ? `<a class="cal-d ${cls}" href="#d-${ds}" aria-label="${mo}월 ${d}일 · ${es.map((e) => esc(e.session)).join(', ')}">${inner}</a>` : `<span class="cal-d ${cls}">${inner}</span>`; }
+      const tail = (7 - ((lead + last.getDate()) % 7)) % 7; for (let i = 0; i < tail; i++) cells += '<span class="cal-d out"></span>';
+      const note = ym === HYROX_START.slice(0, 7) && recap ? `<p class="cal-note"><b>11/22 Hyrox Incheon</b>부터 Hyrox 시즌이에요. 그 전은 웨이트 트레이닝에 집중한 시기예요 · <a href="#wtRecap">2026 웨이트 요약 보기</a></p>` : '';
+      return `<div class="cal"><div class="cal-w">${['월', '화', '수', '목', '금', '토', '일'].map((w, i) => `<span${i === 5 ? ' class="sat"' : i === 6 ? ' class="sun"' : ''}>${w}</span>`).join('')}</div><div class="cal-g">${cells}</div></div>${note}`; };
     const render = () => { const ws = words();
       const rows = log.filter((e) => (filter === 'all' || kindOf(e) === filter) && (!ws.length || hit(hay(e), ws))).sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
-      const recap = !ws.length && (filter === 'all' || filter === 'weights') ? weightRecap(log) : null;
-      // a month is one group; the month Hyrox began is two, so the 2026 recap can sit between them
-      const groups = []; rows.forEach((e) => { const key = `${e.date.slice(0, 7)}${e.date >= HYROX_START ? 'h' : 'w'}`; let g = groups[groups.length - 1];
-        if (!g || g.key !== key) { g = { key, rows: [] }; groups.push(g); } g.rows.push(e); });
-      const isOpen = (g, i) => (ws.length ? true : list._open ? list._open.has(g.key) : i < 2);
-      const split = (g) => groups.some((x) => x !== g && x.key.slice(0, 7) === g.key.slice(0, 7));
-      const head = (g) => { const ym = g.key.slice(0, 7); const n = {}; const real = g.rows.filter((e) => !ahead(e)); real.forEach((e) => { const k = kindOf(e); n[k] = (n[k] || 0) + 1; });
-        const kinds = filter === 'all' ? Object.keys(KN).filter((k) => n[k]).map((k) => `${KN[k]} ${n[k]}`).join(' · ') : '';
-        return `<summary><span class="mo-t">${ym.slice(0, 4)}년 ${+ym.slice(5)}월${split(g) ? `<small>${g.key.endsWith('h') ? 'Hyrox 시작 후' : 'Hyrox 시작 전'}</small>` : ''}</span><span class="mo-n num">${real.length}건${real.length < g.rows.length ? ` + 예정 ${g.rows.length - real.length}` : ''}${kinds ? ` · ${kinds}` : ''}</span></summary>`; };
-      let out = ''; let placed = false; const bodies = {};
-      groups.forEach((g, i) => { if (recap && !placed && g.key.endsWith('w')) { out += recap.html; placed = true; }
-        bodies[g.key] = () => days(g.rows, ws);
-        out += `<details class="mo" data-g="${g.key}"${isOpen(g, i) ? ' open' : ''}>${head(g)}<div class="mo-b">${isOpen(g, i) ? bodies[g.key]() : ''}</div></details>`; });
-      list._bodies = bodies; list._searching = ws.length > 0;
+      recap = !ws.length && (filter === 'all' || filter === 'weights') ? weightRecap(log) : null;
+      // One section per month, newest first, all open: the month as a calendar, then its days. In the month Hyrox began the
+      // calendar marks the start, and the 2026 weight-training recap sits in the list where the earlier days begin.
+      const months = []; rows.forEach((e) => { const ym = e.date.slice(0, 7); let m = months[months.length - 1]; if (!m || m.ym !== ym) { m = { ym, rows: [] }; months.push(m); } m.rows.push(e); });
+      let out = ''; let placed = false;
+      const putRecap = () => { if (recap && !placed) { out += recap.html; placed = true; } };
+      months.forEach((m) => {
+        const real = m.rows.filter((e) => !ahead(e)); const n = {}; real.forEach((e) => { const k = kindOf(e); n[k] = (n[k] || 0) + 1; });
+        const dayN = new Set(real.map((e) => e.date)).size; const km = real.filter(isRun).reduce((t, e) => t + (Number(e.km) || 0), 0);
+        const kinds = Object.keys(KN).filter((k) => n[k]).map((k) => `<span class="mo-k k-${k}">${KN[k]} ${n[k]}${k === 'run' && km ? ` · ${km.toFixed(1)}km` : ''}</span>`).join('');
+        out += `<section class="mo" id="m-${m.ym}"><div class="mo-h"><h3 class="mo-t">${m.ym.slice(0, 4)}년 ${+m.ym.slice(5)}월</h3>
+          <span class="mo-n num">${ws.length ? `${m.rows.length}건` : `운동한 날 <b>${dayN}</b>일`}${real.length < m.rows.length ? ` · 예정 ${m.rows.length - real.length}` : ''}</span><span class="mo-ks">${kinds}</span></div>`;
+        if (!ws.length) out += cal(m.ym, m.rows);
+        const after = m.rows.filter((e) => e.date >= HYROX_START), before = m.rows.filter((e) => e.date < HYROX_START);
+        out += `<div class="mo-b">${days(after, ws)}`;
+        if (before.length) { if (after.length || m.ym === HYROX_START.slice(0, 7)) { out += '</div>'; putRecap(); out += '<div class="mo-b">'; } out += days(before, ws); }
+        out += '</div></section>'; });
+      putRecap();
       list.innerHTML = out || `<p class="note" style="padding:24px 0">${ws.length ? `‘${esc(query)}’에 맞는 기록이 없어요.` : '기록이 없어요.'}</p>`;
       if (recap && placed) recap.draw();
       if (location.hash === '#wtRecap' && $('#wtRecap') && !render.jumped) { render.jumped = true; $('#wtRecap').scrollIntoView(); }
@@ -705,12 +723,8 @@
       $('#logTrash').innerHTML = canWrite() && gone.length ? `<details class="more"><summary>휴지통 · ${gone.length}건</summary><p class="note" style="margin:8px 0">지운 기록은 여기에 남아 있어요. 되살리면 원래 날짜 자리로 돌아가요.</p>${gone.map((e) =>
         `<div class="trash-row"><span class="num"><b>${md(parse(e.date))}</b></span><span>${esc(e.session)}${e.format ? ` · ${esc(e.format)}` : ''}</span><span class="muted small num">${md(parse(e.deleted))}에 지움</span><span class="tools"><button class="btn line sm" type="button" data-restore="${esc(e.id)}">되살리기</button><button class="ic" type="button" data-purge="${esc(e.id)}" title="완전히 지우기" aria-label="완전히 지우기">${ICON.del}</button></span></div>`).join('')}</details>` : '';
     };
-    // A folded month is drawn the first time it is opened. Which months are open is remembered across redraws (not while searching).
-    if (!list._bound) { list._bound = true; list.addEventListener('toggle', (ev) => { const d = ev.target; if (!d.classList || !d.classList.contains('mo') || !d.isConnected) return;
-      const b = d.lastElementChild; if (d.open && !b.firstChild && list._bodies[d.dataset.g]) b.innerHTML = list._bodies[d.dataset.g]();
-      if (!list._searching) list._open = new Set([...list.querySelectorAll('details.mo[open]')].map((x) => x.dataset.g)); }, true); }
-    list._open = null; render();
-    document.querySelectorAll('#logFilter button').forEach((b) => { b.onclick = () => { filter = b.dataset.f; list._open = null; document.querySelectorAll('#logFilter button').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); render(); }; });
+    render();
+    document.querySelectorAll('#logFilter button').forEach((b) => { b.onclick = () => { filter = b.dataset.f; document.querySelectorAll('#logFilter button').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); render(); }; });
     let timer; search.oninput = () => { clearTimeout(timer); timer = setTimeout(() => { query = search.value.trim(); render(); }, 150); };
     if (!canWrite()) { $('#logNew').hidden = true; $('#logHint').hidden = false; }
     if (LOCAL && !token()) $('#logPreview').hidden = false;

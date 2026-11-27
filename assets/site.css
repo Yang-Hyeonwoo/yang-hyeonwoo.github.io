@@ -642,3 +642,50 @@ table.days th .mt { display: none; }
   table.days .xp { min-width: 18px; min-height: 0; padding: 0; border: 0; background: none; font-size: 0.8rem; }
   table.days td { padding: 5px 3px; } table.days .cellbar { padding: 2px 0; line-height: 1.45; }
 }
+
+/* ---- training log: one open section per month, a calendar first ---- */
+section.mo { padding-top: 36px; }
+section.mo + section.mo, .recap + section.mo { border-top: 1px solid var(--line); margin-top: 8px; }
+.mo-h { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 14px; margin-bottom: 14px; }
+.mo-h .mo-t { font-family: var(--display); font-size: 1.7rem; font-weight: 600; color: var(--ink); line-height: 1.2; }
+.mo-h .mo-n { font-size: 0.86rem; color: var(--muted); } .mo-h .mo-n b { color: var(--ink); font-size: 1rem; }
+.mo-ks { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.mo-k { font-size: 0.76rem; font-weight: 600; padding: 3px 9px; border-radius: var(--r-full); color: var(--kc); background: color-mix(in srgb, var(--kc) 10%, #fff); }
+.k-hyrox { --kc: #2b59c3; } .k-run { --kc: #2a9d8f; } .k-weights { --kc: #d9731a; } .k-other { --kc: #8a8a93; }
+.cal { border: 1px solid var(--line-soft); border-radius: var(--r-lg); overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03); }
+.cal-w, .cal-g { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.cal-w span { padding: 8px 10px; font-size: 0.72rem; font-weight: 600; color: var(--muted); background: var(--bg-soft); border-bottom: 1px solid var(--line-soft); }
+.cal-w .sat, .cal-d.sat .dn { color: var(--accent); } .cal-w .sun, .cal-d.sun .dn { color: #c62828; }
+.cal-d { position: relative; display: flex; flex-direction: column; gap: 3px; min-width: 0; min-height: 88px; padding: 6px 7px 8px; color: inherit;
+  border-right: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); transition: background 150ms var(--ease); }
+.cal-g > :nth-child(7n) { border-right: 0; }
+.cal-g > :nth-last-child(-n+7) { border-bottom: 0; }
+.cal-d.out { background: #fbfbfc; }
+a.cal-d:hover { background: var(--bg-soft); color: inherit; }
+.cal-d .dn { font-size: 0.78rem; font-weight: 600; color: var(--ink); line-height: 22px; }
+.cal-d.today .dn { align-self: flex-start; min-width: 22px; padding: 0 6px; border-radius: var(--r-full); background: var(--accent); color: #fff; text-align: center; }
+.cal-d.hy { background: color-mix(in srgb, var(--accent) 4%, #fff); }
+a.cal-d.hy:hover { background: color-mix(in srgb, var(--accent) 8%, #fff); }
+.cal-d.start { box-shadow: inset 3px 0 0 var(--accent); }
+.cal-d .st { position: absolute; top: 8px; right: 7px; font-size: 0.6rem; font-weight: 700; letter-spacing: 0.04em; color: var(--accent-strong); }
+.cal-d .p { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.7rem; font-weight: 600; line-height: 1.35; padding: 2px 6px;
+  border-radius: 5px; color: var(--kc); background: color-mix(in srgb, var(--kc) 11%, #fff); }
+.cal-d .p.plan { background: none; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--kc) 55%, #fff); }
+.cal-note { margin: 10px 2px 0; font-size: 0.8rem; color: var(--muted); }
+.cal-note b { color: var(--accent-strong); }
+section.mo .mo-b { margin-top: 8px; }
+.entry { scroll-margin-top: 76px; }
+.entry:target { animation: hit 1.6s var(--ease); }
+@keyframes hit { 0%, 30% { background: var(--accent-soft); } 100% { background: transparent; } }
+@media (max-width: 640px) {
+  section.mo { padding-top: 28px; }
+  .mo-h .mo-t { font-size: 1.4rem; } .mo-ks { margin-left: 0; width: 100%; }
+  .cal-w span { padding: 6px 0; text-align: center; font-size: 0.68rem; }
+  .cal-d { min-height: 50px; padding: 4px 3px 5px; align-items: center; gap: 2px; }
+  .cal-d .dn { font-size: 0.74rem; line-height: 20px; }
+  .cal-d.today .dn { align-self: center; min-width: 20px; padding: 0 4px; }
+  .cal-d .st { position: static; font-size: 0.52rem; letter-spacing: 0; line-height: 1; }
+  .cal-d .p { width: 70%; height: 4px; padding: 0; font-size: 0; border-radius: 2px; background: var(--kc); }
+  .cal-d .p.plan { background: none; box-shadow: inset 0 0 0 1px var(--kc); }
+}
+@media (prefers-reduced-motion: reduce) { .entry:target { animation: none; } }
