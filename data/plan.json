@@ -3,8 +3,8 @@
  "race": {
   "name": "HYROX Incheon",
   "division": "Pro Single",
-  "date": "2027-05-13",
-  "date_note": "5/13 개막일 기준 · 대회 5/13–16 예정 · 출전일 미정"
+  "date": "2027-05-14",
+  "date_note": "5/14(금) Pro Single 출전 · 대회 5/13–16"
  },
  "goals": [
   {
@@ -58,7 +58,7 @@
    "m": "5월",
    "from": "2027-05-03",
    "theme": "조절 후 출전",
-   "focus": "양 줄이고 강도는 짧게 · 5/13–16 대회"
+   "focus": "양 줄이고 강도는 짧게 · 5/14(금) Pro Single"
   }
  ],
  "races": [

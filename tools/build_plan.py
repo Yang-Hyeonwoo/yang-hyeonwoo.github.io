@@ -114,8 +114,8 @@ for monday, (commute, bonus, wed_run, wed_detail, recovery) in sorted(WEEKS.item
 
 plan = {
     "updated": "2026-11-27",
-    "race": {"name": "HYROX Incheon", "division": "Pro Single", "date": "2027-05-13",      # opening day of the event
-             "date_note": "5/13 개막일 기준 · 대회 5/13–16 예정 · 출전일 미정"},
+    "race": {"name": "HYROX Incheon", "division": "Pro Single", "date": "2027-05-14",      # Pro Single is on Friday (the user, 2026-11-28)
+             "date_note": "5/14(금) Pro Single 출전 · 대회 5/13–16"},
     "goals": [
         {"label": "Hyrox Pro Single", "value": "1:15:00", "sub": "2027년 5월 HYROX Incheon"},
         {"label": "10km", "value": "37:59", "sub": "3월 말~4월 초 대회"},
@@ -127,7 +127,7 @@ plan = {
         {"m": "2월", "from": "2027-02-01", "theme": "10K 대비 + 프로 무게", "focus": "1km 반복과 역치주 · 전 종목 프로 무게 · 감량 마무리"},
         {"m": "3월", "from": "2027-03-01", "theme": "10K 대회", "focus": "목표 페이스 훈련 · 하프 시뮬레이션 · 식사량 올리기"},
         {"m": "4월", "from": "2027-04-05", "theme": "레이스 리허설", "focus": "1km + 스테이션 반복 · 4/17 즈음 풀 리허설"},
-        {"m": "5월", "from": "2027-05-03", "theme": "조절 후 출전", "focus": "양 줄이고 강도는 짧게 · 5/13–16 대회"},
+        {"m": "5월", "from": "2027-05-03", "theme": "조절 후 출전", "focus": "양 줄이고 강도는 짧게 · 5/14(금) Pro Single"},
     ],
     "races": [      # newest first; "event" groups races for the personal-best mark
         {"date": "2025.11.08", "name": "HYROX Seoul", "event": "Hyrox · Open Single", "result": "1:15:00"},
