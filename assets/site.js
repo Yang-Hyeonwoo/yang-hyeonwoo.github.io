@@ -763,7 +763,7 @@
     function table() {
       const first = daily.length ? daily[0].date : TODAY; let out = '', month = '', count = 0;
       for (let dt = parse(TODAY); iso(dt) >= first; dt = addDays(dt, -1)) { const ds = iso(dt); count++;
-        if (ds.slice(0, 7) !== month) { month = ds.slice(0, 7); out += `<tr class="month-row"><td colspan="12">${month.slice(0, 4)}년 ${+month.slice(5)}월</td></tr>`; }
+        if (ds.slice(0, 7) !== month) { month = ds.slice(0, 7); out += `<tr class="month-row"><td colspan="14">${month.slice(0, 4)}년 ${+month.slice(5)}월</td></tr>`; }
         const x = ix[ds] || { rec: null, hyrox: '', run: '', weights: '', etc: '' }; const r = x.rec || {}; const g = goalOf(ds); const wd = dt.getDay(); const sl = mins(r.sleep);
         const mealsT = r.meals ? Object.entries(r.meals).filter(([, v]) => v).map(([k, v]) => `${{ breakfast: '아침', lunch: '점심', snack: '간식', dinner: '저녁', late: '야식' }[k]} ${v}`).join(' · ') : '';
         const noteT = [mealsT, r.note].filter(Boolean).join(' · '); const wt = [x.weights, x.etc].filter(Boolean).join(' · ');
@@ -775,13 +775,14 @@
         const detail = part('Hyrox', x.hyrox) + part('Running', x.runFull) + part('Weight', wt) + part('Sleep', r.bed ? `${r.sleep || ''} (${r.bed} → ${r.wake || ''})` : '')
           + part('Nutrition', r.kcal != null ? `${n0(r.kcal)}kcal · 탄 ${r.carb ?? '–'}g · 단 ${r.prot ?? '–'}g · 지 ${r.fat ?? '–'}g` : '') + part('Note', noteT);
         out += `<tr><td class="num">${canWrite() ? `<button class="dbtn" type="button" data-edit="${ds}" title="이 날 기록 고치기" aria-label="${ds} 기록 고치기">${dayLabel}<span class="pen">${ICON_PEN}</span></button>` : dayLabel}</td>
-          <td class="num">${sl == null ? '' : bar(esc(r.sleep), sl / sleepGoal * 100)}</td><td class="num muted d-only">${r.bed ? `${esc(r.bed)} → ${esc(r.wake || '')}` : ''}</td>
-          ${clip(x.hyrox, 'c')}${clip(x.run, 'c')}${clip(wt, 'c')}<td class="m-only clip">${esc(allT)}</td><td class="num">${r.weight != null ? r.weight.toFixed(2) : ''}</td>
-          <td class="num">${kc}</td><td class="num d-only">${mac('carb')}</td><td class="num d-only">${mac('prot')}</td><td class="num d-only">${mac('fat')}</td>${clip(noteT)}
+          <td class="num gs sl">${sl == null ? '' : bar(esc(r.sleep), sl / sleepGoal * 100)}</td><td class="num muted d-only">${esc(r.bed || '')}</td><td class="num muted d-only">${esc(r.wake || '')}</td>
+          ${clip(x.hyrox, 'c gs')}${clip(x.run, 'c')}${clip(wt, 'c')}<td class="m-only clip">${esc(allT)}</td><td class="num gs bw">${r.weight != null ? r.weight.toFixed(2) : ''}</td>
+          <td class="num kc">${kc}</td><td class="num d-only">${mac('carb')}</td><td class="num d-only">${mac('prot')}</td><td class="num d-only">${mac('fat')}</td>
           <td class="m-only"><button class="xp" type="button" aria-expanded="false" aria-label="${md(dt)} 자세히 보기">▾</button></td></tr>
-          <tr class="more-row" hidden><td colspan="12" class="wrap">${detail || '<span class="muted">추가 기록 없음</span>'}</td></tr>`; }
+          <tr class="more-row" hidden><td colspan="14" class="wrap">${detail || '<span class="muted">추가 기록 없음</span>'}</td></tr>`; }
       $('#dayCount').textContent = `${count}일${canWrite() ? ' · 날짜를 누르면 그날 기록을 고쳐요' : ''}`;
-      $('#dayList').innerHTML = `<div class="scroll-x"><table class="t days"><thead><tr><th class="tl" style="width:8%">Date</th><th style="width:7%">Sleep</th><th class="d-only" style="width:9%">Bed → Wake</th><th class="d-only" style="width:11%">Hyrox</th><th class="d-only" style="width:17%">Running</th><th class="d-only" style="width:8%">Weight</th><th class="m-only tl">운동</th><th style="width:6%">Body kg</th><th style="width:7%">kcal</th><th class="d-only" style="width:5.5%">Carb</th><th class="d-only" style="width:5.5%">Prot</th><th class="d-only" style="width:5.5%">Fat</th><th class="d-only tl">Meals · Note</th><th class="m-only"></th></tr></thead><tbody>${out || '<tr><td colspan="12" class="muted">기록이 없어요.</td></tr>'}</tbody></table></div>`;
+      $('#dayList').innerHTML = `<div class="scroll-x"><table class="t days"><colgroup>${[8, 7.5, 5.5, 5.5, 13, 16, 10, 7, 8.5, 6.3, 6.3, 6.3].map((w) => `<col style="width:${w}%">`).join('')}</colgroup><thead><tr class="grp"><th></th><th colspan="3" class="gs g-sl">Sleep</th><th colspan="3" class="gs g-wo">Workout</th><th colspan="5" class="gs g-nu">Body · Nutrition</th></tr>
+        <tr><th class="tl" style="width:8%">Date</th><th class="gs" style="width:7.5%"><span class="dt">Total</span><span class="mt">수면</span></th><th class="d-only" style="width:5.5%">Bed</th><th class="d-only" style="width:5.5%">Wake</th><th class="d-only gs" style="width:13%">Hyrox</th><th class="d-only" style="width:16%">Running</th><th class="d-only" style="width:10%">Weight</th><th class="m-only tl">운동</th><th class="gs" style="width:7%">체중</th><th style="width:8.5%">kcal</th><th class="d-only" style="width:6.3%">Carb</th><th class="d-only" style="width:6.3%">Prot</th><th class="d-only" style="width:6.3%">Fat</th><th class="m-only"></th></tr></thead><tbody>${out || '<tr><td colspan="14" class="muted">기록이 없어요.</td></tr>'}</tbody></table></div>`;
     }
     // The form remembers what it showed when it was filled. Saving writes only the fields changed since then, so a form left open
     // (or opened from an older copy) never blanks what another device saved in the meantime.

@@ -612,3 +612,33 @@ svg.days-ch text.vl.tot { fill: var(--ink); font-size: 12px; font-weight: 700; }
 #syncBtn.busy svg { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { #syncBtn.busy svg { animation: none; } }
+
+/* ---- records table, denser like the old tracker: group row, larger numbers, bars across the cell, a line between groups ---- */
+@media (min-width: 1240px) { body[data-page="records"] .wrap { max-width: 1240px; } }
+table.days { font-size: 0.86rem; }
+table.days tr.grp th { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.02em; text-transform: none; padding: 8px 8px 4px; border-bottom: 0; }
+table.days tr.grp th.g-sl { color: #1f6fd1; } table.days tr.grp th.g-wo { color: #1e8a4c; } table.days tr.grp th.g-nu { color: #c2610f; }
+table.days th { font-size: 0.76rem; letter-spacing: 0; text-transform: none; color: #55555c; padding: 4px 6px 8px; }
+table.days th.gs, table.days td.gs { border-left: 1px solid var(--line); }
+table.days td { height: 34px; padding: 3px 6px; color: var(--ink); }
+table.days td:first-child b { font-weight: 700; }
+table.days td.muted { color: #6e6e76; }
+table.days td.bw { font-weight: 700; }
+table.days .cellbar { display: block; width: 100%; max-width: none; padding: 4px 0; border-radius: 3px; font-variant-numeric: tabular-nums; }
+table.days td.sl .cellbar, table.days td.kc .cellbar { font-weight: 700; font-size: 0.86rem; }
+table.days .cellbar.g { font-size: 0.82rem; }
+table.days td.kc .cellbar.over1 { color: #c2610f; } table.days td.kc .cellbar.over2 { color: #c62828; }
+table.days tr.month-row td { font-size: 0.8rem; }
+@media (max-width: 640px) {
+  table.days tr.grp, table.days colgroup { display: none; } table.days col { width: auto !important; }
+  table.days { font-size: 0.8rem; } table.days td { height: auto; padding: 6px 4px; }
+  table.days th.gs, table.days td.gs { border-left: 0; }
+  table.days td.sl .cellbar, table.days td.kc .cellbar { font-size: 0.8rem; }
+}
+table.days th .mt { display: none; }
+@media (max-width: 640px) {
+  table.days th .mt { display: inline; } table.days th .dt { display: none; }
+  /* the whole row opens the day, so the arrow is only a hint: small, no box, and the row stays one line tall */
+  table.days .xp { min-width: 18px; min-height: 0; padding: 0; border: 0; background: none; font-size: 0.8rem; }
+  table.days td { padding: 5px 3px; } table.days .cellbar { padding: 2px 0; line-height: 1.45; }
+}
