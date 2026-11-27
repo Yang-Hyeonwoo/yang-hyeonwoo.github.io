@@ -689,3 +689,10 @@ section.mo .mo-b { margin-top: 8px; }
   .cal-d .p.plan { background: none; box-shadow: inset 0 0 0 1px var(--kc); }
 }
 @media (prefers-reduced-motion: reduce) { .entry:target { animation: none; } }
+
+/* ---- records: the two seasons as two tables; the weekday in English, a little apart from the date ---- */
+.dl-h { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; margin: 4px 0 10px; font-family: var(--display); font-size: 1.35rem; font-weight: 600; color: var(--ink); }
+.dl-h span { font-family: var(--font); font-size: 0.8rem; font-weight: 500; color: var(--muted); }
+.dl-h.second { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--line); }
+table.days .wd { display: inline-block; min-width: 2.1em; margin-left: 10px; font-size: 0.8rem; font-weight: 500; }
+@media (max-width: 640px) { table.days .wd { margin-left: 6px; font-size: 0.74rem; } .dl-h { font-size: 1.2rem; } }

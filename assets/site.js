@@ -210,6 +210,8 @@
     log.forEach((e) => { at(e.date).log.push(e); });
     Object.values(ix).forEach((x) => { const of = (k) => x.log.filter((e) => kindOf(e) === k);
       x.hyrox = of('hyrox').map((e) => (e.session === 'Hyrox Training' || e.session === 'Race' ? e.workout || e.session : e.session)).join(', ');
+      x.hyroxL = of('hyrox').map((e) => (e.session === 'Hyrox Training' || e.session === 'Race' ? e.workout || e.session
+        : /^hyrox/i.test(e.session) ? e.session : `Hyrox ${e.session === 'Functional Training' ? 'Functional' : e.session}`)).join(', ');
       x.run = of('run').map((e) => runText(e)).join(' + '); x.runFull = of('run').map((e) => runText(e, true)).join(' + ');
       x.weights = of('weights').map((e) => e.format || 'Weight').join(', ');
       x.etc = x.log.filter((e) => e.session === 'Cardio').map((e) => e.workout || 'Cardio').join(', ');
@@ -774,29 +776,43 @@
     let ix = dayIndex(daily, log);
     const bar = (txt, p, cls = '') => `<span class="cellbar ${cls}" style="--p:${Math.round(Math.max(0, Math.min(100, p || 0)))}%">${txt}</span>`;
     const clip = (t, cls = '') => `<td class="clip d-only ${cls}" title="${esc(t)}">${esc(t)}</td>`;
-    function table() {
-      const first = daily.length ? daily[0].date : TODAY; let out = '', month = '', count = 0;
-      for (let dt = parse(TODAY); iso(dt) >= first; dt = addDays(dt, -1)) { const ds = iso(dt); count++;
+    // Two tables, split where the Hyrox chapter began (the 11/22 race): Hyrox days show Hyrox | Running & Weight, the earlier
+    // weight-training days show Weight | Cardio (Hyrox classes, runs, bike, stairs). Sleep, then body and food, then the workout on the right.
+    const EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    function rowsFor(to, from, hy) { let out = '', month = '', count = 0;
+      for (let dt = parse(to); iso(dt) >= from; dt = addDays(dt, -1)) { const ds = iso(dt); count++;
         if (ds.slice(0, 7) !== month) { month = ds.slice(0, 7); out += `<tr class="month-row"><td colspan="14">${month.slice(0, 4)}년 ${+month.slice(5)}월</td></tr>`; }
-        const x = ix[ds] || { rec: null, hyrox: '', run: '', weights: '', etc: '' }; const r = x.rec || {}; const g = goalOf(ds); const wd = dt.getDay(); const sl = mins(r.sleep);
+        const x = ix[ds] || { rec: null, hyrox: '', hyroxL: '', run: '', weights: '', etc: '' }; const r = x.rec || {}; const g = goalOf(ds); const wd = dt.getDay(); const sl = mins(r.sleep);
         const mealsT = r.meals ? Object.entries(r.meals).filter(([, v]) => v).map(([k, v]) => `${{ breakfast: '아침', lunch: '점심', snack: '간식', dinner: '저녁', late: '야식' }[k]} ${v}`).join(' · ') : '';
         const noteT = [mealsT, r.note].filter(Boolean).join(' · '); const wt = [x.weights, x.etc].filter(Boolean).join(' · ');
         const kc = r.kcal == null ? '' : bar(n0(r.kcal), r.kcal / (g.kcal + 200) * 100, `g${r.kcal > g.kcal + 200 ? ' over2' : r.kcal > g.kcal ? ' over1' : ''}`);
         const mac = (k) => (r[k] == null ? '' : bar(n0(r[k]), r[k] / g[k] * 100, 'g'));
-        const dayLabel = `<b>${md(dt)}</b> <span class="${wd === 6 ? 'sat' : wd === 0 ? 'sun' : 'muted'}">${KO[wd]}</span>`;
-        const allT = [x.hyrox, x.run, wt].filter(Boolean).join(' · ');
+        const dayLabel = `<b>${md(dt)}</b><span class="wd ${wd === 6 ? 'sat' : wd === 0 ? 'sun' : 'muted'}">${EN[wd]}</span>`;
+        const w1 = hy ? x.hyroxL : x.weights, w2 = hy ? [x.run, x.weights, x.etc].filter(Boolean).join(' · ') : [x.hyrox, x.run && `Running ${x.run}`, x.etc].filter(Boolean).join(' · ');
+        const allT = [w1, w2].filter(Boolean).join(' · ');
         const part = (l, t) => (t ? `<div><b>${l}</b><span>${esc(t)}</span></div>` : '');
         const detail = part('Hyrox', x.hyrox) + part('Running', x.runFull) + part('Weight', wt) + part('Sleep', r.bed ? `${r.sleep || ''} (${r.bed} → ${r.wake || ''})` : '')
           + part('Nutrition', r.kcal != null ? `${n0(r.kcal)}kcal · 탄 ${r.carb ?? '–'}g · 단 ${r.prot ?? '–'}g · 지 ${r.fat ?? '–'}g` : '') + part('Note', noteT);
         out += `<tr><td class="num">${canWrite() ? `<button class="dbtn" type="button" data-edit="${ds}" title="이 날 기록 고치기" aria-label="${ds} 기록 고치기">${dayLabel}<span class="pen">${ICON_PEN}</span></button>` : dayLabel}</td>
           <td class="num gs sl">${sl == null ? '' : bar(esc(r.sleep), sl / sleepGoal * 100)}</td><td class="num muted d-only">${esc(r.bed || '')}</td><td class="num muted d-only">${esc(r.wake || '')}</td>
-          ${clip(x.hyrox, 'c gs')}${clip(x.run, 'c')}${clip(wt, 'c')}<td class="m-only clip">${esc(allT)}</td><td class="num gs bw">${r.weight != null ? r.weight.toFixed(2) : ''}</td>
-          <td class="num kc">${kc}</td><td class="num d-only">${mac('carb')}</td><td class="num d-only">${mac('prot')}</td><td class="num d-only">${mac('fat')}</td>
+          <td class="num gs bw">${r.weight != null ? r.weight.toFixed(2) : ''}</td><td class="num kc">${kc}</td><td class="num d-only">${mac('carb')}</td><td class="num d-only">${mac('prot')}</td><td class="num d-only">${mac('fat')}</td>
+          ${clip(w1, 'c gs')}${clip(w2, 'c')}<td class="m-only clip">${esc(allT)}</td>
           <td class="m-only"><button class="xp" type="button" aria-expanded="false" aria-label="${md(dt)} 자세히 보기">▾</button></td></tr>
           <tr class="more-row" hidden><td colspan="14" class="wrap">${detail || '<span class="muted">추가 기록 없음</span>'}</td></tr>`; }
-      $('#dayCount').textContent = `${count}일${canWrite() ? ' · 날짜를 누르면 그날 기록을 고쳐요' : ''}`;
-      $('#dayList').innerHTML = `<div class="scroll-x"><table class="t days"><colgroup>${[8, 7.5, 5.5, 5.5, 13, 16, 10, 7, 8.5, 6.3, 6.3, 6.3].map((w) => `<col style="width:${w}%">`).join('')}</colgroup><thead><tr class="grp"><th></th><th colspan="3" class="gs g-sl">Sleep</th><th colspan="3" class="gs g-wo">Workout</th><th colspan="5" class="gs g-nu">Body · Nutrition</th></tr>
-        <tr><th class="tl" style="width:8%">Date</th><th class="gs" style="width:7.5%"><span class="dt">Total</span><span class="mt">수면</span></th><th class="d-only" style="width:5.5%">Bed</th><th class="d-only" style="width:5.5%">Wake</th><th class="d-only gs" style="width:13%">Hyrox</th><th class="d-only" style="width:16%">Running</th><th class="d-only" style="width:10%">Weight</th><th class="m-only tl">운동</th><th class="gs" style="width:7%">체중</th><th style="width:8.5%">kcal</th><th class="d-only" style="width:6.3%">Carb</th><th class="d-only" style="width:6.3%">Prot</th><th class="d-only" style="width:6.3%">Fat</th><th class="m-only"></th></tr></thead><tbody>${out || '<tr><td colspan="14" class="muted">기록이 없어요.</td></tr>'}</tbody></table></div>`;
+      return { out, count }; }
+    const tableOf = (body, hy) => `<div class="scroll-x"><table class="t days"><colgroup>${[8.5, 7, 5.5, 5.5, 6.5, 7.5, 6, 6, 6, 20.75, 20.75].map((w) => `<col style="width:${w}%">`).join('')}</colgroup>
+      <thead><tr class="grp"><th></th><th colspan="3" class="gs g-sl">Sleep</th><th colspan="5" class="gs g-nu">Body · Nutrition</th><th colspan="2" class="gs g-wo">Workout</th></tr>
+      <tr><th class="tl">Date</th><th class="gs"><span class="dt">Total</span><span class="mt">수면</span></th><th class="d-only">Bed</th><th class="d-only">Wake</th>
+        <th class="gs">체중</th><th>kcal</th><th class="d-only">Carb</th><th class="d-only">Prot</th><th class="d-only">Fat</th>
+        <th class="d-only gs">${hy ? 'Hyrox' : 'Weight'}</th><th class="d-only">${hy ? 'Running &amp; Weight' : 'Cardio'}</th><th class="m-only tl">운동</th><th class="m-only"></th></tr></thead>
+      <tbody>${body || '<tr><td colspan="14" class="muted">기록이 없어요.</td></tr>'}</tbody></table></div>`;
+    function table() {
+      const first = daily.length ? daily[0].date : TODAY; const end = iso(addDays(parse(HYROX_START), -1));
+      const a = rowsFor(TODAY, HYROX_START, true), b = first <= end ? rowsFor(end, first, false) : { out: '', count: 0 };
+      const dot = (d) => d.replace(/-/g, '.');
+      $('#dayCount').textContent = `${a.count + b.count}일${canWrite() ? ' · 날짜를 누르면 그날 기록을 고쳐요' : ''}`;
+      $('#dayList').innerHTML = `<h3 class="dl-h">Hyrox Season <span class="num">${dot(HYROX_START)} 한강짐런부터</span></h3>${tableOf(a.out, true)}`
+        + (b.count ? `<h3 class="dl-h second">Weight Season <span class="num">${dot(first)} – ${dot(end)} · 웨이트 트레이닝에 집중한 시기</span></h3>${tableOf(b.out, false)}` : '');
     }
     // The form remembers what it showed when it was filled. Saving writes only the fields changed since then, so a form left open
     // (or opened from an older copy) never blanks what another device saved in the meantime.
