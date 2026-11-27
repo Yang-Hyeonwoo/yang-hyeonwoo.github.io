@@ -101,6 +101,11 @@ def run_fields(acts):
     return f
 
 
+def written(planned):
+    """The session name saved for a planned run: a gym commute is written as plain Jogging (the user's choice, 2026-11-27)."""
+    return 'Jogging' if planned == 'Run commute' else planned
+
+
 def session_for(day):
     """The log session a planned run becomes: the same choice the site makes for its check button ('' = no run planned)."""
     for it in (day or {}).get('items', []):
@@ -268,7 +273,7 @@ def merge_runs(log, plan_days, acts, seen, laps_of):
         else:
             f = day_fields(new, laps_of, planned)
             free = [e for e in runs if not e.get('garmin')]
-            mine = next((e for e in free if e.get('session') == planned), None) or (free[0] if free else None)
+            mine = next((e for e in free if e.get('session') == written(planned)), None) or (free[0] if free else None)
             if mine:                                   # typed or checked off on the site: fill only what is empty
                 for k, v in f.items():
                     if empty(mine.get(k)):
@@ -278,7 +283,7 @@ def merge_runs(log, plan_days, acts, seen, laps_of):
                 notes.append(f'{d} run filled {mine.get("km")}km')
             else:
                 longest = max(new, key=lambda x: x.get('distance') or 0)
-                log.append({'id': 'g' + ids[0], 'date': d, 'session': planned or session_by_type(longest), **f, 'garmin': ids})
+                log.append({'id': 'g' + ids[0], 'date': d, 'session': written(planned) or session_by_type(longest), **f, 'garmin': ids})
                 notes.append(f'{d} run new {f.get("km")}km')
         for i in ids:
             seen[i] = d

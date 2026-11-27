@@ -423,7 +423,7 @@ table.days td.num { padding-left: 5px; padding-right: 5px; }
 .entry .when { padding-top: 1px; line-height: 1.5; } .entry .when b { line-height: 30px; }
 .entry .top { min-height: 30px; }
 /* plan items: the text stays ink; only the bullet tells the kind, in the chart colours (Hyrox / Running / Weight) */
-.plan-items li.k-hyrox::marker { color: #2b59c3; } .plan-items li.k-run::marker { color: #2a9d8f; } .plan-items li.k-weights::marker { color: #d9731a; }
+.plan-items li.k-hyrox::marker { color: #d63c4a; } .plan-items li.k-run::marker { color: #2a9d8f; } .plan-items li.k-weights::marker { color: #d9731a; }
 .plan-items li.k-core::marker { color: var(--faint); }
 .dday .count .r .lbl { display: block; margin-bottom: 2px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.62); }
 .recap .lead { line-height: 1.8; }
@@ -562,7 +562,7 @@ table.days td.clip.c { text-align: center; }
 .entry .items > .item + .item { position: relative; margin-top: 16px; padding-top: 16px; }
 .entry .items > .item + .item::before { content: ""; position: absolute; top: 0; left: 15px; right: 0; border-top: 1px dashed var(--line); }   /* starts at the title, so it reads as inside the day */
 .entry .item .ttl::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; vertical-align: 2px; background: #b8b8bd; }
-.entry .item.k-hyrox .ttl::before { background: #2b59c3; } .entry .item.k-run .ttl::before { background: #2a9d8f; } .entry .item.k-weights .ttl::before { background: #d9731a; }
+.entry .item.k-hyrox .ttl::before { background: #d63c4a; } .entry .item.k-run .ttl::before { background: #2a9d8f; } .entry .item.k-weights .ttl::before { background: #d9731a; }
 @media (max-width: 860px) { .entry .when .n { display: inline; margin: 0 0 0 6px; } }
 
 /* ---- Training Log: the WOD always open, its result in the column beside it ---- */
@@ -651,7 +651,7 @@ section.mo + section.mo, .recap + section.mo { border-top: 1px solid var(--line)
 .mo-h .mo-n { font-size: 0.86rem; color: var(--muted); } .mo-h .mo-n b { color: var(--ink); font-size: 1rem; }
 .mo-ks { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
 .mo-k { font-size: 0.76rem; font-weight: 600; padding: 3px 9px; border-radius: var(--r-full); color: var(--kc); background: color-mix(in srgb, var(--kc) 10%, #fff); }
-.k-hyrox { --kc: #2b59c3; } .k-run { --kc: #2a9d8f; } .k-weights { --kc: #d9731a; } .k-other { --kc: #8a8a93; }
+.k-hyrox { --kc: #d63c4a; } .k-cycle { --kc: #7b8494; } .k-run { --kc: #2a9d8f; } .k-weights { --kc: #d9731a; } .k-other { --kc: #8a8a93; }
 .cal-note { margin: 10px 2px 0; font-size: 0.8rem; color: var(--muted); }
 .cal-note b { color: var(--accent-strong); }
 section.mo .mo-b { margin-top: 8px; }
@@ -750,3 +750,57 @@ table.days td.muted { font-size: 0.75rem; }
   table.days td:first-child > b { width: 2.9em; } table.days td:first-child > .wd { width: 2.3em; }
   table.days td.m-only.clip { text-align: left; }
 }
+
+/* ---- training log: one calendar, months by arrows; the month's numbers above it; the detailed log folded below ---- */
+.calbox { margin-top: 8px; }
+.cal-head { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.cal-title { font-family: var(--display); font-size: 1.75rem; font-weight: 600; color: var(--ink); min-width: 8.2em; text-align: center; letter-spacing: -0.01em; }
+.cal-nav { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: #fff; color: var(--ink); font-size: 1.25rem; line-height: 1; cursor: pointer;
+  display: inline-grid; place-items: center; transition: background 150ms var(--ease), border-color 150ms var(--ease); }
+.cal-nav:hover:not(:disabled) { background: var(--bg-soft); border-color: rgba(0, 0, 0, 0.18); }
+.cal-nav:disabled { opacity: 0.3; cursor: default; }
+.cal-today { margin-left: auto; }
+.cal-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 0; margin-bottom: 14px; border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; background: #fff; }
+.cs { display: flex; flex-direction: column; gap: 3px; padding: 11px 14px 12px; border-right: 1px solid var(--line-soft); position: relative; }
+.cs:last-child { border-right: 0; }
+.cs .l { font-size: 0.7rem; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.cs .v { font-size: 1.25rem; font-weight: 700; color: var(--ink); line-height: 1.2; white-space: nowrap; }
+.cs .v small { margin-left: 2px; font-size: 0.72rem; font-weight: 600; color: var(--muted); }
+.cs .v em { margin-left: 5px; font-style: normal; font-size: 0.74rem; font-weight: 600; color: var(--muted); }
+.cs[class*="k-"]::before { content: ""; position: absolute; left: 14px; right: 14px; top: 0; height: 3px; border-radius: 0 0 3px 3px; background: var(--kc); }
+.cs.all { background: var(--bg-soft); }
+.cal-d.adj { opacity: 0.4; background: #fcfcfd; }
+.cal-d.adj .p { filter: saturate(0.6); }
+.cal-d .mk { display: block; font-size: 0.6rem; font-weight: 700; line-height: 1.25; padding: 2px 6px; border-radius: 4px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cal-d .mk-h { background: #d63c4a; } .cal-d .mk-w { background: #d9731a; }
+.cal-d.start { box-shadow: inset 3px 0 0 #d63c4a; } .cal-d.wend { box-shadow: inset -3px 0 0 #d9731a; }
+.cal-m { justify-content: flex-start; gap: 8px; }
+.cal-m .kc { color: var(--text); }
+.cal-lg .m { margin-left: auto; color: var(--muted); } .cal-lg .m:first-of-type { color: var(--muted); }
+.cal-lg .m svg { margin: 0 1px 0 0; vertical-align: -1px; }
+.cal-note { margin: 10px 2px 0; font-size: 0.8rem; line-height: 1.7; color: var(--muted); }
+.cal-note b.h { color: #d63c4a; } .cal-note b.w { color: #c2610f; }
+details.mo-log { margin-top: 22px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+details.mo-log > summary { display: flex; align-items: center; gap: 10px; min-height: 52px; cursor: pointer; list-style: none; font-weight: 700; color: var(--ink); font-size: 0.95rem; }
+details.mo-log > summary::-webkit-details-marker { display: none; }
+details.mo-log > summary .num { font-size: 0.8rem; font-weight: 500; color: var(--muted); }
+details.mo-log > summary::after { content: ""; width: 8px; height: 8px; margin-left: auto; border-right: 2px solid var(--faint, #b0b0b8); border-bottom: 2px solid var(--faint, #b0b0b8); transform: rotate(45deg) translateY(-3px); transition: transform 200ms var(--ease); }
+details.mo-log[open] > summary::after { transform: rotate(225deg) translateY(-2px); }
+details.mo-log .entry:last-child { border-bottom: 0; }
+.srch-m { margin: 24px 0 4px; font-family: var(--display); font-size: 1.3rem; font-weight: 600; color: var(--ink); } .srch-m span { font-family: var(--font); font-size: 0.8rem; color: var(--muted); }
+.entry.flash { animation: hit 1.6s var(--ease); }
+@media (max-width: 640px) {
+  .cal-title { font-size: 1.35rem; min-width: 0; flex: 1; }
+  .cal-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } .cs.all { grid-column: 1 / -1; flex-direction: row; align-items: baseline; gap: 10px; }
+  .cs { padding: 9px 10px 10px; border-bottom: 1px solid var(--line-soft); } .cs .v { font-size: 1.05rem; } .cs .l { font-size: 0.64rem; white-space: normal; }
+  .cs .v em { display: block; margin-left: 0; font-size: 0.66rem; }
+  .cs[class*="k-"]::before { left: 10px; right: 10px; }
+  .cal-d .mk { font-size: 0; padding: 0; height: 3px; width: 72%; border-radius: 2px; }
+  .cal-d.start, .cal-d.wend { box-shadow: none; }
+  .cal-lg .m { margin-left: 0; }
+}
+
+/* records: no opening rows on a wide screen; on a phone the opened day reads left to right */
+@media (min-width: 641px) { table.days tbody tr:not(.month-row):not(.more-row) { cursor: default; } table.days tr.more-row { display: none; } }
+table.days tr.more-row td.wrap { text-align: left; height: auto; padding: 10px 12px 12px; }
+tr.more-row td.wrap > div { justify-content: flex-start; text-align: left; } tr.more-row td.wrap b { text-align: left; }
