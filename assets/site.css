@@ -853,3 +853,32 @@ body[data-page="plan"] section[id^="p-"], .plan-week { scroll-margin-top: 72px; 
   .jump a { min-height: 36px; display: inline-flex; align-items: center; }
   .care-line { gap: 3px 12px; font-size: 0.72rem; }
 }
+
+/* ---- pencil buttons: outlined, quiet, the same everywhere a record is written ---- */
+.pen-btn { display: inline-flex; align-items: center; gap: 7px; min-height: 38px; padding: 0 16px 0 13px; border: 1px solid var(--line); border-radius: var(--r-full);
+  background: #fff; color: var(--ink); font: inherit; font-size: 0.86rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+  transition: background 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease); }
+.pen-btn svg { color: var(--accent); flex: none; }
+.pen-btn:hover { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent-strong); }
+.pen-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pen-btn[hidden] { display: none; }
+
+/* ---- log: search and the pencil on one row, more room before the calendar; month arrows that read as buttons ---- */
+.log-top { display: flex; align-items: center; gap: 12px; margin: 0 0 8px; }
+.log-top .log-find { flex: 1; margin: 0; } .log-top .log-find .in { max-width: 380px; }
+.log-top #logHint { margin-left: auto; }
+.calbox { margin-top: 40px; }
+.cal-nav { width: 40px; height: 40px; border: 0; background: var(--ink); color: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12); }
+.cal-nav:hover:not(:disabled) { background: var(--accent); border-color: transparent; }
+.cal-nav:disabled { background: var(--line-soft); color: var(--faint, #b0b0b8); box-shadow: none; opacity: 1; }
+.mo-log { margin-top: 36px; border-top: 1px solid var(--line); }
+.mo-log-h { display: flex; align-items: baseline; gap: 10px; padding: 22px 0 4px; font-family: var(--display); font-size: 1.45rem; font-weight: 600; color: var(--ink); }
+.mo-log-h span { font-family: var(--font); font-size: 0.8rem; font-weight: 500; color: var(--muted); }
+.mo-log .entry:last-child { border-bottom: 0; }
+@media (max-width: 640px) {
+  .log-top { gap: 8px; } .log-top .log-find .in { max-width: none; }
+  .pen-btn { min-height: 44px; padding: 0 14px 0 12px; font-size: 0.82rem; }
+  .log-top .pen-btn span { display: none; } .log-top .pen-btn { width: 44px; padding: 0; justify-content: center; }
+  .calbox { margin-top: 28px; }
+  .cal-nav { width: 38px; height: 38px; }
+}

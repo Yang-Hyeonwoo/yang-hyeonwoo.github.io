@@ -187,6 +187,7 @@
   const isDone = (item, date, log) => !!doneEntry(item, date, log);
   const KIND = { hyrox: 'Hyrox', commute: 'Run', run: 'Run', weights: 'Weight', core: 'Core', rest: 'Rest', free: 'Free' };
   const doneChip = '<span class="chip g">완료</span>';
+  const PEN_BTN = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
   const ICON_PEN = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
   const doneMark = '<span class="tick" role="img" aria-label="완료">✓</span>';
 
@@ -399,7 +400,7 @@
     return `<div class="grid g2"><div class="plate today">
         <div class="chips">${day ? `<span class="chip a">${esc(day.week)}</span>` : ''}</div>
         <h3 class="date">${NOW.getMonth() + 1}월 ${NOW.getDate()}일 <em>${KO[NOW.getDay()]}요일</em></h3>${items}${past}
-        <div class="form-foot"><a class="btn" href="log.html#new">${day && day.items.some((it) => doneEntry(it, TODAY, log)) ? '운동 추가 기록' : '운동 기록'}</a><a class="btn line" href="records.html#new">식단 · 체중 기록</a></div></div>
+        <div class="form-foot"><a class="pen-btn" href="log.html#new">${PEN_BTN}<span>${day && day.items.some((it) => doneEntry(it, TODAY, log)) ? '운동 추가 기록' : '운동 기록'}</span></a><a class="pen-btn" href="records.html#new">${PEN_BTN}<span>식단 · 체중 기록</span></a></div></div>
       <div class="soft"><h3 style="font-size:.95rem;color:var(--ink);margin-bottom:12px">Today's Targets <span class="muted" style="font-weight:500">· 오늘 목표</span></h3>${kv}
       <div class="kv" style="margin-top:8px;grid-template-columns:repeat(2,minmax(0,1fr))"><div><div class="l">Bedtime · 오늘 취침</div><div class="v num">${plan.targets.bed}</div><div class="s">기상 ${plan.targets.wake} · ${plan.targets.sleep} 수면</div></div>
       <div><div class="l">Last night · 어젯밤 수면</div><div class="v num">${slept == null ? '–' : hmHtml(slept)}</div><div class="s num">${rec.bed ? `${rec.bed} → ${rec.wake || ''}` : '기록 없음'}</div></div></div></div></div>`;
@@ -729,8 +730,8 @@
       for (let dt = start; dt <= end; dt = addDays(dt, 1)) cells += dayCell(dt, by, dt.getMonth() !== mo - 1);
       const lo = minYM(), hi = maxYM();
       const notes = [];
-      return `<div class="calbox"><div class="cal-head"><button class="cal-nav" type="button" data-go="-1" aria-label="이전 달"${ym <= lo ? ' disabled' : ''}>‹</button><h3 class="cal-title">${ymText(ym)}</h3>
-          <button class="cal-nav" type="button" data-go="1" aria-label="다음 달"${ym >= hi ? ' disabled' : ''}>›</button>${ym !== TODAY.slice(0, 7) ? '<button class="btn line sm cal-today" type="button" data-go="0">이번 달</button>' : ''}</div>
+      return `<div class="calbox"><div class="cal-head"><button class="cal-nav" type="button" data-go="-1" aria-label="이전 달"${ym <= lo ? ' disabled' : ''}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><h3 class="cal-title">${ymText(ym)}</h3>
+          <button class="cal-nav" type="button" data-go="1" aria-label="다음 달"${ym >= hi ? ' disabled' : ''}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>${ym !== TODAY.slice(0, 7) ? '<button class="btn line sm cal-today" type="button" data-go="0">이번 달</button>' : ''}</div>
         ${stats(ym, rows)}
         <div class="cal"><div class="cal-w">${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((w, i) => `<span${i === 5 ? ' class="sat"' : i === 6 ? ' class="sun"' : ''}>${w}</span>`).join('')}</div><div class="cal-g">${cells}</div>
         <div class="cal-lg">${['hyrox', 'run', 'weights'].map((k) => `<span class="k-${k}"><i></i>${NAMES[k]}</span>`).join('')}<span class="k-cycle"><i></i>Cycle</span><span class="m">${MOON}수면 · ${FORK}섭취 kcal</span></div></div>
@@ -746,20 +747,16 @@
         out = out || `<p class="note" style="padding:24px 0">‘${esc(query)}’에 맞는 기록이 없어요.</p>`;
       } else {
         const inM = rows.filter((e) => e.date.slice(0, 7) === curYM);
-        out = cal(curYM, rows) + (inM.length ? `<details class="mo-log" id="moLog"><summary><span>${+curYM.slice(5)}월 훈련 기록 자세히 보기</span><span class="num">${inM.length}건</span></summary><div class="mo-b">${days(inM, ws)}</div></details>`
+        out = cal(curYM, rows) + (inM.length ? `<section class="mo-log" id="moLog"><h3 class="mo-log-h">${+curYM.slice(5)}월 훈련 기록 <span class="num">${inM.length}건</span></h3><div class="mo-b">${days(inM, ws)}</div></section>`
           : `<p class="note" style="margin-top:16px">${+curYM.slice(5)}월에는 적힌 운동 기록이 없어요.</p>`);
       }
       list.innerHTML = out;
-      $('#logCount').textContent = `${filter === 'all' && !ws.length ? '전체 ' : ''}${rows.length}건`;
-      const gone = all.filter((e) => e.deleted).sort((a2, b2) => (a2.deleted < b2.deleted ? 1 : -1));
-      $('#logTrash').innerHTML = canWrite() && gone.length ? `<details class="more"><summary>휴지통 · ${gone.length}건</summary><p class="note" style="margin:8px 0">지운 기록은 여기에 남아 있어요. 되살리면 원래 날짜 자리로 돌아가요.</p>${gone.map((e) =>
-        `<div class="trash-row"><span class="num"><b>${md(parse(e.date))}</b></span><span>${esc(e.session)}${e.format ? ` · ${esc(e.format)}` : ''}</span><span class="muted small num">${md(parse(e.deleted))}에 지움</span><span class="tools"><button class="btn line sm" type="button" data-restore="${esc(e.id)}">되살리기</button><button class="ic" type="button" data-purge="${esc(e.id)}" title="완전히 지우기" aria-label="완전히 지우기">${ICON.del}</button></span></div>`).join('')}</details>` : '';
     };
     // month arrows, "이번 달", a swipe on the calendar; a day opens the folded log at that day
     const go = (n) => { const lo = minYM(), hi = maxYM(); const next = n === 0 ? TODAY.slice(0, 7) : ymAdd(curYM, n); if (next < lo || next > hi) return; curYM = next; render(); };
     if (!list._cal) { list._cal = true;
       list.addEventListener('click', (ev) => { const nb = ev.target.closest('[data-go]'); if (nb) { go(+nb.dataset.go); return; }
-        const dc = ev.target.closest('a.cal-d[data-day]'); if (!dc) return; ev.preventDefault(); const d = $('#moLog'); if (d) d.open = true;
+        const dc = ev.target.closest('a.cal-d[data-day]'); if (!dc) return; ev.preventDefault(); 
         const row = document.getElementById(`d-${dc.dataset.day}`); if (row) { row.scrollIntoView({ behavior: 'smooth', block: 'start' }); row.classList.remove('flash'); void row.offsetWidth; row.classList.add('flash'); } });
       let x0 = null, y0 = null;
       list.addEventListener('touchstart', (ev) => { if (!ev.target.closest('.cal')) { x0 = null; return; } x0 = ev.touches[0].clientX; y0 = ev.touches[0].clientY; }, { passive: true });
@@ -775,9 +772,6 @@
     list.onclick = (ev) => { const ed = ev.target.closest('[data-edit]'), del = ev.target.closest('[data-del]');
       if (ed) open(log.find((e) => e.id === ed.dataset.edit));
       if (del && confirm('이 기록을 지울까요?\n휴지통으로 옮겨지고, 목록 맨 아래 휴지통에서 되살릴 수 있어요.')) change((arr) => { const x = arr.find((e) => e.id === del.dataset.del); if (x) x.deleted = TODAY; return arr; }, `log: trash ${del.dataset.del}`); };
-    $('#logTrash').onclick = (ev) => { const re = ev.target.closest('[data-restore]'), pu = ev.target.closest('[data-purge]');
-      if (re) change((arr) => { const x = arr.find((e) => e.id === re.dataset.restore); if (x) delete x.deleted; return arr; }, `log: restore ${re.dataset.restore}`);
-      if (pu && confirm('휴지통에서도 완전히 지울까요?\n이건 되돌릴 수 없어요.')) change((arr) => arr.filter((e) => e.id !== pu.dataset.purge), `log: purge ${pu.dataset.purge}`); };
     form.onsubmit = async (ev) => { ev.preventDefault(); const btn = $('#logSave'); const k = kind();
       const dur = parseDur(f.minutes.value); if (f.minutes.value.trim() && dur == null) { msg.textContent = '시간은 37:54 처럼 분:초로 적어주세요.'; return; }
       btn.disabled = true; msg.textContent = '저장하는 중…';
