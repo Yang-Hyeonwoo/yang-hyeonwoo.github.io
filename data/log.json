@@ -1454,12 +1454,14 @@
   "session": "Hyrox Single",
   "format": "AMRAP",
   "minutes": 30,
-  "workout": "AMRAP 30 min\n#1 Burpee to Box · 5 - 10 - 15 - 20…\n#2 Wall Ball Shot 9kg · 10 - 20 - 30 - 40…\n#3 Machine · 150 - 300 - 450 - 600m…",
+  "workout": "AMRAP 30 min\n#1 Burpee to Box · 5 - 10 - 15 - 20…\n#2 Wall Ball Shot 9kg · 10 - 20 - 30 - 40…\n#3 Machine (무동력 트레드밀) · 150 - 300 - 450 - 600m…",
   "avg_hr": 167,
   "max_hr": 196,
   "garmin": [
    "25213853610"
-  ]
+  ],
+  "result": "4R + 25 / 50 / 630m\n총 Burpee to Box 75 · Wall Ball 9kg 150 · 무동력 트레드밀 2,130m",
+  "notes": "버피는 5개씩, 월볼은 10개씩 끊어서 진행\n월볼 9kg 생각보다 가볍고 잘 밀림\n러닝 중 종아리 쥐 없음 · 버피 때 팔꿈치 통증 전혀 없음\n페이스 조절했는데도 힘들었고 30분이 꽤 길게 느껴짐\n체육관 왕복 자전거 (갈 때 가민을 늦게 켜서 거리 덜 찍힘)"
  },
  {
   "id": "emwyz3v31",
