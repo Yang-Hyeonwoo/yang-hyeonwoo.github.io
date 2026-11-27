@@ -939,7 +939,7 @@ body[data-page="log"] .cal-d .p.plan { background: #fff; box-shadow: inset 3px 0
    · Cycle: white, thin border, bike. No left colour line. Sleep and kcal step back to grey. */
 body[data-page="log"] .k-hyrox { --kc: #2747a5; --kb: #2747a5; --kt: #fff; }
 body[data-page="log"] .k-run { --kc: #195c39; --kb: #ddf3e6; --kt: #195c39; }
-body[data-page="log"] .k-weights { --kc: #344054; --kb: #f0f2f5; --kt: #344054; }
+body[data-page="log"] .k-weights { --kc: #263241; --kb: #cbd2db; --kt: #1f2937; }
 body[data-page="log"] .k-cycle { --kc: #4b5058; --kb: #fff; --kt: #3a3f46; }
 body[data-page="log"] .cal-d .p, body[data-page="log"] .cal-d .p.k-weights, body[data-page="log"] .cal-d .p.k-cycle {
   background: var(--kb); color: var(--kt); box-shadow: none; border-radius: 4px; }
@@ -948,7 +948,7 @@ body[data-page="log"] .cal-d .p.plan { background: #fff; color: var(--kc); box-s
 body[data-page="log"] .cal-d .p svg { color: currentColor; opacity: 0.85; }
 body[data-page="log"] .cal-lg i, body[data-page="log"] .cs i { background: var(--kb); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--kc) 45%, transparent); }
 body[data-page="log"] .entry .item.k-hyrox .ttl::before { background: #2747a5; } body[data-page="log"] .entry .item.k-run .ttl::before { background: #2e8b57; }
-body[data-page="log"] .entry .item.k-weights .ttl::before { background: #98a2b3; }
+body[data-page="log"] .entry .item.k-weights .ttl::before { background: #8a94a6; }
 body[data-page="log"] .cal-m, body[data-page="log"] .cal-m .sl, body[data-page="log"] .cal-m .kc { color: #9a9ca3; }
 body[data-page="log"] .cal-m .sl.low { color: #9a9ca3; } body[data-page="log"] .cal-m .sl.low svg { color: #c2610f; opacity: 1; }
 @media (max-width: 640px) {
