@@ -474,14 +474,13 @@
     $('#road').innerHTML = `<div class="road" style="margin-top:0">${plan.roadmap.map((r) => `<div class="${r === phase ? 'now' : r.from < phase.from ? 'past' : ''}"><div class="m">${esc(r.m)}</div><div class="th">${esc(r.theme)}</div><div class="f">${esc(r.focus)}</div></div>`).join('')}</div>`;
     // the weeks at a glance, under the roadmap: one small card per week (what it is for and its base running distance, with a bar
     // to compare weeks). The Wednesday session and the day-by-day detail are in the week's own plan below; a card opens it.
-    const kmTop = Math.max(...plan.weeks.map((w) => w.run_km + (w.bonus_km || 0)));
     $('#weekTable').innerHTML = `<div class="wk-grid">${plan.weeks.map((w, i) => { const mon = parse(w.start); const now = w.start === thisMon;
       return `<a class="wkc${now ? ' now' : ''}${w.recovery ? ' rec' : ''}" href="#w-${w.start}"><div class="n"><b class="num">${i + 1}주차</b><span class="num">${md(mon)}–${md(addDays(mon, 6))}</span></div>
         <div class="t">${esc(w.label)}${now ? ' <span class="chip a">이번 주</span>' : ''}${w.recovery ? ' <span class="chip w">회복</span>' : ''}</div>
         <div class="c">${esc(w.concept || '')}</div>
         ${w.start <= thisMon ? (() => { const got = runSum(log, w.start, iso(addDays(mon, 6))).km;
-          return `<div class="km run"><span class="num"><b>${got.toFixed(1)}</b> / ${w.run_km}km${now ? '<small> · 진행 중</small>' : ''}</span><i><u style="width:${(w.run_km / kmTop * 100).toFixed(1)}%"></u><s style="width:${(Math.min(got, kmTop) / kmTop * 100).toFixed(1)}%"></s></i></div>`; })()
-          : `<div class="km"><span class="num"><b>${w.run_km}</b>km${w.bonus_km ? `<small> · 보너스 +${w.bonus_km}</small>` : ''}</span><i><u style="width:${(w.run_km / kmTop * 100).toFixed(1)}%"></u></i></div>`}</a>`; }).join('')}</div>`;
+          return `<div class="km run"><span class="num"><b>${got.toFixed(1)}</b> / ${w.run_km}km${now ? '<small> · 진행 중</small>' : ''}</span><i title="계획의 ${Math.round(got / w.run_km * 100)}%"><s style="width:${Math.min(100, got / w.run_km * 100).toFixed(1)}%"></s></i></div>`; })()
+          : `<div class="km"><span class="num"><b>${w.run_km}</b>km${w.bonus_km ? `<small> · 보너스 +${w.bonus_km}</small>` : ''}</span><i></i></div>`}</a>`; }).join('')}</div>`;
     const raceMon = monday(parse(plan.race.date)); const totalWeeks = Math.round((raceMon - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
     const nowNo = Math.round((monday(NOW) - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
     $('#weekTotal').textContent = `대회 주까지 총 ${totalWeeks}주${nowNo >= 1 && nowNo <= totalWeeks ? ` · 지금 ${nowNo}주차` : ''}`;
