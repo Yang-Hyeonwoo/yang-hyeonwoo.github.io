@@ -115,7 +115,7 @@ for monday, (commute, bonus, wed_run, wed_detail, recovery) in sorted(WEEKS.item
 plan = {
     "updated": "2026-11-27",
     "race": {"name": "HYROX Incheon", "division": "Pro Single", "date": "2027-05-14",      # Pro Single is on Friday (the user, 2026-11-28)
-             "date_note": "5/14(금) Pro Single 출전 · 대회 5/13–16"},
+             "date_note": "5/14(금) Pro Single 출전"},
     "goals": [
         {"label": "Hyrox Pro Single", "value": "1:15:00", "sub": "2027년 5월 HYROX Incheon"},
         {"label": "10km", "value": "37:59", "sub": "3월 말~4월 초 대회"},

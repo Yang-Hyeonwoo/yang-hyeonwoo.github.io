@@ -956,3 +956,6 @@ body[data-page="log"] .cal-m .sl.low { color: #9a9ca3; } body[data-page="log"] .
   body[data-page="log"] .cal-d .p.k-cycle { box-shadow: inset 0 0 0 1px #dfe1e5; }
   body[data-page="log"] .cal-m .sl.low { color: #c2610f; }
 }
+
+/* ---- Training Log: weekly running mileage between the calendar and the month's log ---- */
+body[data-page="log"] .run-wk { margin-top: 28px; }

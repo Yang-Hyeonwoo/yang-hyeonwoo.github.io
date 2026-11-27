@@ -229,6 +229,17 @@
   }
 
   // ---------- charts ----------
+  // Weekly running mileage (shown in the Training Log under the calendar): the last 12 weeks (Mon–Sun), every bar labelled,
+  // the plan's base distance as a black tick, this week drawn lighter while it is still going.
+  function runWeeks(nowEl, chartEl, plan, log) {
+    const mon = monday(NOW); const bars = [];
+    for (let i = 11; i >= 0; i--) { const m = addDays(mon, -7 * i); const st = weekRun(m, plan, log);
+      bars.push({ label: md(m), tipx: `${weekLabel(m)} (${md(m)}–${md(addDays(m, 6))})`, y: st.km, plan: st.meta ? st.meta.run_km : 0, cur: i === 0 }); }
+    const done4 = bars.slice(-5, -1); const avg4 = done4.reduce((a, b) => a + b.y, 0) / done4.length; const cur = bars[bars.length - 1];
+    nowEl.innerHTML = `${cur.y.toFixed(1)}<small>km · 이번 주${cur.plan ? ` / 기본 계획 ${cur.plan}km` : ''}</small><span class="chip num">지난 4주 평균 ${avg4.toFixed(1)}km</span>`;
+    barChart(chartEl, bars, { label: '주간 러닝 거리', labels: true, wide: true, h: 220, color: PAGE === 'log' ? '#2e8b57' : KINDS[1].color, vfmt: (v) => (v >= 10 ? v.toFixed(0) : v.toFixed(1)),
+      tip: (b) => `${b.tipx} · <b>${b.y.toFixed(1)}</b>km${b.plan ? ` (기본 계획 ${b.plan}km)` : ''}${b.cur ? ' · 진행 중' : ''}` });
+  }
   // Small monthly charts print their values on the marks (o.labels), like the old spreadsheet; every chart also has a hover tooltip.
   const vl = (x, y, t, anchor = 'middle') => `<text class="vl" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}">${t}</text>`;
   // Line with a dot on every point. o.labels prints values on the dots (thinned out when there are many), o.area tints the area under the line.
@@ -510,16 +521,6 @@
         + cell('평균 기상', wakes.length ? hm(avgOf(wakes)) : '–', `목표 ${plan.targets.wake}`) : '<p class="note">최근 4주 수면 기록이 없어요.</p>';
     };
     draw(0);   // the whole record by default: the long view is the point of this section
-    // Running mileage, the number the user follows week to week: the last 12 weeks, every bar labelled, the plan's base distance
-    // as a black tick, this week drawn lighter while it is still going.
-    const runWeeks = () => { const bars = []; for (let i = 11; i >= 0; i--) { const m = addDays(mon, -7 * i); const st = weekRun(m, plan, log);
-        bars.push({ label: md(m), tipx: `${weekLabel(m)} (${md(m)}–${md(addDays(m, 6))})`, y: st.km, plan: st.meta ? st.meta.run_km : 0, cur: i === 0 }); }
-      const done4 = bars.slice(-5, -1); const avg4 = done4.reduce((a, b) => a + b.y, 0) / done4.length; const cur = bars[bars.length - 1];
-      $('#nowR').innerHTML = `${cur.y.toFixed(1)}<small>km · 이번 주${cur.plan ? ` / 기본 계획 ${cur.plan}km` : ''}</small><span class="chip num">지난 4주 평균 ${avg4.toFixed(1)}km</span>`;
-      barChart($('#chR'), bars, { label: '주간 러닝 거리', labels: true, wide: true, h: 220, color: C.run, vfmt: (v) => (v >= 10 ? v.toFixed(0) : v.toFixed(1)),
-        tip: (b) => `${b.tipx} · <b>${b.y.toFixed(1)}</b>km${b.plan ? ` (기본 계획 ${b.plan}km)` : ''}${b.cur ? ' · 진행 중' : ''}` }); };
-    runWeeks(); let rwW = $('#chR').clientWidth;
-    window.addEventListener('resize', () => { const w = $('#chR').clientWidth; if ((w > 700) !== (rwW > 700)) { rwW = w; runWeeks(); } });
     document.querySelectorAll('#range button').forEach((b) => { b.onclick = () => { document.querySelectorAll('#range button').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); draw(+b.dataset.w); }; });
     // races, newest first; the fastest result of each event gets a PB mark
     const secsOf = (t) => t.split(':').reduce((acc, v) => acc * 60 + Number(v), 0); const best = {};
@@ -631,6 +632,7 @@
   const fmtDate = (d) => { const x = parse(d); return `<b class="num">${x.getMonth() + 1}/${x.getDate()}</b>${KO[x.getDay()]}요일`; };
   async function logPage() {
     let all = await load('log'); let log = live(all); let filter = 'all'; let editing = null;
+    const planP = load('plan').catch(() => null);
     const dayRec = {}; (await load('daily').catch(() => [])).forEach((r) => { dayRec[r.date] = r; });
     const form = $('#logForm'), list = $('#logList'), msg = $('#logMsg'); const f = form.elements;
     const search = $('#logSearch') || document.createElement('input'); let query = search.value.trim();   // (a page copy from before the search box existed)
@@ -760,10 +762,12 @@
         out = out || `<p class="note" style="padding:24px 0">‘${esc(query)}’에 맞는 기록이 없어요.</p>`;
       } else {
         const inM = rows.filter((e) => e.date.slice(0, 7) === curYM);
-        out = cal(curYM, rows) + (inM.length ? `<section class="mo-log" id="moLog"><h3 class="mo-log-h">${+curYM.slice(5)}월 훈련 기록 <span class="num">${inM.length}건</span></h3><div class="mo-b">${days(inM, ws)}</div></section>`
+        out = cal(curYM, rows) + `<div class="plate chart-card run-wk"><h3>Running Mileage · 주간 러닝 거리 <span class="muted" style="font-weight:500">· 최근 12주</span></h3><div class="now num" id="nowR"></div><div class="chart" id="chR"></div>
+          <p class="note" style="margin-top:6px">막대 위 숫자는 그 주(월–일)에 달린 거리, 검은 가로선은 그 주 기본 계획이에요. 이번 주 막대는 진행 중이라 연하게 보여요.</p></div>` + (inM.length ? `<section class="mo-log" id="moLog"><h3 class="mo-log-h">${+curYM.slice(5)}월 훈련 기록 <span class="num">${inM.length}건</span></h3><div class="mo-b">${days(inM, ws)}</div></section>`
           : `<p class="note" style="margin-top:16px">${+curYM.slice(5)}월에는 적힌 운동 기록이 없어요.</p>`);
       }
       list.innerHTML = out;
+      if (!ws.length) planP.then((pl) => { const n = $('#nowR'), c = $('#chR'); if (pl && n && c) runWeeks(n, c, pl, log.filter((e) => !ahead(e))); });
     };
     // month arrows, "이번 달", a swipe on the calendar; a day opens the folded log at that day
     const go = (n) => { const lo = minYM(), hi = maxYM(); const next = n === 0 ? TODAY.slice(0, 7) : ymAdd(curYM, n); if (next < lo || next > hi) return; curYM = next; render(); };
