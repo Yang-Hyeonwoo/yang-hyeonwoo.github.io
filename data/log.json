@@ -1454,7 +1454,12 @@
   "session": "Hyrox Single",
   "format": "AMRAP",
   "minutes": 30,
-  "workout": "AMRAP 30 min\n#1 Burpee to Box · 5 - 10 - 15 - 20…\n#2 Wall Ball Shot 9kg · 10 - 20 - 30 - 40…\n#3 Machine · 150 - 300 - 450 - 600m…"
+  "workout": "AMRAP 30 min\n#1 Burpee to Box · 5 - 10 - 15 - 20…\n#2 Wall Ball Shot 9kg · 10 - 20 - 30 - 40…\n#3 Machine · 150 - 300 - 450 - 600m…",
+  "avg_hr": 167,
+  "max_hr": 196,
+  "garmin": [
+   "25213853610"
+  ]
  },
  {
   "id": "emwyz3v31",
