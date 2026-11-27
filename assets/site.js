@@ -102,6 +102,9 @@
         <a href="${ROOT}training/log.html"${t('log')}>Training Log</a><a href="${ROOT}training/records.html"${t('records')}>Daily Records</a>
       </nav>
       <a class="back" href="${ROOT}">← Main</a>
+      ${token() ? `<button class="icon-btn" id="syncBtn" type="button" aria-label="가민 동기화" title="가민 기록 지금 가져오기">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2M3 12a9 9 0 0 1 15.5-6.2"/><path d="M18.5 2v4h-4M5.5 22v-4h4"/></svg>
+      </button>` : ''}
       <button class="icon-btn${token() ? ' ok' : ''}" id="keyBtn" type="button" aria-label="입력 설정" title="입력 설정">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3m-3 3 3 3m-6 0 2 2"/></svg>
       </button></div></header>` : `<header class="site-head"><div class="wrap">
@@ -115,15 +118,48 @@
     const dlg = el(`<dialog id="keyDlg"><h3>입력 설정</h3>
       <p class="note">이 사이트는 누구나 볼 수 있지만, 기록을 저장하려면 본인 확인용 GitHub 토큰이 필요해요. 토큰은 이 브라우저에만 저장돼요.</p>
       <ol><li>GitHub → Settings → Developer settings → Fine-grained tokens → Generate new token</li>
-      <li>Repository access: <b>${CFG.repo}</b> 하나만 선택</li><li>Permissions → Contents: <b>Read and write</b></li><li>만든 토큰을 아래에 붙여넣기</li></ol>
+      <li>Repository access: <b>${CFG.repo}</b> 하나만 선택</li><li>Permissions → Contents: <b>Read and write</b> · 가민 동기화 버튼까지 쓰려면 Actions: <b>Read and write</b>도</li><li>만든 토큰을 아래에 붙여넣기</li></ol>
       <label class="note" for="keyIn">토큰</label><input class="in" id="keyIn" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…">
       <div class="form-foot"><button class="btn" id="keySave" type="button">저장</button><button class="btn line" id="keyDel" type="button">이 기기에서 지우기</button>
       <button class="btn line" id="keyClose" type="button">닫기</button></div><p class="note" id="keyMsg" style="margin-top:12px"></p></dialog>`);
     document.body.append(dlg);
     $('#keyBtn').onclick = () => { $('#keyMsg').textContent = token() ? '이 기기에 토큰이 저장되어 있어요.' : ''; dlg.showModal(); };
     $('#keyClose').onclick = () => dlg.close();
+    if ($('#syncBtn')) $('#syncBtn').onclick = () => garminSync($('#syncBtn'));
     $('#keyDel').onclick = () => { localStorage.removeItem(KEY); location.reload(); };
     $('#keySave').onclick = () => { const v = $('#keyIn').value.trim(); if (!v) return; localStorage.setItem(KEY, v); location.reload(); };
+  }
+
+  // ---------- Garmin sync on demand ----------
+  // Starts the same GitHub Actions job that runs every hour (garmin.yml), waits for it, then draws the page again from the
+  // repository. Needs the token to also have Actions: Read and write; without it GitHub answers 403 and the page says what to add.
+  const syncMsg = (t, ok) => { const old = $('#garminSync'); if (old) old.remove(); const m = $('main'); if (!t || !m) return;
+    m.prepend(el(`<div class="wrap" id="garminSync"><div class="banner${ok ? ' ok' : ''}" role="status" style="margin:16px 0 0">${t}</div></div>`)); };
+  async function garminSync(btn) {
+    if (btn.classList.contains('busy')) return;
+    const h = { Authorization: `Bearer ${token()}`, Accept: 'application/vnd.github+json' };
+    const base = `https://api.github.com/repos/${CFG.owner}/${CFG.repo}/actions/workflows/garmin.yml`;
+    const done = (t, ok) => { btn.classList.remove('busy'); syncMsg(t, ok); };
+    btn.classList.add('busy'); syncMsg('가민 기록을 가져오는 중이에요. 보통 30초–1분 걸려요.');
+    const t0 = Date.now() - 30000;
+    try {
+      const r = await fetch(`${base}/dispatches`, { method: 'POST', headers: h, body: JSON.stringify({ ref: CFG.branch }) });
+      if (r.status === 401) return done('토큰이 만료됐어요. 오른쪽 위 열쇠 버튼에서 새 토큰을 넣어주세요.');
+      if (r.status === 403 || r.status === 404) return done('이 토큰에는 동기화 권한이 없어요. GitHub → Settings → Developer settings → Fine-grained tokens에서 이 토큰을 열고 Permissions에 <b>Actions: Read and write</b>를 추가해 주세요. 토큰 값은 바뀌지 않아서 다시 넣을 필요 없어요.');
+      if (!r.ok) return done(`동기화를 시작하지 못했어요 (GitHub ${r.status}). 잠시 뒤 다시 눌러주세요.`);
+      for (let i = 0; i < 60; i++) {           // up to about 5 minutes: a scheduled run already going makes this one wait its turn
+        await new Promise((res) => setTimeout(res, 5000));
+        const q = await fetch(`${base}/runs?event=workflow_dispatch&per_page=5`, { headers: h, cache: 'no-store' });
+        if (!q.ok) continue;
+        const run = ((await q.json()).workflow_runs || []).find((x) => Date.parse(x.created_at) >= t0);
+        if (!run || run.status !== 'completed') continue;
+        if (run.conclusion !== 'success') return done(`동기화가 실패했어요. <a href="${run.html_url}" target="_blank" rel="noopener">GitHub에서 보기</a>`);
+        ['log', 'daily'].forEach((n) => { try { localStorage.removeItem(CACHE + n); } catch { /* ignore */ } });
+        try { sessionStorage.setItem('site.synced', String(Date.now())); } catch { /* ignore */ }
+        location.reload(); return;
+      }
+      done('아직 끝나지 않았어요. 조금 뒤 새로고침하면 들어와 있을 거예요.');
+    } catch (e) { done('연결이 불안정해서 동기화를 시작하지 못했어요. 잠시 뒤 다시 눌러주세요.'); }
   }
 
   // ---------- sessions: three kinds, Hyrox / Running / Weight ----------
@@ -840,6 +876,7 @@
   }
 
   chrome();
+  try { const v = Number(sessionStorage.getItem('site.synced')); if (v) { sessionStorage.removeItem('site.synced'); if (Date.now() - v < 60000) syncMsg('가민 기록을 가져왔어요.', true); } } catch { /* ignore */ }
   const run = { hub, training, plan: planPage, log: logPage, records: recordsPage }[PAGE];
   const fail = (e) => { console.error(e); const m = $('main'); if (m) m.prepend(el(`<div class="wrap"><div class="banner" style="margin-top:16px">기록을 불러오지 못했어요. 잠시 뒤 새로고침해 주세요. (${esc(e.message)})</div></div>`)); };
   // After the background fetch: say so when the page is showing an older copy, or when the saved token no longer works.

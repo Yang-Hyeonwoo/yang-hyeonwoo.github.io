@@ -606,3 +606,9 @@ svg.days-ch text.vl.tot { fill: var(--ink); font-size: 12px; font-weight: 700; }
 .wkc .km i { position: relative; }
 .wkc .km u, .wkc .km s { position: absolute; left: 0; top: 0; bottom: 0; }
 .wkc .km u { background: #2a9d8f; opacity: 0.25; } .wkc .km s { background: #2a9d8f; opacity: 1; }
+
+/* ---- header: Garmin sync button, spinning while the job runs ---- */
+#syncBtn.busy { color: var(--accent); cursor: progress; }
+#syncBtn.busy svg { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { #syncBtn.busy svg { animation: none; } }
