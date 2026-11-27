@@ -36,14 +36,22 @@ jobs:
         if: env.HAS_TOKENS == 'true'
         with:
           python-version: '3.12'
-      - name: Install the Garmin library
+      # the library is kept between runs (about 5 s saved on each); a new version in the key installs it afresh
+      - uses: actions/cache@v4
+        id: libs
         if: env.HAS_TOKENS == 'true'
-        run: pip install --quiet garminconnect==0.3.20
+        with:
+          path: ${{ runner.temp }}/garmin-libs
+          key: garmin-libs-${{ runner.os }}-py3.12-garminconnect-0.3.20
+      - name: Install the Garmin library
+        if: env.HAS_TOKENS == 'true' && steps.libs.outputs.cache-hit != 'true'
+        run: pip install --quiet --target "$RUNNER_TEMP/garmin-libs" garminconnect==0.3.20
       - name: Sync
         env:
           GARMINTOKENS: ${{ secrets.GARMIN_TOKENS }}
           GITHUB_TOKEN: ${{ github.token }}
           INSPECT: ${{ inputs.inspect }}
+          PYTHONPATH: ${{ runner.temp }}/garmin-libs
         run: python tools/garmin_sync.py --tokens-out "$RUNNER_TEMP/garmin_tokens.json" ${INSPECT:+--inspect "$INSPECT"}
       - name: Keep the new login tokens
         # Garmin may replace the refresh token when it is used. Saving it back needs a token that may write

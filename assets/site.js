@@ -140,19 +140,23 @@
     const h = { Authorization: `Bearer ${token()}`, Accept: 'application/vnd.github+json' };
     const base = `https://api.github.com/repos/${CFG.owner}/${CFG.repo}/actions/workflows/garmin.yml`;
     const done = (t, ok) => { btn.classList.remove('busy'); syncMsg(t, ok); };
-    btn.classList.add('busy'); syncMsg('가민 기록을 가져오는 중이에요. 보통 30초–1분 걸려요.');
+    btn.classList.add('busy'); syncMsg('가민 기록을 가져오는 중이에요. 보통 20–30초 걸려요.');
     const t0 = Date.now() - 30000;
     try {
       const r = await fetch(`${base}/dispatches`, { method: 'POST', headers: h, body: JSON.stringify({ ref: CFG.branch }) });
       if (r.status === 401) return done('토큰이 만료됐어요. 오른쪽 위 열쇠 버튼에서 새 토큰을 넣어주세요.');
       if (r.status === 403 || r.status === 404) return done('이 토큰에는 동기화 권한이 없어요. GitHub → Settings → Developer settings → Fine-grained tokens에서 사이트에 넣은 토큰(Contents: Read and write가 있는 것)을 열고 Permissions에 <b>Actions: Read and write</b>를 추가해 주세요. 토큰 값은 바뀌지 않아서 다시 넣을 필요 없어요.');
       if (!r.ok) return done(`동기화를 시작하지 못했어요 (GitHub ${r.status}). 잠시 뒤 다시 눌러주세요.`);
-      for (let i = 0; i < 60; i++) {           // up to about 5 minutes: a scheduled run already going makes this one wait its turn
-        await new Promise((res) => setTimeout(res, 5000));
+      // A run takes about 20 s, most of it GitHub starting a machine: wait 8 s, then look every 2 s (up to about 5 minutes,
+      // since a scheduled run already going makes this one wait its turn), saying where it is meanwhile.
+      const start = Date.now(); const STEP = { queued: '순서 기다리는 중', waiting: '순서 기다리는 중', pending: '순서 기다리는 중', in_progress: '가민에서 읽는 중' };
+      await new Promise((res) => setTimeout(res, 8000));
+      for (let i = 0; i < 150; i++) {
+        if (i) await new Promise((res) => setTimeout(res, 2000));
         const q = await fetch(`${base}/runs?event=workflow_dispatch&per_page=5`, { headers: h, cache: 'no-store' });
         if (!q.ok) continue;
         const run = ((await q.json()).workflow_runs || []).find((x) => Date.parse(x.created_at) >= t0);
-        if (!run || run.status !== 'completed') continue;
+        if (!run || run.status !== 'completed') { syncMsg(`가민 기록을 가져오는 중이에요 · ${run ? STEP[run.status] || '진행 중' : '시작하는 중'} · ${Math.round((Date.now() - start) / 1000)}초`); continue; }
         if (run.conclusion !== 'success') return done(`동기화가 실패했어요. <a href="${run.html_url}" target="_blank" rel="noopener">GitHub에서 보기</a>`);
         ['log', 'daily'].forEach((n) => { try { localStorage.removeItem(CACHE + n); } catch { /* ignore */ } });
         try { sessionStorage.setItem('site.synced', String(Date.now())); } catch { /* ignore */ }
