@@ -1456,5 +1456,12 @@
   "minutes": 30,
   "workout": "AMRAP 30 min\n#1 Burpee to Box · 5 - 10 - 15 - 20…\n#2 Wall Ball Shot 9kg · 10 - 20 - 30 - 40…\n#3 Machine · 150 - 300 - 450 - 600m…",
   "planned": true
+ },
+ {
+  "id": "emwyz3v31",
+  "date": "2026-11-27",
+  "session": "Core",
+  "workout": "행잉 레그레이즈",
+  "result": "12,8,8"
  }
 ]
