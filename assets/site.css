@@ -959,3 +959,7 @@ body[data-page="log"] .cal-m .sl.low { color: #9a9ca3; } body[data-page="log"] .
 
 /* ---- Training Log: weekly running mileage between the calendar and the month's log ---- */
 body[data-page="log"] .run-wk { margin-top: 28px; }
+
+/* ---- coaching notes under the training charts ---- */
+.note.coach { margin-top: 10px; padding: 11px 13px; border-radius: var(--r-md); background: var(--bg-soft); font-size: 0.8rem; line-height: 1.65; color: var(--text); text-wrap: pretty; }
+.note.coach b { display: block; margin-bottom: 2px; color: var(--ink); font-weight: 700; }

@@ -229,9 +229,12 @@
   }
 
   // ---------- charts ----------
+  // The plan's running for a month: weekly base km of its weeks (by the Thursday rule), recovery weeks set apart
+  const kmMonth = (plan, ym) => { const ws = plan.weeks.filter((w) => iso(addDays(parse(w.start), 3)).slice(0, 7) === ym); const main = ws.filter((w) => !w.recovery).map((w) => w.run_km);
+    return ws.length ? { lo: Math.round(Math.min(...main)), hi: Math.round(Math.max(...main)), total: Math.round(ws.reduce((a, w) => a + w.run_km, 0) / 10) * 10 } : null; };
   // Weekly running mileage (shown in the Training Log under the calendar): the last 12 weeks (Mon–Sun), every bar labelled,
   // the plan's base distance as a black tick, this week drawn lighter while it is still going.
-  function runWeeks(nowEl, chartEl, plan, log) {
+  function runWeeks(nowEl, chartEl, plan, log, noteEl) {
     const mon = monday(NOW); const bars = [];
     for (let i = 11; i >= 0; i--) { const m = addDays(mon, -7 * i); const st = weekRun(m, plan, log);
       bars.push({ label: md(m), tipx: `${weekLabel(m)} (${md(m)}–${md(addDays(m, 6))})`, y: st.km, plan: st.meta ? st.meta.run_km : 0, cur: i === 0 }); }
@@ -239,6 +242,13 @@
     nowEl.innerHTML = `${cur.y.toFixed(1)}<small>km · 이번 주${cur.plan ? ` / 기본 계획 ${cur.plan}km` : ''}</small><span class="chip num">지난 4주 평균 ${avg4.toFixed(1)}km</span>`;
     barChart(chartEl, bars, { label: '주간 러닝 거리', labels: true, wide: true, h: 220, color: PAGE === 'log' ? '#2e8b57' : KINDS[1].color, vfmt: (v) => (v >= 10 ? v.toFixed(0) : v.toFixed(1)),
       tip: (b) => `${b.tipx} · <b>${b.y.toFixed(1)}</b>km${b.plan ? ` (기본 계획 ${b.plan}km)` : ''}${b.cur ? ' · 진행 중' : ''}` });
+    if (!noteEl) return;
+    const nxt = plan.weeks.find((w) => w.start === iso(addDays(mon, 7))); const left = cur.plan ? Math.max(0, cur.plan - cur.y) : 0;
+    const rec = plan.weeks.filter((w) => w.recovery && w.start > iso(mon)).map((w) => `${md(parse(w.start))} 주 ${Math.round(w.run_km)}km`).join(', ');
+    noteEl.innerHTML = `<b>이번 주 ${cur.y.toFixed(1)} / ${cur.plan || '–'}km${cur.plan ? (left > 0.05 ? ` · ${left.toFixed(1)}km 남음` : ' · 계획 달성') : ''}${nxt ? ` · 다음 주 목표 ${nxt.run_km}km` : ''}.</b> `
+      + `웨이트 시즌에는 주 0–25km로 들쭉날쭉했어요. 이제는 끊기지 않게 쌓는 게 핵심이에요. `
+      + `${nxt && cur.plan && nxt.run_km > cur.plan * 1.3 ? `이번 주는 대회 직후라 줄여 둔 주이고, 다음 주부터 기본 계획 거리로 올라가요. 그 뒤로는 ` : ''}한 주에 2–3km씩(10% 이내) 올리고, 3주 올린 뒤 1주는 줄여요${rec ? ` (${rec})` : ''}. `
+      + `비나 일정으로 왕복 러닝을 놓치면 보충하지 말고, 수요일 포인트 훈련만은 지켜요.`;
   }
   // Small monthly charts print their values on the marks (o.labels), like the old spreadsheet; every chart also has a hover tooltip.
   const vl = (x, y, t, anchor = 'middle') => `<text class="vl" x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anchor}">${t}</text>`;
@@ -509,6 +519,16 @@
       const mk = months.map((a) => { const [y, m] = a.ym.split('-').map(Number); return { label: `${m}월`, tip: `${y}년 ${m}월`, y: runSum(log, `${a.ym}-01`, iso(new Date(y, m, 0))).km, cur: a.ym === thisYm }; });
       const mPrev = mk.length > 1 ? mk[mk.length - 2] : null;
       $('#nowRM').innerHTML = `${mk.length ? mk[mk.length - 1].y.toFixed(1) : '0'}<small>km · ${NOW.getMonth() + 1}월 러닝</small>${mPrev ? `<span class="chip num">${mPrev.label} ${mPrev.y.toFixed(1)}km</span>` : ''}`;
+      // what to focus on: the Hyrox season's monthly mix, and how far running has to grow
+      const ymAt = (n) => { const d = new Date(NOW.getFullYear(), NOW.getMonth() + n, 1); return iso(d).slice(0, 7); };
+      const pre = mk.filter((m) => { const ym = months[mk.indexOf(m)].ym; return ym < HYROX_START.slice(0, 7); }); const lastW = pre[pre.length - 1];
+      const n1 = kmMonth(plan, ymAt(1)), n2 = kmMonth(plan, ymAt(2)); const mon1 = +ymAt(1).slice(5), mon2 = +ymAt(2).slice(5);
+      if ($('#noteMD')) $('#noteMD').innerHTML = `<b>지금 집중할 것: Hyrox와 러닝을 늘리고, 웨이트는 주 1회로.</b> 11/22부터 Hyrox 시즌이에요. 웨이트 시즌에는 한 달 15–25일 중 대부분이 웨이트였지만, `
+        + `이제 한 달 기준은 Hyrox 16일 안팎(주 4회) · 러닝 16일 안팎(수요일 포인트 · 왕복 2회 · 주말) · 웨이트 4일(수요일 상체)이에요. `
+        + `${NOW.getMonth() + 1}월 지금까지 Hyrox ${mNow.v[0]}일 · 러닝 ${mNow.v[1]}일 · 웨이트 ${mNow.v[2]}일. 일정이 꼬이면 금요일 Single과 수요일 러닝부터 지켜요.`;
+      if ($('#noteRM')) $('#noteRM').innerHTML = `<b>러닝 거리를 지금의 두 배 이상으로.</b> 웨이트 시즌에는 한 달 ${lastW ? `${Math.round(lastW.y)}km 안팎(${lastW.label})` : '70km 안팎'}이었어요. `
+        + `Hyrox Pro는 지친 상태로 1km를 8번 뛰는 경기라, 꾸준한 거리가 기록을 좌우해요. `
+        + `${n1 ? `${mon1}월은 주 ${n1.lo}–${n1.hi}km(한 달 약 ${n1.total}km)` : ''}${n2 ? `, ${mon2}월은 주 ${n2.lo}–${n2.hi}km` : ''}가 목표이고, 10K 37:59를 위해 2월부터는 주 40km 이상으로 올려요.`;
       barChart($('#chRM'), mk, { label: '월별 러닝 거리', labels: true, h: 210, color: C.run, vfmt: (v) => v.toFixed(0), tip: (b) => `${b.tip} · <b>${b.y.toFixed(1)}</b>km${b.cur ? ' (진행 중)' : ''}` });
       // Recovery: the last four weeks in numbers
       const from = iso(addDays(NOW, -27)); const rec = daily.filter((r) => r.date >= from && r.date <= TODAY && mins(r.sleep) != null);
@@ -763,11 +783,11 @@
       } else {
         const inM = rows.filter((e) => e.date.slice(0, 7) === curYM);
         out = cal(curYM, rows) + `<div class="plate chart-card run-wk"><h3>Running Mileage · 주간 러닝 거리 <span class="muted" style="font-weight:500">· 최근 12주</span></h3><div class="now num" id="nowR"></div><div class="chart" id="chR"></div>
-          <p class="note" style="margin-top:6px">막대 위 숫자는 그 주(월–일)에 달린 거리, 검은 가로선은 그 주 기본 계획이에요. 이번 주 막대는 진행 중이라 연하게 보여요.</p></div>` + (inM.length ? `<section class="mo-log" id="moLog"><h3 class="mo-log-h">${+curYM.slice(5)}월 훈련 기록 <span class="num">${inM.length}건</span></h3><div class="mo-b">${days(inM, ws)}</div></section>`
+          <p class="note coach" id="noteR"></p></div>` + (inM.length ? `<section class="mo-log" id="moLog"><h3 class="mo-log-h">${+curYM.slice(5)}월 훈련 기록 <span class="num">${inM.length}건</span></h3><div class="mo-b">${days(inM, ws)}</div></section>`
           : `<p class="note" style="margin-top:16px">${+curYM.slice(5)}월에는 적힌 운동 기록이 없어요.</p>`);
       }
       list.innerHTML = out;
-      if (!ws.length) planP.then((pl) => { const n = $('#nowR'), c = $('#chR'); if (pl && n && c) runWeeks(n, c, pl, log.filter((e) => !ahead(e))); });
+      if (!ws.length) planP.then((pl) => { const n = $('#nowR'), c = $('#chR'); if (pl && n && c) runWeeks(n, c, pl, log.filter((e) => !ahead(e)), $('#noteR')); });
     };
     // month arrows, "이번 달", a swipe on the calendar; a day opens the folded log at that day
     const go = (n) => { const lo = minYM(), hi = maxYM(); const next = n === 0 ? TODAY.slice(0, 7) : ymAdd(curYM, n); if (next < lo || next > hi) return; curYM = next; render(); };
