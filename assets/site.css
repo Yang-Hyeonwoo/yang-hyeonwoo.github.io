@@ -423,7 +423,7 @@ table.days td.num { padding-left: 5px; padding-right: 5px; }
 .entry .when { padding-top: 1px; line-height: 1.5; } .entry .when b { line-height: 30px; }
 .entry .top { min-height: 30px; }
 /* plan items: the text stays ink; only the bullet tells the kind, in the chart colours (Hyrox / Running / Weight) */
-.plan-items li.k-hyrox::marker { color: #8d0e35; } .plan-items li.k-run::marker { color: #ea5270; } .plan-items li.k-weights::marker { color: #f4b9c3; }
+.plan-items li.k-hyrox::marker { color: #153594; } .plan-items li.k-run::marker { color: #4487eb; } .plan-items li.k-weights::marker { color: #abcbf4; }
 .plan-items li.k-core::marker { color: var(--faint); }
 .dday .count .r .lbl { display: block; margin-bottom: 2px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.62); }
 .recap .lead { line-height: 1.8; }
@@ -562,7 +562,7 @@ table.days td.clip.c { text-align: center; }
 .entry .items > .item + .item { position: relative; margin-top: 16px; padding-top: 16px; }
 .entry .items > .item + .item::before { content: ""; position: absolute; top: 0; left: 15px; right: 0; border-top: 1px dashed var(--line); }   /* starts at the title, so it reads as inside the day */
 .entry .item .ttl::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; vertical-align: 2px; background: #b8b8bd; }
-.entry .item.k-hyrox .ttl::before { background: #8d0e35; } .entry .item.k-run .ttl::before { background: #ea5270; } .entry .item.k-weights .ttl::before { background: #f4b9c3; }
+.entry .item.k-hyrox .ttl::before { background: #153594; } .entry .item.k-run .ttl::before { background: #4487eb; } .entry .item.k-weights .ttl::before { background: #abcbf4; }
 @media (max-width: 860px) { .entry .when .n { display: inline; margin: 0 0 0 6px; } }
 
 /* ---- Training Log: the WOD always open, its result in the column beside it ---- */
@@ -598,14 +598,14 @@ svg.days-ch text.vl.tot { fill: var(--ink); font-size: 12px; font-weight: 700; }
 .wkc .km { margin-top: 4px; font-size: 0.78rem; color: var(--muted); }
 .wkc .km b { font-size: 1.05rem; color: var(--ink); margin-right: 1px; } .wkc .km small { font-size: 0.7rem; }
 .wkc .km i { display: flex; height: 4px; margin-top: 6px; border-radius: 2px; background: var(--line-soft); overflow: hidden; }
-.wkc .km s { display: block; background: #ea5270; } .wkc .km u { display: block; background: #ea5270; opacity: 0.35; }
+.wkc .km s { display: block; background: #4487eb; } .wkc .km u { display: block; background: #4487eb; opacity: 0.35; }
 @media (max-width: 1000px) { .wk-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { #weekTable { padding: 0; } .wk-grid { gap: 8px; } .wkc { padding: 12px; } .wkc .c { font-size: 0.78rem; } }
 
 /* ---- plan week cards: run so far (solid) over the week's base plan (light) ---- */
 .wkc .km i { position: relative; }
 .wkc .km u, .wkc .km s { position: absolute; left: 0; top: 0; bottom: 0; }
-.wkc .km u { background: #ea5270; opacity: 0.25; } .wkc .km s { background: #ea5270; opacity: 1; }
+.wkc .km u { background: #4487eb; opacity: 0.25; } .wkc .km s { background: #4487eb; opacity: 1; }
 
 /* ---- header: Garmin sync button, spinning while the job runs ---- */
 #syncBtn.busy { color: var(--accent); cursor: progress; }
@@ -651,7 +651,7 @@ section.mo + section.mo, .recap + section.mo { border-top: 1px solid var(--line)
 .mo-h .mo-n { font-size: 0.86rem; color: var(--muted); } .mo-h .mo-n b { color: var(--ink); font-size: 1rem; }
 .mo-ks { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
 .mo-k { font-size: 0.76rem; font-weight: 600; padding: 3px 9px; border-radius: var(--r-full); color: var(--kc); background: color-mix(in srgb, var(--kc) 10%, #fff); }
-.k-hyrox { --kc: #8d0e35; } .k-cycle { --kc: #714757; } .k-run { --kc: #ea5270; } .k-weights { --kc: #f4b9c3; } .k-other { --kc: #8a8a93; }
+.k-hyrox { --kc: #153594; } .k-cycle { --kc: #536578; } .k-run { --kc: #4487eb; } .k-weights { --kc: #abcbf4; } .k-other { --kc: #8a8a93; }
 .cal-note { margin: 10px 2px 0; font-size: 0.8rem; color: var(--muted); }
 .cal-note b { color: var(--accent-strong); }
 section.mo .mo-b { margin-top: 8px; }
@@ -884,8 +884,8 @@ body[data-page="plan"] section[id^="p-"], .plan-week { scroll-margin-top: 72px; 
 }
 
 /* ---- kind colours, second pass: burgundy, steel blue, stone beige, slate. Beige is light, so text on it is dark ---- */
-svg.days-ch text.vl.in.dk { fill: #241820; }
-.cal-d .p.k-weights { background: color-mix(in srgb, #f4b9c3 22%, #fff); }
+svg.days-ch text.vl.in.dk { fill: #172132; }
+.cal-d .p.k-weights { background: color-mix(in srgb, #abcbf4 22%, #fff); }
 /* Home: the month picked on the chart, its kinds as coloured dots */
 .now .mk { display: inline-flex; align-items: center; gap: 5px; margin-left: 12px; font-family: var(--font); font-size: 0.78rem; font-weight: 600; color: var(--text); letter-spacing: 0; vertical-align: 4px; }
 .now .mk i { width: 8px; height: 8px; border-radius: 2px; }

@@ -173,7 +173,7 @@
   const FORMATS = ['AMRAP', 'For Time', 'EMOM', 'Timed Sets', 'Interval', 'Chipper', 'Strength', 'Steady', 'Upper Body', 'Lower Body', 'Full Body'];
   const isRun = (e) => RUNS.includes(e.session);
   const kindOf = (e) => (HYROX.includes(e.session) ? 'hyrox' : isRun(e) ? 'run' : e.session === 'Weight Training' ? 'weights' : 'other');
-  const KINDS = [{ k: 'hyrox', name: 'Hyrox', color: '#8d0e35' }, { k: 'run', name: 'Running', color: '#ea5270' }, { k: 'weights', name: 'Weight', color: '#f4b9c3' }];   // checked for colour-blind separation
+  const KINDS = [{ k: 'hyrox', name: 'Hyrox', color: '#153594' }, { k: 'run', name: 'Running', color: '#4487eb' }, { k: 'weights', name: 'Weight', color: '#abcbf4' }];   // checked for colour-blind separation
   // The log entry that makes a plan item count as done (none = not done yet).
   function doneEntry(item, date, log) {
     const next = item.wk ? iso(addDays(parse(date), 1)) : '';      // the weekend run may be done on Sunday instead
@@ -307,7 +307,7 @@
       const parts = c.v.map((v, k) => ({ v, k })).filter((q) => q.v);
       parts.forEach((q, j) => { const h = sum ? (q.v / sum) * (H - B - Y(c.total)) : 0; const y0 = y - h; const last = j === parts.length - 1; const r = last ? Math.min(4, h, bw / 2) : 0; const gap = j ? 1 : 0;
         out += `<path d="M${x.toFixed(1)} ${(y - gap).toFixed(1)}V${(y0 + r).toFixed(1)}${r ? `q0-${r} ${r}-${r}h${(bw - 2 * r).toFixed(1)}q${r} 0 ${r} ${r}` : `h${bw.toFixed(1)}`}V${(y - gap).toFixed(1)}z" fill="${KINDS[q.k].color}"/>`;
-        if (h >= 13) out += `<text class="vl in${q.k ? ' dk' : ''}" x="${(x + bw / 2).toFixed(1)}" y="${(y0 + h / 2 + 3.5).toFixed(1)}" text-anchor="middle">${q.v}</text>`;
+        if (h >= 13) out += `<text class="vl in${q.k === 2 ? ' dk' : ''}" x="${(x + bw / 2).toFixed(1)}" y="${(y0 + h / 2 + 3.5).toFixed(1)}" text-anchor="middle">${q.v}</text>`;
         y = y0; });
       out += c.total ? `<text class="vl tot" x="${(x + bw / 2).toFixed(1)}" y="${(Y(c.total) - 5).toFixed(1)}" text-anchor="middle">${c.total}</text>` : '';
       return `<rect class="selbg" data-s="${i}" x="${(L + i * gw + 2).toFixed(1)}" y="${T - 14}" width="${(gw - 4).toFixed(1)}" height="${H - B - T + 14}" rx="6" fill="transparent"/>${out}<rect data-i="${i}" x="${(L + i * gw).toFixed(1)}" y="0" width="${gw.toFixed(1)}" height="${H}" fill="transparent"/>`; }).join('');
@@ -464,7 +464,7 @@
       catch (err) { alert(err.message); b.disabled = false; } };
     // ---- Training / Nutrition / Recovery charts ----
     // The four weekly charts share one x-axis: the same weeks, in the same positions, with the same labels.
-    const C = { weight: '#2b59c3', sleep: '#6b4fc8', kcal: '#d9731a', run: '#ea5270' };
+    const C = { weight: '#2b59c3', sleep: '#6b4fc8', kcal: '#d9731a', run: '#4487eb' };
     const firstDay = daily.length ? daily[0].date : TODAY; const firstMon = monday(parse(firstDay));
     const allWeeks = Math.round((mon - firstMon) / (7 * 864e5)) + 1;
     const draw = (nw) => {
