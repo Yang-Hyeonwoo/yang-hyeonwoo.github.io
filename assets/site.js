@@ -145,7 +145,7 @@
     try {
       const r = await fetch(`${base}/dispatches`, { method: 'POST', headers: h, body: JSON.stringify({ ref: CFG.branch }) });
       if (r.status === 401) return done('토큰이 만료됐어요. 오른쪽 위 열쇠 버튼에서 새 토큰을 넣어주세요.');
-      if (r.status === 403 || r.status === 404) return done('이 토큰에는 동기화 권한이 없어요. GitHub → Settings → Developer settings → Fine-grained tokens에서 이 토큰을 열고 Permissions에 <b>Actions: Read and write</b>를 추가해 주세요. 토큰 값은 바뀌지 않아서 다시 넣을 필요 없어요.');
+      if (r.status === 403 || r.status === 404) return done('이 토큰에는 동기화 권한이 없어요. GitHub → Settings → Developer settings → Fine-grained tokens에서 사이트에 넣은 토큰(Contents: Read and write가 있는 것)을 열고 Permissions에 <b>Actions: Read and write</b>를 추가해 주세요. 토큰 값은 바뀌지 않아서 다시 넣을 필요 없어요.');
       if (!r.ok) return done(`동기화를 시작하지 못했어요 (GitHub ${r.status}). 잠시 뒤 다시 눌러주세요.`);
       for (let i = 0; i < 60; i++) {           // up to about 5 minutes: a scheduled run already going makes this one wait its turn
         await new Promise((res) => setTimeout(res, 5000));
