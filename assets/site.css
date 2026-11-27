@@ -821,3 +821,35 @@ tr.more-row td.wrap > div { justify-content: flex-start; text-align: left; } tr.
   .cs-g { gap: 4px 12px; } .cs { font-size: 0.72rem; padding: 0; border: 0; } .cs-g.sub .cs { font-size: 0.68rem; }
   .cal-d.today .dn { min-width: 20px; padding: 0 4px; }
 }
+
+/* ---- records: view tabs under the title, the record counts as one quiet line ---- */
+.chips.views { margin: 0 0 4px; }
+.chips.views button { font-weight: 600; padding: 0.4rem 1.1rem; }
+body[data-page="records"] #daily { padding-top: 20px; border-top: 0; }
+.care-line { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: -4px 2px 14px; font-size: 0.78rem; color: var(--muted); }
+.care-line .cs b { font-weight: 700; color: var(--ink); } .care-line .sub { font-size: 0.74rem; }
+
+/* ---- plan: jump links under the title; a section lands below the fixed header ---- */
+.jump { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 8px; }
+.jump a { padding: 0.32rem 0.85rem; border: 1px solid var(--line); border-radius: var(--r-full); font-size: 0.82rem; font-weight: 500; color: var(--muted); background: #fff; white-space: nowrap;
+  transition: color 150ms var(--ease), border-color 150ms var(--ease); }
+.jump a:hover { color: var(--ink); border-color: rgba(0, 0, 0, 0.18); }
+.jump a.now { background: var(--ink); border-color: var(--ink); color: #fff; }
+body[data-page="plan"] section[id^="p-"], .plan-week { scroll-margin-top: 72px; }
+
+@media (max-width: 640px) {
+  /* Home: the countdown as one compact row, so today's session and the write buttons fit the first screen */
+  .dday { gap: 8px; }
+  .dday .count { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; column-gap: 16px; row-gap: 2px; padding: 14px 18px; min-height: 0; }
+  .dday .count .n { grid-row: 1 / span 2; font-size: 2.7rem; line-height: 1; }
+  .dday .count .t { align-self: end; font-size: 0.66rem; }
+  .dday .count .r { align-self: start; font-size: 0.82rem; line-height: 1.35; } .dday .count .r .lbl { display: none; } .dday .count .r span { font-size: 0.7rem; }
+  .dday .goal { padding: 9px 10px; } .dday .goal .v { font-size: 1.05rem; } .dday .goal .g { margin-bottom: 1px; font-size: 0.58rem; }
+  .home-top + .sec { padding-top: 20px; }
+  /* Log: the four kinds on one row */
+  #logFilter { flex-wrap: nowrap; gap: 5px; width: 100%; }
+  #logFilter button { flex: 1 1 auto; padding: 0 0.5rem; font-size: 0.76rem; white-space: nowrap; }
+  .jump { flex-wrap: nowrap; overflow-x: auto; margin: 4px -16px 8px; padding: 0 16px 4px; scrollbar-width: none; } .jump::-webkit-scrollbar { display: none; }
+  .jump a { min-height: 36px; display: inline-flex; align-items: center; }
+  .care-line { gap: 3px 12px; font-size: 0.72rem; }
+}

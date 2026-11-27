@@ -19,47 +19,24 @@
 <body data-root="../" data-page="records">
 <main>
   <div class="wrap">
-    <section class="hero" style="padding-bottom:8px">
+    <section class="hero" style="padding-bottom:16px">
       <p class="eyebrow">Daily Records</p>
       <h1>전체 <em>기록</em></h1>
       <p class="lead">수면, 운동, 체중, 식단을 하루 한 줄로 모았습니다. 첫 기록부터 오늘까지 전부 보여줍니다.</p>
     </section>
 
-    <section class="sec">
-      <div class="sec-head"><span class="sec-no">01</span><h2>Discipline</h2><span class="ko">기록 현황</span></div>
-      <div class="soft"><div class="kv" id="careKv"></div></div>
-    </section>
+    <div class="chips views" id="recView" role="tablist" aria-label="보기">
+      <button type="button" role="tab" data-v="daily" class="on" aria-selected="true">일별 기록</button>
+      <button type="button" role="tab" data-v="body" aria-selected="false">인바디</button>
+    </div>
 
-    <section class="sec">
-      <div class="sec-head"><span class="sec-no">02</span><h2>Body</h2><span class="ko">인바디</span><span class="side num" id="bodyNote"></span></div>
-      <div class="plate"><div id="bodyTable"></div>
-        <div class="form-foot" style="margin-top:14px"><button class="btn line sm" id="bodyNew" type="button">InBody 970 결과지 추가</button></div>
-        <form id="bodyForm" hidden autocomplete="off" style="margin-top:14px">
-          <div class="form">
-            <div class="c2"><label for="bd-date">측정일</label><input class="in" id="bd-date" name="date" type="date" required></div>
-            <div class="c1"><label for="bd-w">체중 kg</label><input class="in" id="bd-w" name="weight" type="number" inputmode="decimal" step="0.1" min="0"></div>
-            <div class="c1"><label for="bd-m">골격근량 kg</label><input class="in" id="bd-m" name="muscle" type="number" inputmode="decimal" step="0.1" min="0"></div>
-            <div class="c1"><label for="bd-f">체지방량 kg</label><input class="in" id="bd-f" name="fat" type="number" inputmode="decimal" step="0.1" min="0"></div>
-            <div class="c1"><label for="bd-p">체지방률 %</label><input class="in" id="bd-p" name="fat_pct" type="number" inputmode="decimal" step="0.1" min="0" max="100"></div>
-          </div>
-          <details class="more" style="margin-top:10px"><summary>결과지 나머지 칸 <span class="muted">· 있으면</span></summary>
-          <div class="form" style="margin-top:10px">
-            <div class="c1"><label for="bd-sc">인바디 점수</label><input class="in" id="bd-sc" name="score" type="number" inputmode="numeric" step="1" min="0"></div>
-            <div class="c1"><label for="bd-vf">내장지방 cm²</label><input class="in" id="bd-vf" name="vfa" type="number" inputmode="decimal" step="0.1" min="0"></div>
-            <div class="c1"><label for="bd-bi">BMI</label><input class="in" id="bd-bi" name="bmi" type="number" inputmode="decimal" step="0.1" min="0"></div>
-            <div class="c1"><label for="bd-bm">기초대사량 kcal</label><input class="in" id="bd-bm" name="bmr" type="number" inputmode="numeric" step="1" min="0"></div>
-          </div></details>
-          <div class="form-foot"><button class="btn" type="submit">저장</button><button class="btn line" id="bodyCancel" type="button">닫기</button><span class="note" id="bodyMsg" role="status"></span></div>
-        </form></div>
-    </section>
-
-    <section class="sec" id="daily">
-      <div class="sec-head"><span class="sec-no">03</span><h2>Daily Records</h2><span class="ko">일별 기록</span></div>
+    <section class="sec" id="daily" data-view="daily">
       <div class="form-foot" style="margin:0 0 16px">
         <span class="note num" id="dayCount"></span>
         <button class="btn" id="dayNew" type="button" style="margin-left:auto">식단 · 체중 기록</button>
         <span class="note" id="dayHint" hidden style="margin-left:auto">기록을 쓰려면 오른쪽 위 열쇠 버튼에서 입력 설정을 해주세요.</span>
       </div>
+      <div class="care-line num" id="careKv"></div>
       <div class="banner" id="dayPreview" hidden>미리보기 중이에요. 여기서 저장한 내용은 이 기기에만 남아요.</div>
       <div class="plate" id="dayFormWrap" hidden style="margin-bottom:24px">
         <form id="dayForm" autocomplete="off">
@@ -84,12 +61,36 @@
         </form>
       </div>
       <div class="plate" id="dayList"></div>
-      <p class="note" style="margin-top:12px">하늘색 막대는 수면 목표 7시간 30분 대비, 회색 막대는 그날 목표 대비예요. 칼로리가 목표를 넘으면 <b class="over1">주황</b>, 200kcal 넘게 넘으면 <b class="over2">빨강</b>으로 보여요. 운동 칸은 Log의 운동 기록에서 가져와요. 줄을 누르면 그날 내용이 전부 펼쳐지고, 날짜를 누르면 고칠 수 있어요.</p>
+      <p class="note" style="margin-top:12px">하늘색 막대는 수면 목표 7시간 30분 대비, 회색 막대는 그날 목표 대비예요. 칼로리가 목표를 넘으면 <b class="over1">주황</b>, 200kcal 넘게 넘으면 <b class="over2">빨강</b>으로 보여요. 운동 칸은 Log의 운동 기록에서 가져와요. 날짜를 누르면 고칠 수 있어요.</p>
     </section>
 
-    <section class="sec" id="recapSec" style="padding-top:8px">
+    <section class="sec" id="recapSec" data-view="daily" style="padding-top:8px">
       <div id="recapBox"></div>
     </section>
+
+    <section class="sec" id="body" data-view="body" hidden>
+      <div class="sec-head"><h2>Body</h2><span class="ko">인바디</span><span class="side num" id="bodyNote"></span></div>
+      <div class="plate"><div id="bodyTable"></div>
+        <div class="form-foot" style="margin-top:14px"><button class="btn line sm" id="bodyNew" type="button">InBody 970 결과지 추가</button></div>
+        <form id="bodyForm" hidden autocomplete="off" style="margin-top:14px">
+          <div class="form">
+            <div class="c2"><label for="bd-date">측정일</label><input class="in" id="bd-date" name="date" type="date" required></div>
+            <div class="c1"><label for="bd-w">체중 kg</label><input class="in" id="bd-w" name="weight" type="number" inputmode="decimal" step="0.1" min="0"></div>
+            <div class="c1"><label for="bd-m">골격근량 kg</label><input class="in" id="bd-m" name="muscle" type="number" inputmode="decimal" step="0.1" min="0"></div>
+            <div class="c1"><label for="bd-f">체지방량 kg</label><input class="in" id="bd-f" name="fat" type="number" inputmode="decimal" step="0.1" min="0"></div>
+            <div class="c1"><label for="bd-p">체지방률 %</label><input class="in" id="bd-p" name="fat_pct" type="number" inputmode="decimal" step="0.1" min="0" max="100"></div>
+          </div>
+          <details class="more" style="margin-top:10px"><summary>결과지 나머지 칸 <span class="muted">· 있으면</span></summary>
+          <div class="form" style="margin-top:10px">
+            <div class="c1"><label for="bd-sc">인바디 점수</label><input class="in" id="bd-sc" name="score" type="number" inputmode="numeric" step="1" min="0"></div>
+            <div class="c1"><label for="bd-vf">내장지방 cm²</label><input class="in" id="bd-vf" name="vfa" type="number" inputmode="decimal" step="0.1" min="0"></div>
+            <div class="c1"><label for="bd-bi">BMI</label><input class="in" id="bd-bi" name="bmi" type="number" inputmode="decimal" step="0.1" min="0"></div>
+            <div class="c1"><label for="bd-bm">기초대사량 kcal</label><input class="in" id="bd-bm" name="bmr" type="number" inputmode="numeric" step="1" min="0"></div>
+          </div></details>
+          <div class="form-foot"><button class="btn" type="submit">저장</button><button class="btn line" id="bodyCancel" type="button">닫기</button><span class="note" id="bodyMsg" role="status"></span></div>
+        </form></div>
+    </section>
+
   </div>
 </main>
 <script src="../assets/site.js?v=1127r"></script>

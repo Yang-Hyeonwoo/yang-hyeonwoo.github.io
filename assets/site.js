@@ -399,7 +399,7 @@
     return `<div class="grid g2"><div class="plate today">
         <div class="chips">${day ? `<span class="chip a">${esc(day.week)}</span>` : ''}</div>
         <h3 class="date">${NOW.getMonth() + 1}월 ${NOW.getDate()}일 <em>${KO[NOW.getDay()]}요일</em></h3>${items}${past}
-        <div class="form-foot"><a class="btn" href="log.html#new">운동 기록</a><a class="btn line" href="records.html#new">식단 · 체중 기록</a></div></div>
+        <div class="form-foot"><a class="btn" href="log.html#new">${day && day.items.some((it) => doneEntry(it, TODAY, log)) ? '운동 추가 기록' : '운동 기록'}</a><a class="btn line" href="records.html#new">식단 · 체중 기록</a></div></div>
       <div class="soft"><h3 style="font-size:.95rem;color:var(--ink);margin-bottom:12px">Today's Targets <span class="muted" style="font-weight:500">· 오늘 목표</span></h3>${kv}
       <div class="kv" style="margin-top:8px;grid-template-columns:repeat(2,minmax(0,1fr))"><div><div class="l">Bedtime · 오늘 취침</div><div class="v num">${plan.targets.bed}</div><div class="s">기상 ${plan.targets.wake} · ${plan.targets.sleep} 수면</div></div>
       <div><div class="l">Last night · 어젯밤 수면</div><div class="v num">${slept == null ? '–' : hmHtml(slept)}</div><div class="s num">${rec.bed ? `${rec.bed} → ${rec.wake || ''}` : '기록 없음'}</div></div></div></div></div>`;
@@ -544,6 +544,7 @@
         ${w.concept ? `<p class="concept">${esc(w.concept)}</p>` : ''}
         <div class="scroll-x"><table class="t"><thead><tr><th class="dcol">Day</th><th>Training</th><th class="r d-only" style="width:9.5rem">Nutrition</th></tr></thead><tbody>${rows}</tbody></table></div></section>`; }).join('');
     const now = document.getElementById(`w-${thisMon}`); if (now && location.hash === '#now') now.scrollIntoView();
+    const jn = $('.jump a.now'); if (jn) { if (now) jn.href = `#w-${thisMon}`; else jn.hidden = true; }      // the jump link goes to this week's own plan
 
     // Paces: the newest row is "now"; older rows stay behind the fold so the change over time is visible.
     const P = plan.paces || []; const cur = P[P.length - 1]; if (!cur) return;
@@ -749,7 +750,7 @@
           : `<p class="note" style="margin-top:16px">${+curYM.slice(5)}월에는 적힌 운동 기록이 없어요.</p>`);
       }
       list.innerHTML = out;
-      $('#logCount').textContent = `${rows.length}건`;
+      $('#logCount').textContent = `${filter === 'all' && !ws.length ? '전체 ' : ''}${rows.length}건`;
       const gone = all.filter((e) => e.deleted).sort((a2, b2) => (a2.deleted < b2.deleted ? 1 : -1));
       $('#logTrash').innerHTML = canWrite() && gone.length ? `<details class="more"><summary>휴지통 · ${gone.length}건</summary><p class="note" style="margin:8px 0">지운 기록은 여기에 남아 있어요. 되살리면 원래 날짜 자리로 돌아가요.</p>${gone.map((e) =>
         `<div class="trash-row"><span class="num"><b>${md(parse(e.date))}</b></span><span>${esc(e.session)}${e.format ? ` · ${esc(e.format)}` : ''}</span><span class="muted small num">${md(parse(e.deleted))}에 지움</span><span class="tools"><button class="btn line sm" type="button" data-restore="${esc(e.id)}">되살리기</button><button class="ic" type="button" data-purge="${esc(e.id)}" title="완전히 지우기" aria-label="완전히 지우기">${ICON.del}</button></span></div>`).join('')}</details>` : '';
@@ -802,6 +803,7 @@
     const h = decodeURIComponent(location.hash);
     if (h.startsWith('#edit=') && canWrite()) { const e = log.find((x) => x.id === h.slice(6)); if (e) open(e); }
     if (h.startsWith('#new') && canWrite()) { const [s, fm] = h.slice(5).split('~'); open(null, s && SESSIONS.includes(s) ? { session: s, format: fm } : null); }
+    else if (h.startsWith('#new') && $('#keyBtn')) $('#keyBtn').click();
   }
 
 
@@ -830,7 +832,7 @@
         const w1 = hy ? x.hyroxL : x.weights, w2 = hy ? [x.runL, x.cycle, x.weights, x.etc].filter(Boolean).join(' · ') : [x.hyrox, x.runL, x.etc].filter(Boolean).join(' · ');
         const allT = [w1, w2].filter(Boolean).join(' · ');
         const part = (l, t) => (t ? `<div><b>${l}</b><span>${esc(t)}</span></div>` : '');
-        const detail = part('Hyrox', x.hyrox) + part('Running', x.runFull) + part('Weight', wt) + part('Sleep', r.bed ? `${r.sleep || ''} (${r.bed} → ${r.wake || ''})` : '')
+        const detail = part('Hyrox', hy ? x.hyroxL : x.hyrox) + part('Running', x.runFull) + part('Cycle', hy ? x.cycle : '') + part('Weight', wt) + part('Sleep', r.bed ? `${r.sleep || ''} (${r.bed} → ${r.wake || ''})` : '')
           + part('Nutrition', r.kcal != null ? `${n0(r.kcal)}kcal · 탄 ${r.carb ?? '–'}g · 단 ${r.prot ?? '–'}g · 지 ${r.fat ?? '–'}g` : '') + part('Note', noteT);
         out += `<tr><td class="num">${canWrite() ? `<button class="dbtn" type="button" data-edit="${ds}" title="이 날 기록 고치기" aria-label="${ds} 기록 고치기">${dayLabel}<span class="pen">${ICON_PEN}</span></button>` : dayLabel}</td>
           <td class="num gs sl">${sl == null ? '' : bar(esc(r.sleep), sl / sleepGoal * 100)}</td><td class="num muted d-only">${esc(r.bed || '')}</td><td class="num muted d-only">${esc(r.wake || '')}</td>
@@ -862,11 +864,10 @@
     // Discipline: how many days were actually written down, and what they average
     const care = () => { const span = daily.length ? Math.round((parse(TODAY) - parse(daily[0].date)) / 864e5) + 1 : 0;
       const sl = daily.map((r) => mins(r.sleep)).filter((v) => v != null), kc = daily.filter((r) => r.kcal != null), bw = daily.filter((r) => r.weight != null), pr = daily.filter((r) => r.prot != null);
-      const cell = (l, v, sub) => `<div><div class="l">${l}</div><div class="v num">${v}</div><div class="s num">${sub}</div></div>`;
-      $('#careKv').innerHTML = cell('수면을 기록한 날', `${sl.length}<small>일</small>`, `${span}일 중 · 평균 ${sl.length ? hm(avgOf(sl)) : '–'}`)
-        + cell('체중을 잰 날', `${bw.length}<small>일</small>`, `${span}일 중`)
-        + cell('식단을 기록한 날', `${kc.length}<small>일</small>`, kc.length ? `평균 ${Math.round(avgOf(kc.map((r) => r.kcal))).toLocaleString('en-US')}kcal` : '')
-        + cell('하루 평균 단백질', pr.length ? `${Math.round(avgOf(pr.map((r) => r.prot)))}<small>g</small>` : '–', pr.length && bw.length ? `체중 1kg당 ${(avgOf(pr.map((r) => r.prot)) / avgOf(bw.map((r) => r.weight))).toFixed(1)}g` : ''); };
+      const it = (l, v, sub) => `<span class="cs">${l} <b>${v}</b>${sub ? ` <span class="sub">${sub}</span>` : ''}</span>`;
+      $('#careKv').innerHTML = it('수면 기록', `${sl.length}일`, sl.length ? `평균 ${hm(avgOf(sl))}` : '') + it('체중 기록', `${bw.length}일`, '')
+        + it('식단 기록', `${kc.length}일`, kc.length ? `평균 ${Math.round(avgOf(kc.map((r) => r.kcal))).toLocaleString('en-US')}kcal` : '')
+        + it('평균 단백질', pr.length ? `${Math.round(avgOf(pr.map((r) => r.prot)))}g` : '–', pr.length && bw.length ? `체중 1kg당 ${(avgOf(pr.map((r) => r.prot)) / avgOf(bw.map((r) => r.weight))).toFixed(1)}g` : '') + `<span class="cs sub">${span}일 중</span>`; };
     // InBody: the latest measurement first, each number with its change since the one before; then every measurement as plain numbers
     // InBody (970 sheets only, the user's rule): the latest sheet first (the four main numbers, then the rest of the sheet,
     // each with its change since the last sheet that had it), then every sheet side by side.
@@ -948,7 +949,11 @@
         ix = dayIndex(daily, log); table(); care(); if (f.date.value === d) fill(d);      // the form now shows the day as it is stored, other devices' fields included
       } catch (err) { msg.textContent = err.message; } finally { btn.disabled = false; } };
 
-    if (location.hash === '#new' && canWrite()) open(TODAY);
+    if (location.hash === '#new' && canWrite()) open(TODAY); else if (location.hash === '#new' && $('#keyBtn')) $('#keyBtn').click();
+    const view = (v) => { document.querySelectorAll('[data-view]').forEach((n) => { n.hidden = n.dataset.view !== v; });
+      document.querySelectorAll('#recView button').forEach((b) => { const on = b.dataset.v === v; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); }); };
+    document.querySelectorAll('#recView button').forEach((b) => { b.onclick = () => { view(b.dataset.v); history.replaceState(null, '', b.dataset.v === 'body' ? '#body' : location.pathname + location.search); }; });
+    view(location.hash === '#body' ? 'body' : 'daily');
     const rc = weightRecap(log); const box = $('#recapBox');
     if (rc && box) { box.innerHTML = rc.html; rc.draw(); if (location.hash === '#wtRecap') $('#wtRecap').scrollIntoView(); }
   }

@@ -25,26 +25,30 @@
       <p class="lead">금요일 Hyrox Single 훈련과 수요일 러닝 포인트 훈련이 한 주의 핵심입니다.<br>조깅은 페이스에 신경 쓰기보다 심박 150 이하로 뛰고, 주말과 공휴일에는 휴식을 취하거나 LSD를 합니다.</p>
     </section>
 
-    <section class="sec">
+    <nav class="jump" aria-label="이 페이지 안에서 이동">
+      <a class="now" href="#now">이번 주</a><a href="#p-road">로드맵</a><a href="#p-weeks">주차별 계획</a><a href="#p-paces">페이스</a><a href="#p-pro">프로 무게</a><a href="#p-str">웨이트 · 복근</a><a href="#p-nut">영양</a><a href="#p-sleep">수면</a>
+    </nav>
+
+    <section class="sec" id="p-road">
       <div class="sec-head"><span class="sec-no">01</span><h2>Roadmap</h2><span class="ko">대회까지 여섯 달</span></div>
       <div id="road"></div>
       <h3 style="font-size:.95rem;color:var(--ink);margin:24px 0 10px">10 Weeks at a Glance <span class="muted" style="font-weight:500">· 막대는 그 주 기본 계획 대비 달린 거리 · 누르면 그 주 계획으로</span></h3>
       <div id="weekTable"></div>
     </section>
 
-    <section class="sec">
+    <section class="sec" id="p-weeks">
       <div class="sec-head"><span class="sec-no">02</span><h2>Week by Week</h2><span class="ko">주차별 계획</span><span class="side num" id="weekTotal"></span></div>
       <p class="note" style="margin:-4px 0 16px"><span class="chip a">핵심</span> 표시가 붙은 수요일 러닝과 금요일 Single은 꼭 지켜요. 체육관 왕복 러닝은 주 2회면 성공이고, 비 오는 날은 건너뛰고 보충하지 않아요.</p>
       <div id="weeks"></div>
     </section>
 
-    <section class="sec">
+    <section class="sec" id="p-paces">
       <div class="sec-head"><span class="sec-no">03</span><h2>Paces</h2><span class="ko">러닝 페이스</span>
         <span class="side num" id="paceSide"></span></div>
       <div class="plate" id="paces"></div>
     </section>
 
-    <section class="sec">
+    <section class="sec" id="p-pro">
       <div class="sec-head"><span class="sec-no">04</span><h2>Pro Weights</h2><span class="ko">프로 무게</span></div>
       <div class="plate"><div class="scroll-x"><table class="t">
         <thead><tr><th>종목</th><th>지금</th><th>프로 무게</th><th>진행</th></tr></thead>
@@ -58,7 +62,7 @@
         <p class="note" style="margin-top:12px">무게를 내리는 기준은 자세가 무너지거나 통증이 3/10을 넘을 때뿐.</p></div>
     </section>
 
-    <section class="sec">
+    <section class="sec" id="p-str">
       <div class="sec-head"><span class="sec-no">05</span><h2>Strength &amp; Core</h2><span class="ko">웨이트와 복근</span></div>
       <div class="grid g2">
         <div class="plate"><h3 style="font-size:1rem;color:var(--ink);margin-bottom:8px">상체 · 수요일 22:30 헬스장 45분</h3>
@@ -70,7 +74,7 @@
       </div>
     </section>
 
-    <section class="sec">
+    <section class="sec" id="p-nut">
       <div class="sec-head"><span class="sec-no">06</span><h2>Nutrition</h2><span class="ko">영양</span><span class="side">2월까지 완만한 감량 · 3월부터 퍼포먼스</span></div>
       <div class="grid g2">
         <div class="plate"><div class="scroll-x"><table class="t">
@@ -94,7 +98,7 @@
       </div>
     </section>
 
-    <section class="sec">
+    <section class="sec" id="p-sleep">
       <div class="sec-head"><span class="sec-no">07</span><h2>Sleep &amp; Conditioning</h2><span class="ko">수면과 컨디션 관리</span></div>
       <div class="plate rule-list">
         <div><b>취침 · 기상</b><span>01:30 취침, 09:00 기상 (7시간 30분). 00:45에 화면 끄기.</span></div>
