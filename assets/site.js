@@ -173,7 +173,7 @@
   const FORMATS = ['AMRAP', 'For Time', 'EMOM', 'Timed Sets', 'Interval', 'Chipper', 'Strength', 'Steady', 'Upper Body', 'Lower Body', 'Full Body'];
   const isRun = (e) => RUNS.includes(e.session);
   const kindOf = (e) => (HYROX.includes(e.session) ? 'hyrox' : isRun(e) ? 'run' : e.session === 'Weight Training' ? 'weights' : 'other');
-  const KINDS = [{ k: 'hyrox', name: 'Hyrox', color: '#d63c4a' }, { k: 'run', name: 'Running', color: '#2a9d8f' }, { k: 'weights', name: 'Weight', color: '#d9731a' }];   // checked for colour-blind separation
+  const KINDS = [{ k: 'hyrox', name: 'Hyrox', color: '#813f52' }, { k: 'run', name: 'Running', color: '#486d89' }, { k: 'weights', name: 'Weight', color: '#b9a790' }];   // checked for colour-blind separation
   // The log entry that makes a plan item count as done (none = not done yet).
   function doneEntry(item, date, log) {
     const next = item.wk ? iso(addDays(parse(date), 1)) : '';      // the weekend run may be done on Sunday instead
@@ -300,23 +300,28 @@
   function daysChart(box, cats, o) {
     const W = 520, H = o.h || 210, L = 26, R = 8, T = 22, B = 22; const top = 31;
     const gw = (W - L - R) / cats.length, bw = Math.min(40, gw * 0.56); const Y = (v) => T + (1 - v / top) * (H - T - B);
-    const grid = [0, 10, 20, 30].map((v) => `<line x1="${L}" x2="${W - R}" y1="${Y(v).toFixed(1)}" y2="${Y(v).toFixed(1)}" stroke="rgba(0,0,0,${v ? 0.06 : 0.14})"/><text class="ax" x="${L - 6}" y="${(Y(v) + 3.5).toFixed(1)}" text-anchor="end">${v}</text>`).join('');
+    // no number axis: the bar's height is the days trained, the numbers inside are each kind's days, which need not add up to it
+    const grid = `<line x1="${L}" x2="${W - R}" y1="${Y(0).toFixed(1)}" y2="${Y(0).toFixed(1)}" stroke="rgba(0,0,0,0.14)"/>`;
+    let pick = o.pick ?? cats.length - 1;
     const marks = cats.map((c, i) => { const x = L + i * gw + (gw - bw) / 2; const sum = c.v.reduce((a, b) => a + b, 0); let y = H - B; let out = '';
       const parts = c.v.map((v, k) => ({ v, k })).filter((q) => q.v);
       parts.forEach((q, j) => { const h = sum ? (q.v / sum) * (H - B - Y(c.total)) : 0; const y0 = y - h; const last = j === parts.length - 1; const r = last ? Math.min(4, h, bw / 2) : 0; const gap = j ? 1 : 0;
         out += `<path d="M${x.toFixed(1)} ${(y - gap).toFixed(1)}V${(y0 + r).toFixed(1)}${r ? `q0-${r} ${r}-${r}h${(bw - 2 * r).toFixed(1)}q${r} 0 ${r} ${r}` : `h${bw.toFixed(1)}`}V${(y - gap).toFixed(1)}z" fill="${KINDS[q.k].color}"/>`;
-        if (h >= 13) out += `<text class="vl in" x="${(x + bw / 2).toFixed(1)}" y="${(y0 + h / 2 + 3.5).toFixed(1)}" text-anchor="middle">${q.v}</text>`;
+        if (h >= 13) out += `<text class="vl in${q.k === 2 ? ' dk' : ''}" x="${(x + bw / 2).toFixed(1)}" y="${(y0 + h / 2 + 3.5).toFixed(1)}" text-anchor="middle">${q.v}</text>`;
         y = y0; });
       out += c.total ? `<text class="vl tot" x="${(x + bw / 2).toFixed(1)}" y="${(Y(c.total) - 5).toFixed(1)}" text-anchor="middle">${c.total}</text>` : '';
-      return `${out}<rect data-i="${i}" x="${(L + i * gw).toFixed(1)}" y="0" width="${gw.toFixed(1)}" height="${H - B}" fill="transparent"/>`; }).join('');
-    const xl = cats.map((c, i) => `<text class="ax" x="${(L + i * gw + gw / 2).toFixed(1)}" y="${H - 5}" text-anchor="middle">${c.label}</text>`).join('');
-    box.innerHTML = `<div class="legend">${KINDS.map((q) => `<span><i style="background:${q.color}"></i>${q.name}</span>`).join('')}</div>
+      return `<rect class="selbg" data-s="${i}" x="${(L + i * gw + 2).toFixed(1)}" y="${T - 14}" width="${(gw - 4).toFixed(1)}" height="${H - B - T + 14}" rx="6" fill="transparent"/>${out}<rect data-i="${i}" x="${(L + i * gw).toFixed(1)}" y="0" width="${gw.toFixed(1)}" height="${H}" fill="transparent"/>`; }).join('');
+    const xl = cats.map((c, i) => `<text class="ax" data-x="${i}" x="${(L + i * gw + gw / 2).toFixed(1)}" y="${H - 5}" text-anchor="middle">${c.label}</text>`).join('');
+    box.innerHTML = `<div class="legend">${KINDS.map((q) => `<span><i style="background:${q.color}"></i>${q.name}</span>`).join('')}<span class="muted">· 막대를 누르면 그 달 내역</span></div>
       <svg class="days-ch" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label)}">${grid}${marks}${xl}</svg><div class="tip"></div>`;
     const tip = $('.tip', box), svg = $('svg', box);
     box.querySelectorAll('rect[data-i]').forEach((r) => { const i = +r.dataset.i, c = cats[i];
       const show = () => { tip.innerHTML = `${c.tip || c.label} · <b>${c.total}</b>일 운동 · ${KINDS.map((q, k) => `${q.name} ${c.v[k]}`).join(' · ')}`; tip.style.left = `${Math.min(72, Math.max(28, (L + (i + 0.5) * gw) / W * 100))}%`;
         tip.style.top = `${svg.offsetTop + Y(c.total) / H * svg.getBoundingClientRect().height - 12}px`; tip.style.opacity = 1; };
-      r.addEventListener('mouseenter', show); r.addEventListener('touchstart', show, { passive: true }); r.addEventListener('mouseleave', () => { tip.style.opacity = 0; }); });
+      r.addEventListener('mouseenter', show); r.addEventListener('touchstart', show, { passive: true }); r.addEventListener('mouseleave', () => { tip.style.opacity = 0; });
+      r.addEventListener('click', () => { pick = i; mark(); if (o.onPick) o.onPick(c); }); });
+    const mark = () => { box.querySelectorAll('rect.selbg').forEach((n) => n.classList.toggle('sel', +n.dataset.s === pick)); box.querySelectorAll('text[data-x]').forEach((n) => n.classList.toggle('on', +n.dataset.x === pick)); };
+    mark(); if (o.onPick && cats[pick]) o.onPick(cats[pick]);
   }
   // One bar per kind (Hyrox, Running, Weight) in each group. cats: [{ label, tip, v: [hyrox, run, weights] }]
   function kindChart(box, cats, o) {
@@ -432,9 +437,11 @@
     $('#goals').innerHTML = `<div class="dday"><div class="count"><div class="t">${esc(plan.race.name)} · ${esc(plan.race.division)}</div><div class="n num">${ddayText(dday(plan)).replace('-', '<i class="dash"></i>')}</div>
       <div class="r"><span class="lbl">${wkNow ? '이번 주 목표' : '이번 달 테마'}</span>${esc(wkNow ? wkNow.concept : cur.theme)}<span>${esc(plan.race.date_note)}</span></div></div>
       <div class="grid g3">${plan.goals.map((g) => `<div class="goal"><div class="g">Goal · 목표</div><div class="l">${esc(g.label)}</div><div class="v num">${esc(g.value)}</div><div class="s">${esc(g.sub)}</div></div>`).join('')}</div></div>`;
+    if ($('#goalsM')) $('#goalsM').innerHTML = `<div class="dday">${$('#goals .g3').outerHTML}</div>`;
     const mon = monday(NOW), m0 = iso(mon), mo = NOW.getMonth() + 1;
     const paint = () => {
       $('#today').innerHTML = todayCard(plan, log, daily);
+      const tp = $('#today .plate.today'); if (tp && $('#goalsM')) tp.after($('#goalsM'));     // on a phone the season goals sit right under today's session
       const s = weekRun(mon, plan, log); const wkRows = daily.filter((r) => r.date >= m0 && r.date <= TODAY);
       const wk = wkRows.map((r) => mins(r.sleep)).filter((v) => v != null), kc = wkRows.map((r) => r.kcal).filter((v) => v != null);
       const runM = runSum(log, MONTH0, TODAY);
@@ -457,7 +464,7 @@
       catch (err) { alert(err.message); b.disabled = false; } };
     // ---- Training / Nutrition / Recovery charts ----
     // The four weekly charts share one x-axis: the same weeks, in the same positions, with the same labels.
-    const C = { weight: '#2b59c3', sleep: '#6b4fc8', kcal: '#d9731a', run: '#2a9d8f' };
+    const C = { weight: '#2b59c3', sleep: '#6b4fc8', kcal: '#d9731a', run: '#486d89' };
     const firstDay = daily.length ? daily[0].date : TODAY; const firstMon = monday(parse(firstDay));
     const allWeeks = Math.round((mon - firstMon) / (7 * 864e5)) + 1;
     const draw = (nw) => {
@@ -483,8 +490,10 @@
       Object.values(ix).forEach((x) => { const k = x.date.slice(0, 7); const a = (by[k] = by[k] || { ym: k, v: [0, 0, 0], any: 0, days: 0 }); KEYS.forEach((key, i) => { if (x[key]) a.v[i]++; }); if (x.any) a.any++; a.days++; });
       const thisYm = TODAY.slice(0, 7); const months = Object.values(by).filter((a) => a.days >= 7 || a.ym === thisYm).sort((a, b) => (a.ym < b.ym ? -1 : 1));
       const mNow = by[thisYm] || { any: 0, v: [0, 0, 0] };
-      $('#nowMD').innerHTML = `${mNow.any}<small>일 · ${NOW.getMonth() + 1}월 운동한 날</small><span class="chip num">${KINDS.map((q, k) => `${q.name} ${mNow.v[k]}`).join(' · ')}</span>`;
-      daysChart($('#chMD'), months.map((a) => ({ label: `${+a.ym.slice(5)}월`, tip: `${a.ym.slice(0, 4)}년 ${+a.ym.slice(5)}월`, v: a.v, total: a.any })), { label: '월별 운동한 날', h: 210 });
+      // the headline is the month picked on the chart (this month to start): days trained, then each kind's days in its colour
+      const showMonth = (c) => { $('#nowMD').innerHTML = `${c.total}<small>일 · ${c.label} 운동한 날</small><span class="mks">${KINDS.map((q, k) => `<span class="mk num"><i style="background:${q.color}"></i>${q.name} ${c.v[k]}일</span>`).join('')}</span>`; };
+      void mNow;
+      daysChart($('#chMD'), months.map((a) => ({ label: `${+a.ym.slice(5)}월`, tip: `${a.ym.slice(0, 4)}년 ${+a.ym.slice(5)}월`, v: a.v, total: a.any })), { label: '월별 운동한 날', h: 210, onPick: showMonth });
       // running distance per month, same months as the chart beside it
       const mk = months.map((a) => { const [y, m] = a.ym.split('-').map(Number); return { label: `${m}월`, tip: `${y}년 ${m}월`, y: runSum(log, `${a.ym}-01`, iso(new Date(y, m, 0))).km, cur: a.ym === thisYm }; });
       const mPrev = mk.length > 1 ? mk[mk.length - 2] : null;
@@ -545,7 +554,8 @@
         ${w.concept ? `<p class="concept">${esc(w.concept)}</p>` : ''}
         <div class="scroll-x"><table class="t"><thead><tr><th class="dcol">Day</th><th>Training</th><th class="r d-only" style="width:9.5rem">Nutrition</th></tr></thead><tbody>${rows}</tbody></table></div></section>`; }).join('');
     const now = document.getElementById(`w-${thisMon}`); if (now && location.hash === '#now') now.scrollIntoView();
-    const jn = $('.jump a.now'); if (jn) { if (now) jn.href = `#w-${thisMon}`; else jn.hidden = true; }      // the jump link goes to this week's own plan
+    const jn = $('.jump a.now'); if (jn) { if (now) { const m0 = parse(thisMon), m6 = addDays(m0, 6); jn.href = `#w-${thisMon}`;
+      jn.textContent = `이번 주 계획 · ${md(m0)}–${m0.getMonth() === m6.getMonth() ? m6.getDate() : md(m6)}`; } else jn.hidden = true; }      // the jump link goes to this week's own plan
 
     // Paces: the newest row is "now"; older rows stay behind the fold so the change over time is visible.
     const P = plan.paces || []; const cur = P[P.length - 1]; if (!cur) return;
@@ -837,8 +847,8 @@
       return { out, count }; }
     const tableOf = (body, hy) => `<div class="scroll-x"><table class="t days"><colgroup>${[11, 7, 5.5, 5.5, 7, 8.5, 7, 7, 7, 17, 17.5].map((w) => `<col style="width:${w}%">`).join('')}</colgroup>
       <thead><tr class="grp"><th></th><th colspan="3" class="gs g-sl">Sleep</th><th colspan="5" class="gs g-nu">Body · Nutrition</th><th colspan="2" class="gs g-wo">Workout</th></tr>
-      <tr><th>Date</th><th class="gs"><span class="dt">Total</span><span class="mt">수면</span></th><th class="d-only">Bed</th><th class="d-only">Wake</th>
-        <th class="gs">체중</th><th>kcal</th><th class="d-only">Carb</th><th class="d-only">Prot</th><th class="d-only">Fat</th>
+      <tr><th>날짜</th><th class="gs"><span class="dt">총수면</span><span class="mt">수면</span></th><th class="d-only">취침</th><th class="d-only">기상</th>
+        <th class="gs">체중<small>kg</small></th><th>섭취<small>kcal</small></th><th class="d-only">탄수<small>g</small></th><th class="d-only">단백질<small>g</small></th><th class="d-only">지방<small>g</small></th>
         <th class="d-only gs">${hy ? 'Hyrox' : 'Weight'}</th><th class="d-only">${hy ? 'Running &amp; Weight' : 'Cardio'}</th><th class="m-only tl">운동</th><th class="m-only"></th></tr></thead>
       <tbody>${body || '<tr><td colspan="14" class="muted">기록이 없어요.</td></tr>'}</tbody></table></div>`;
     function table() {
