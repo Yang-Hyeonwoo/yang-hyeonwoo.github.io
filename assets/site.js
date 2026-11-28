@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1129d';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1129e';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -468,8 +468,8 @@
     const wkNow = plan.weeks.find((w) => w.start === iso(monday(NOW)) && w.concept);
     $('#goals').innerHTML = `<div class="dday"><div class="count"><div class="t">${esc(plan.race.name)} · ${esc(plan.race.division)}</div><div class="n num">${ddayText(dday(plan)).replace('-', '<i class="dash"></i>')}</div>
       <div class="r"><span class="lbl">${wkNow ? '이번 주 목표' : '이번 달 테마'}</span><span class="th">${esc(wkNow ? wkNow.concept : cur.theme).split(' · ').map((x) => `<span class="nb">${x}</span>`).join('<span class="sep"> · </span>')}</span><span>${esc(plan.race.date_note)}</span></div></div>
-      <div class="grid g3">${plan.goals.map((g) => `<div class="goal"><div class="g">Goal</div><div class="l">${esc(g.label)}</div><div class="v num">${esc(g.value)}</div><div class="s">${esc(g.sub)}</div></div>`).join('')}</div></div>`;
-    if ($('#goalsM')) $('#goalsM').innerHTML = `<div class="dday">${$('#goals .g3').outerHTML}</div>`;
+      <div class="glist"><div class="gl-h">Season Goals</div><ul>${plan.goals.map((g) => `<li><div class="gl-t"><span>${esc(g.label)}</span><em>${esc(g.sub)}</em></div><b class="num">${esc(g.value)}</b></li>`).join('')}</ul></div></div>`;
+    if ($('#goalsM')) $('#goalsM').innerHTML = `<div class="dday">${$('#goals .glist').outerHTML}</div>`;
     const mon = monday(NOW), m0 = iso(mon), mo = NOW.getMonth() + 1;
     const paint = () => {
       $('#today').innerHTML = todayCard(plan, log, daily);
