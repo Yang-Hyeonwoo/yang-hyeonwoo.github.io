@@ -1398,3 +1398,11 @@ table.wt-str td.dlt.up { color: var(--accent-strong); font-weight: 600; }
   .week .day .it .dot { margin-top: 0.48em; }
   .week .day .sts { padding-top: 4px; }
 }
+
+/* ======== 1129i ======== */
+/* Today and This Week start where the cards' content starts */
+#today, #week, #week + p.note { padding-left: 24px; padding-right: 24px; }
+@media (max-width: 640px) { #today, #week, #week + p.note { padding-left: 18px; padding-right: 18px; } }
+/* Today's Targets centred */
+#today .soft.tgt, #today .soft.tgt h3 { text-align: center; }
+#today .soft.tgt .kv > div { text-align: center; }
