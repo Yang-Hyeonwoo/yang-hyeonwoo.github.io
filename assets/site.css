@@ -1406,3 +1406,11 @@ table.wt-str td.dlt.up { color: var(--accent-strong); font-weight: 600; }
 /* Today's Targets centred */
 #today .soft.tgt, #today .soft.tgt h3 { text-align: center; }
 #today .soft.tgt .kv > div { text-align: center; }
+
+/* ======== 1129k: the opened day's detail, a step smaller than the table ======== */
+@media (max-width: 640px) {
+  table.days tr.more-row td.wrap { font-size: 0.6rem; line-height: 1.55; padding: 9px 10px 10px; }
+  table.days tr.more-row td.wrap > div { gap: 8px; }
+  table.days tr.more-row td.wrap > div + div { margin-top: 2px; }
+  table.days tr.more-row td.wrap b { width: 4.2rem; font-size: 0.58rem; }
+}
