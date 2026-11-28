@@ -976,3 +976,74 @@ body[data-page="log"] .run-wk { margin-top: 28px; }
 .recov-box { display: flex; flex-direction: column; border: 1px solid transparent; }     /* same box as the chart card beside it */
 .recov-box .note.coach { margin-top: auto; background: #fff; }
 .recov-box .kv { margin-bottom: 12px; }
+
+/* ---- 1128f: calmer type on phones, English facts, centred calendar numbers ---- */
+/* D-day banner: room between lines; the theme wraps at its " · " joints, never inside a phrase */
+.dday .count .r span.th, .dday .count .r .th span { display: inline; font-size: inherit; font-weight: inherit; color: inherit; }
+.dday .count .r .th .nb { display: inline-block; max-width: 100%; }
+@media (max-width: 640px) {
+  .dday .count { row-gap: 6px; padding: 18px 20px; }
+  .dday .count .r { line-height: 1.5; }
+  .dday .count .r .th .sep { display: none; }
+  .dday .count .r .th .nb { display: block; }
+  .dday .count .r > span:last-child { margin-top: 4px; line-height: 1.4; }
+}
+/* the log: facts and results in regular weight */
+.entry .meta.fact { font-weight: 400; color: var(--text); }
+.entry .res .pre, .entry .wod .res .pre { font-weight: 400; color: var(--ink); }
+/* Daily Records: dates read left to right */
+table.days td:first-child b, table.days .dbtn b { text-align: left; }
+/* calendar numbers centred */
+.cal-stats { flex-direction: column; align-items: center; gap: 6px; }
+.cal-stats .cs-g { justify-content: center; }
+/* search box: the write hint goes under it instead of squeezing it */
+.log-top { flex-wrap: wrap; }
+.log-top .log-find { flex: 1 1 240px; min-width: 0; }
+.log-find .in { -webkit-appearance: none; appearance: none; }
+@media (max-width: 640px) {
+  /* Daily Records table */
+  table.days { font-size: 0.7rem; }
+  table.days thead tr:last-child th { font-size: 0.66rem; }
+  table.days thead th small { font-size: 0.56rem; }
+  table.days td:first-child b { font-weight: 600; }
+  table.days .wd { font-size: 0.64rem; }
+  table.days td.sl .cellbar, table.days td.kc .cellbar { font-size: 0.7rem; font-weight: 600; }
+  table.days td.bw { font-size: 0.72rem; font-weight: 600; }
+  table.days td.clip { font-size: 0.7rem; font-weight: 400; }
+  table.days tr.month-row td { font-size: 0.7rem; }
+  /* the log */
+  .entry { padding: 14px 0; }
+  .entry .when b { font-size: 0.92rem; } .entry .when { font-size: 0.74rem; }
+  .entry .top .ttl { font-size: 0.9rem; } .entry .fmt { font-size: 0.76rem; }
+  .entry .meta, .entry .meta.fact { font-size: 0.78rem; line-height: 1.55; }
+  .entry h4 { font-size: 0.62rem; }
+  .entry .pre, .entry .wod .pre, .entry .sum { font-size: 0.8rem; line-height: 1.6; }
+  .entry .res .pre, .entry .wod .res .pre { font-size: 0.82rem; }
+  .entry .items > .item + .item { margin-top: 12px; padding-top: 12px; }
+  .mo-log-h { font-size: 1.3rem; }
+  /* calendar: moon and fork beside each day's sleep and kcal */
+  .cal-m svg { display: inline-block; width: 8px; height: 8px; opacity: 0.9; }
+  .cal-m > span { gap: 2px; }
+  .cal-stats { gap: 5px; }
+  .cs-g { gap: 3px 12px; }
+  /* search: full width, the hint below in small type */
+  .log-top { row-gap: 6px; }
+  .log-top .log-find { flex: 1 1 0; }
+  .log-top #logHint { flex: 1 1 100%; order: 3; margin: 0 2px; font-size: 0.72rem; line-height: 1.5; }
+}
+
+/* ---- This Week on a phone: one list, a thin rule between days, no boxes or gradients ---- */
+@media (max-width: 860px) {
+  .week { gap: 0; border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; background: #fff; }
+  .week .day, .week .day.done, .week .day.off, .week .day.today { min-height: 0; padding: 11px 14px; border: 0; border-radius: 0; box-shadow: none; background: #fff;
+    grid-template-columns: 52px minmax(0, 1fr); align-items: start; gap: 6px; }
+  .week .day + .day { border-top: 1px solid var(--line-soft); }
+  .week .day.off .its { color: var(--muted); }
+  .week .day.today { background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+  .week .day .dn { font-size: 0.72rem; line-height: 20px; }
+  .week .day .dn b { font-size: 0.92rem; }
+  .week .day.done .dn b { color: var(--ink); } .week .day.today .dn b { color: var(--accent-strong); }
+  .week .day .it { font-size: 0.82rem; line-height: 20px; margin-bottom: 2px; }
+  .week .day .it.did { font-weight: 500; }
+  .week .day .tick { width: 14px; height: 14px; margin-top: 3px; }
+}

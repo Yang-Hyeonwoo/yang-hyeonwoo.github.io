@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1128e';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1128f';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -333,18 +333,17 @@
         if (h >= 13) out += `<text class="vl in${q.k === 2 ? ' dk' : ''}" x="${(x + bw / 2).toFixed(1)}" y="${(y0 + h / 2 + 3.5).toFixed(1)}" text-anchor="middle">${q.v}</text>`;
         y = y0; });
       out += c.total ? `<text class="vl tot" x="${(x + bw / 2).toFixed(1)}" y="${(Y(c.total) - 5).toFixed(1)}" text-anchor="middle">${c.total}</text>` : '';
-      return `<rect class="selbg" data-s="${i}" x="${(L + i * gw + 2).toFixed(1)}" y="${T - 14}" width="${(gw - 4).toFixed(1)}" height="${H - B - T + 14}" rx="6" fill="transparent"/>${out}<rect data-i="${i}" x="${(L + i * gw).toFixed(1)}" y="0" width="${gw.toFixed(1)}" height="${H}" fill="transparent"/>`; }).join('');
+      return `${out}<rect data-i="${i}" x="${(L + i * gw).toFixed(1)}" y="0" width="${gw.toFixed(1)}" height="${H}" fill="transparent"/>`; }).join('');
     const xl = cats.map((c, i) => `<text class="ax" data-x="${i}" x="${(L + i * gw + gw / 2).toFixed(1)}" y="${H - 5}" text-anchor="middle">${c.label}</text>`).join('');
-    box.innerHTML = `<div class="legend">${KINDS.map((q) => `<span><i style="background:${q.color}"></i>${q.name}</span>`).join('')}<span class="muted">· 막대를 누르면 그 달 내역</span></div>
+    box.innerHTML = `<div class="legend">${KINDS.map((q) => `<span><i style="background:${q.color}"></i>${q.name}</span>`).join('')}</div>
       <svg class="days-ch" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label)}">${grid}${marks}${xl}</svg><div class="tip"></div>`;
     const tip = $('.tip', box), svg = $('svg', box);
     box.querySelectorAll('rect[data-i]').forEach((r) => { const i = +r.dataset.i, c = cats[i];
       const show = () => { tip.innerHTML = `${c.tip || c.label} · <b>${c.total}</b>일 운동 · ${KINDS.map((q, k) => `${q.name} ${c.v[k]}`).join(' · ')}`; tip.style.left = `${Math.min(72, Math.max(28, (L + (i + 0.5) * gw) / W * 100))}%`;
         tip.style.top = `${svg.offsetTop + Y(c.total) / H * svg.getBoundingClientRect().height - 12}px`; tip.style.opacity = 1; };
       r.addEventListener('mouseenter', show); r.addEventListener('touchstart', show, { passive: true }); r.addEventListener('mouseleave', () => { tip.style.opacity = 0; });
-      r.addEventListener('click', () => { pick = i; mark(); if (o.onPick) o.onPick(c); }); });
-    const mark = () => { box.querySelectorAll('rect.selbg').forEach((n) => n.classList.toggle('sel', +n.dataset.s === pick)); box.querySelectorAll('text[data-x]').forEach((n) => n.classList.toggle('on', +n.dataset.x === pick)); };
-    mark(); if (o.onPick && cats[pick]) o.onPick(cats[pick]);
+    });
+    if (o.onPick && cats[pick]) o.onPick(cats[pick]);
   }
   // One bar per kind (Hyrox, Running, Weight) in each group. cats: [{ label, tip, v: [hyrox, run, weights] }]
   function kindChart(box, cats, o) {
@@ -389,7 +388,8 @@
 
   // durations: stored as minutes, typed as 37:54, shown as "37분 54초"; sleep shown as "6시간 47분"
   const hmHtml = (m) => { const t = Math.round(m); return `${Math.floor(t / 60)}<small>시간</small> ${t % 60}<small>분</small>`; };
-  const durText = (min) => { const s = Math.round(min * 60); return s % 60 ? `${Math.floor(s / 60)}분 ${s % 60}초` : `${s / 60}분`; };
+  const durText = (min) => { const s = Math.round(min * 60); if (!(s % 60)) return `${s / 60} min`; const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+    return h ? `${h}:${pad(m)}:${pad(s % 60)}` : `${m}:${pad(s % 60)}`; };
   const durClock = (min) => { const s = Math.round(min * 60); return `${Math.floor(s / 60)}:${pad(s % 60)}`; };
   const parseDur = (v) => { const t = String(v || '').trim(); if (!t) return null; if (!t.includes(':')) return numOrNull(t);
     const p = t.split(':').map(Number); if (p.length > 3 || p.some(Number.isNaN)) return null; return Math.round((p.length === 3 ? p[0] * 60 + p[1] + p[2] / 60 : p[0] + p[1] / 60) * 100) / 100; };
@@ -450,7 +450,7 @@
       const state = need.length ? (got === need.length ? 'done' : got ? 'part' : d < TODAY ? 'miss' : '') : did.length ? 'done' : 'off';
       const st = state === 'part' ? `<i class="st part num" role="img" aria-label="계획 ${need.length}개 중 ${got}개 기록">${got}/${need.length}</i>` : state === 'miss' ? '<i class="st">미기록</i>' : '';
       return `<div class="day${d === TODAY ? ' today' : ''}${state ? ` ${state}` : ''}"><div class="dn"><span>${KO[dt.getDay()]}</span>${st}<b class="num">${dt.getDate()}</b></div><div class="its">${its}</div></div>`; }).join('')}</div>
-      <p class="note wk-key">파란 칸은 계획한 운동을 모두 기록한 날이에요. <b class="num">1/2</b>는 일부만 기록, <b>미기록</b>은 지난 날인데 기록이 없다는 뜻이에요.</p>`;
+      <p class="note wk-key">체크 표시는 기록한 운동이에요. <b class="num">1/2</b>는 일부만 기록, <b>미기록</b>은 지난 날인데 기록이 없다는 뜻이에요.</p>`;
   }
 
   async function training() {
@@ -458,7 +458,7 @@
     const cur = [...plan.roadmap].reverse().find((r) => r.from <= TODAY) || plan.roadmap[0];
     const wkNow = plan.weeks.find((w) => w.start === iso(monday(NOW)) && w.concept);
     $('#goals').innerHTML = `<div class="dday"><div class="count"><div class="t">${esc(plan.race.name)} · ${esc(plan.race.division)}</div><div class="n num">${ddayText(dday(plan)).replace('-', '<i class="dash"></i>')}</div>
-      <div class="r"><span class="lbl">${wkNow ? '이번 주 목표' : '이번 달 테마'}</span>${esc(wkNow ? wkNow.concept : cur.theme)}<span>${esc(plan.race.date_note)}</span></div></div>
+      <div class="r"><span class="lbl">${wkNow ? '이번 주 목표' : '이번 달 테마'}</span><span class="th">${esc(wkNow ? wkNow.concept : cur.theme).split(' · ').map((x) => `<span class="nb">${x}</span>`).join('<span class="sep"> · </span>')}</span><span>${esc(plan.race.date_note)}</span></div></div>
       <div class="grid g3">${plan.goals.map((g) => `<div class="goal"><div class="g">Goal · 목표</div><div class="l">${esc(g.label)}</div><div class="v num">${esc(g.value)}</div><div class="s">${esc(g.sub)}</div></div>`).join('')}</div></div>`;
     if ($('#goalsM')) $('#goalsM').innerHTML = `<div class="dday">${$('#goals .g3').outerHTML}</div>`;
     const mon = monday(NOW), m0 = iso(mon), mo = NOW.getMonth() + 1;
@@ -682,7 +682,7 @@
     return { html, draw };
   }
 
-  const fmtDate = (d) => { const x = parse(d); return `<b class="num">${x.getMonth() + 1}/${x.getDate()}</b>${KO[x.getDay()]}요일`; };
+  const fmtDate = (d) => { const x = parse(d); return `<b class="num">${x.getMonth() + 1}/${x.getDate()}</b>${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][x.getDay()]}`; };
   async function logPage() {
     let all = await load('log'); let log = live(all); let filter = 'all'; let editing = null;
     const planP = load('plan').catch(() => null);
@@ -739,7 +739,7 @@
     const short = (t) => !!t && t.length <= 90 && t.split('\n').length <= 2;
     const block = (t, v) => `<div><h4>${t}</h4><div class="pre">${esc(v)}</div></div>`;
     const item = (e, ws) => { const k = kindOf(e); const vis = [md(parse(e.date)), e.date, e.session, e.format];
-      const meta = [e.km != null && `${e.km}km`, e.minutes != null && durText(e.minutes), e.pace && `${e.pace}/km`, e.rpe != null && `RPE ${e.rpe}`, e.avg_hr && `평균 심박 ${e.avg_hr}`, e.max_hr && `최대 ${e.max_hr}`].filter(Boolean).map(esc);
+      const meta = [e.km != null && `${e.km}km`, e.minutes != null && durText(e.minutes), e.pace && `${e.pace}/km`, e.rpe != null && `RPE ${e.rpe}`, e.avg_hr && `Avg HR ${e.avg_hr}`, e.max_hr && `Max HR ${e.max_hr}`].filter(Boolean).map(esc);
       if (e.approx) meta.push('<span title="엑셀에 실제 날짜가 없어서 순서와 부위로 맞춘 기록이에요">세트 기록 날짜 추정</span>');
       let shown = '', hidden = '', label = ''; const rows = k === 'weights' ? liftRows(e) : null;
       if (rows) { const sum = rows.map((m) => (m[2] && /\d/.test(m[2]) ? `${m[1]} ${m[2]}` : m[1])).join(' · '); vis.push(sum);
@@ -758,7 +758,7 @@
         ${meta.length ? `<p class="meta num${k === 'run' ? ' fact' : ''}">${meta.join(' · ')}</p>` : ''}${shown}${hidden ? `<details class="ed"${openIt ? ' open' : ''}><summary>${label}</summary>${hidden}</details>` : ''}</div>`; };
     // a day is one row: the date once on the left, each session of that day stacked on the right
     const days = (rows, ws) => { const out = []; rows.forEach((e) => { const d = out[out.length - 1]; if (d && d.date === e.date) d.rows.push(e); else out.push({ date: e.date, rows: [e] }); });
-      return out.map((d) => `<article class="entry${d.rows.length > 1 ? ' multi' : ''}" id="d-${d.date}"><div class="when">${fmtDate(d.date)}${d.rows.length > 1 ? `<span class="n num">${d.rows.length}개</span>` : ''}</div><div class="items">${d.rows.map((e) => item(e, ws)).join('')}</div></article>`).join(''); };
+      return out.map((d) => `<article class="entry${d.rows.length > 1 ? ' multi' : ''}" id="d-${d.date}"><div class="when">${fmtDate(d.date)}${d.rows.length > 1 ? `<span class="n num">${d.rows.length} sessions</span>` : ''}</div><div class="items">${d.rows.map((e) => item(e, ws)).join('')}</div></article>`).join(''); };
     const NAMES = { hyrox: 'Hyrox training', run: 'Running', weights: 'Weight training' };
     // Calendar names: "Hyrox Single", "Jogging 8.3km 5:45", the weight split; core work is not shown.
     const tagText = (e) => { const k = kindOf(e); return k === 'run' ? runLabel(e) : k === 'weights' ? (e.format || 'Weight') : k === 'hyrox' ? hyLabel(e) : e.workout || e.session; };
@@ -816,7 +816,7 @@
       } else {
         const inM = rows.filter((e) => e.date.slice(0, 7) === curYM);
         out = cal(curYM, rows) + `<div class="plate chart-card run-wk"><h3>Running Mileage · 주간 러닝 거리 <span class="muted" style="font-weight:500">· 최근 12주</span></h3><div class="now num" id="nowR"></div><div class="chart" id="chR"></div>
-          <p class="note coach" id="noteR"></p></div>` + (inM.length ? `<section class="mo-log" id="moLog"><h3 class="mo-log-h">${+curYM.slice(5)}월 훈련 기록 <span class="num">${inM.length}건</span></h3><div class="mo-b">${days(inM, ws)}</div></section>`
+          <p class="note coach" id="noteR"></p></div>` + (inM.length ? `<section class="mo-log" id="moLog"><h3 class="mo-log-h">${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][+curYM.slice(5) - 1]} Training Log <span class="num">${inM.length} entries</span></h3><div class="mo-b">${days(inM, ws)}</div></section>`
           : `<p class="note" style="margin-top:16px">${+curYM.slice(5)}월에는 적힌 운동 기록이 없어요.</p>`);
       }
       list.innerHTML = out;
