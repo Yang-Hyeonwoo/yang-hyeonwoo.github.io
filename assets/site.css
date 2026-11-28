@@ -1358,3 +1358,43 @@ table.wt-str td.dlt.up { color: var(--accent-strong); font-weight: 600; }
   .glist .gl-t em { font-size: 0.7rem; }
   .glist b { font-size: 1.25rem; }
 }
+
+/* ======== 1129f: fewer boxes ======== */
+/* figures: label, number, note, divided by hairlines instead of cards */
+.kv { gap: 0 24px; }
+.kv > div { background: none; border: 0; border-radius: 0; padding: 11px 0 10px; border-top: 1px solid var(--line-soft); }
+.kv .l { font-size: 0.72rem; }
+.kv .v { font-size: 1.15rem; line-height: 1.35; }
+.kv .s { font-size: 0.72rem; }
+.stats { gap: 0 28px; }
+.stat { background: none; border-radius: 0; padding: 12px 0 0; border-top: 1px solid var(--line); }
+.stat .l { font-size: 0.74rem; }
+.stat .v { font-size: 1.45rem; }
+.stat .s { font-size: 0.74rem; margin-top: 2px; }
+
+/* Today: no card around the session or the targets */
+#today .plate.today { border: 0; box-shadow: none; background: none; padding: 0; border-radius: 0; }
+#today .soft.tgt { background: none; border-radius: 0; padding: 0 0 0 32px; border-left: 1px solid var(--line); }
+#today .plate.today .chips { margin-top: 0; }
+#today .plate.today .date { margin-top: 8px; }
+@media (max-width: 860px) {
+  #today .soft.tgt { padding: 20px 0 0; border-left: 0; border-top: 1px solid var(--line); }
+}
+
+/* Daily Records: the tables sit on the page, the dates under their titles */
+#dayList.plate { border: 0; box-shadow: none; background: none; padding: 0; border-radius: 0; }
+.dl-h { flex-direction: column; align-items: flex-start; gap: 2px; }
+.dl-h span { font-size: 0.78rem; }
+
+/* This Week on a phone: one line per day where it can be */
+@media (max-width: 860px) {
+  .week .day, .week .day.done, .week .day.off, .week .day.today { grid-template-columns: 54px minmax(0, 1fr) auto; column-gap: 10px; padding: 8px 2px; }
+  .week .day + .day::before { left: 66px; }
+  .week .day .dn { flex-direction: row; align-items: center; justify-content: flex-start; gap: 5px; }
+  .week .day .dn b { order: -1; width: 24px; height: 24px; font-size: 0.88rem; }
+  .week .day .dn .w { font-size: 0.64rem; }
+  .week .day .its { padding-top: 2px; }
+  .week .day .it { font-size: 0.8rem; line-height: 1.4; margin-bottom: 2px; }
+  .week .day .it .dot { margin-top: 0.48em; }
+  .week .day .sts { padding-top: 4px; }
+}

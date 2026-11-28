@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1129e';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1129f';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -100,7 +100,7 @@
     const t = (p) => (PAGE === p ? ' class="on" aria-current="page"' : '');
     const sub = PAGE !== 'hub';
     document.body.prepend(el(sub ? `<header class="site-head sub"><div class="wrap">
-      <a class="brand" href="${ROOT}training/"><em>Training</em></a>
+      <a class="brand" href="${ROOT}training/"><em>Fitness</em></a>
       <nav class="nav" aria-label="Training 메뉴">
         <a href="${ROOT}training/"${t('training')}>Home</a><a href="${ROOT}training/plan.html"${t('plan')}>Hyrox Plan</a>
         <a href="${ROOT}training/log.html"${t('log')}>Training Log</a><a href="${ROOT}training/records.html"${t('records')}>Daily Records</a>
@@ -113,7 +113,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3m-3 3 3 3m-6 0 2 2"/></svg>
       </button></div></header>` : `<header class="site-head"><div class="wrap">
       <a class="brand" href="${ROOT}">Hyeonwoo <em>Yang</em></a>
-      <nav class="nav" aria-label="주 메뉴"><a href="${CFG.research}">Research</a><a href="${ROOT}training/">Training</a></nav></div></header>`));
+      <nav class="nav" aria-label="주 메뉴"><a href="${CFG.research}">Research</a><a href="${ROOT}training/">Fitness</a></nav></div></header>`));
     document.body.append(el(`<footer class="foot"><div class="wrap">© 2026 Hyeonwoo Yang. All rights reserved.</div></footer>`));
     // fetch the other tabs ahead of time, so the first visit to each is as quick as a return visit
     ['', 'plan.html', 'log.html', 'records.html'].forEach((f) => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = `${ROOT}training/${f}?v=${VERSION}`; document.head.append(l); });
@@ -439,7 +439,7 @@
         <div class="chips">${day ? `<span class="chip a">${esc(day.week)}</span>` : ''}</div>
         <h3 class="date">${NOW.getMonth() + 1}월 ${NOW.getDate()}일 <em>${KO[NOW.getDay()]}요일</em></h3>${items}${past}
         <div class="form-foot"><a class="pen-btn" href="log.html#new">${PEN_BTN}<span>${day && day.items.some((it) => doneEntry(it, TODAY, log)) ? '운동 추가 기록' : '운동 기록'}</span></a><a class="pen-btn" href="records.html#new">${PEN_BTN}<span>식단 · 체중 기록</span></a></div></div>
-      <div class="soft"><h3 style="font-size:.95rem;color:var(--ink);margin-bottom:12px">Today's Targets</h3>${kv}
+      <div class="soft tgt"><h3 style="font-size:.95rem;color:var(--ink);margin-bottom:12px">Today's Targets</h3>${kv}
       <div class="kv" style="margin-top:8px;grid-template-columns:repeat(2,minmax(0,1fr))"><div><div class="l">Bedtime</div><div class="v num">${plan.targets.bed}</div><div class="s">기상 ${plan.targets.wake} · ${plan.targets.sleep} 수면</div></div>
       <div><div class="l">Last night</div><div class="v num">${slept == null ? '–' : hmHtml(slept)}</div><div class="s num">${rec.bed ? `${rec.bed} → ${rec.wake || ''}` : '기록 없음'}</div></div></div></div></div>`;
   }
@@ -933,8 +933,8 @@
       const a = rowsFor(TODAY, HYROX_START, true), b = first <= end ? rowsFor(end, first, false) : { out: '', count: 0 };
       const dot = (d) => d.replace(/-/g, '.');
       $('#dayCount').textContent = `${a.count + b.count}일${canWrite() ? ' · 날짜를 누르면 그날 기록을 고쳐요' : ''}`;
-      $('#dayList').innerHTML = `<h3 class="dl-h">Hyrox Season <span class="num">${dot(HYROX_START)} 한강짐런부터</span></h3>${tableOf(a.out, true)}`
-        + (b.count ? `<h3 class="dl-h second">Weight Season <span class="num">${dot(first)} – ${dot(end)} · 웨이트 트레이닝에 집중한 시기</span></h3>${tableOf(b.out, false)}` : '');
+      $('#dayList').innerHTML = `<h3 class="dl-h">Hyrox Training <span class="num">${dot(HYROX_START)} –</span></h3>${tableOf(a.out, true)}`
+        + (b.count ? `<h3 class="dl-h second">Weight Training <span class="num">${dot(first)} – ${dot(end)}</span></h3>${tableOf(b.out, false)}` : '');
     }
     // The form remembers what it showed when it was filled. Saving writes only the fields changed since then, so a form left open
     // (or opened from an older copy) never blanks what another device saved in the meantime.
@@ -948,7 +948,7 @@
       const it = (l, v, sub) => `<span class="cs">${l} <b>${v}</b>${sub ? ` <span class="sub">${sub}</span>` : ''}</span>`;
       $('#careKv').innerHTML = it('수면 기록', `${sl.length}일`, sl.length ? `평균 ${hm(avgOf(sl))}` : '') + it('체중 기록', `${bw.length}일`, '')
         + it('식단 기록', `${kc.length}일`, kc.length ? `평균 ${Math.round(avgOf(kc.map((r) => r.kcal))).toLocaleString('en-US')}kcal` : '')
-        + it('평균 단백질', pr.length ? `${Math.round(avgOf(pr.map((r) => r.prot)))}g` : '–', pr.length && bw.length ? `체중 1kg당 ${(avgOf(pr.map((r) => r.prot)) / avgOf(bw.map((r) => r.weight))).toFixed(1)}g` : '') + `<span class="cs sub">${span}일 중</span>`; };
+        + it('평균 단백질', pr.length ? `${Math.round(avgOf(pr.map((r) => r.prot)))}g` : '–', pr.length && bw.length ? `체중 1kg당 ${(avgOf(pr.map((r) => r.prot)) / avgOf(bw.map((r) => r.weight))).toFixed(1)}g` : ''); };
     // InBody: the latest measurement first, each number with its change since the one before; then every measurement as plain numbers
     // InBody (970 sheets only, the user's rule): the latest sheet first (the four main numbers, then the rest of the sheet,
     // each with its change since the last sheet that had it), then every sheet side by side.
