@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&amp;family=Noto+Serif+KR:wght@600;700&amp;display=swap">
-<link rel="stylesheet" href="../assets/site.css?v=1129a">
+<link rel="stylesheet" href="../assets/site.css?v=1129b">
 </head>
 <body data-root="../" data-page="training">
 <main>
@@ -25,29 +25,29 @@
     </section>
 
     <section class="sec">
-      <div class="sec-head"><span class="sec-no">01</span><h2>Today</h2><span class="ko">오늘 할 것</span></div>
+      <div class="sec-head"><span class="sec-no">01</span><h2>Today</h2></div>
       <div id="today"></div>
       <div class="goals-m" id="goalsM"></div>
     </section>
 
     <section class="sec">
-      <div class="sec-head"><span class="sec-no">02</span><h2>This Week</h2><span class="ko">이번 주</span><span class="side num" id="weekSide"></span></div>
+      <div class="sec-head"><span class="sec-no">02</span><h2>This Week</h2><span class="side num" id="weekSide"></span></div>
       <div id="week"></div>
       <p class="note" style="margin-top:12px"><a href="plan.html#now">이번 주 계획 자세히 보기 →</a></p>
     </section>
 
     <section class="sec">
-      <div class="sec-head"><span class="sec-no">03</span><h2>Training</h2><span class="ko">운동</span></div>
+      <div class="sec-head"><span class="sec-no">03</span><h2>Training</h2></div>
       <div class="grid g2">
-        <div class="plate chart-card"><h3>Training Days · 월별 운동한 날</h3><div class="now num" id="nowMD"></div><div class="chart" id="chMD"></div>
+        <div class="plate chart-card"><h3>Monthly Training Days</h3><div class="now num" id="nowMD"></div><div class="chart" id="chMD"></div>
           <p class="note coach" id="noteMD"></p></div>
-        <div class="plate chart-card"><h3>Running · 월별 러닝 거리</h3><div class="now num" id="nowRM"></div><div class="chart" id="chRM"></div>
+        <div class="plate chart-card"><h3>Monthly Running</h3><div class="now num" id="nowRM"></div><div class="chart" id="chRM"></div>
           <p class="note coach" id="noteRM"></p></div>
       </div>
     </section>
 
     <section class="sec">
-      <div class="sec-head"><span class="sec-no">04</span><h2>Nutrition</h2><span class="ko">영양</span>
+      <div class="sec-head"><span class="sec-no">04</span><h2>Nutrition</h2>
         <span class="side"><span class="chips" id="range" role="group" aria-label="주간 그래프 기간">
           <button type="button" data-w="0" class="on" aria-pressed="true">전체</button>
           <button type="button" data-w="24" aria-pressed="false">24주</button>
@@ -60,20 +60,20 @@
     </section>
 
     <section class="sec">
-      <div class="sec-head"><span class="sec-no">05</span><h2>Recovery</h2><span class="ko">회복</span></div>
+      <div class="sec-head"><span class="sec-no">05</span><h2>Recovery</h2></div>
       <div class="grid g2">
         <div class="plate chart-card"><h3>Sleep · 주 평균 수면</h3><div class="now num" id="nowS"></div><div class="chart" id="chS"></div><p class="note coach" id="noteS"></p></div>
-        <div class="soft recov-box"><h3 style="font-size:.95rem;color:var(--ink);margin-bottom:12px">Last 4 Weeks <span class="muted" style="font-weight:500">· 최근 4주</span></h3>
+        <div class="soft recov-box"><h3 style="font-size:.95rem;color:var(--ink);margin-bottom:12px">Last 4 Weeks</h3>
           <div class="kv" id="recov" style="grid-template-columns:repeat(2,minmax(0,1fr))"></div><p class="note coach" id="noteL"></p></div>
       </div>
     </section>
 
     <section class="sec">
-      <div class="sec-head"><span class="sec-no">06</span><h2>Races</h2><span class="ko">대회 기록</span></div>
+      <div class="sec-head"><span class="sec-no">06</span><h2>Races</h2></div>
       <div class="plate" id="races"></div>
     </section>
   </div>
 </main>
-<script src="../assets/site.js?v=1129a"></script>
+<script src="../assets/site.js?v=1129b"></script>
 </body>
 </html>

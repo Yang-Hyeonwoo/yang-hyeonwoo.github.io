@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1129a';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1129b';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -19,6 +19,10 @@
   const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
   const monday = (d) => addDays(d, -((d.getDay() + 6) % 7));
   const KO = ['일', '월', '화', '수', '목', '금', '토'];
+  const WD = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const WDL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const nbs = (t, sep = ' · ') => String(t || '').split(sep).map((x) => `<span class="nb">${esc(x)}</span>`).join(sep);
   const md = (d) => `${d.getMonth() + 1}/${d.getDate()}`;
   const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], NTH = ['1st', '2nd', '3rd', '4th', '5th'];
   // "Nov 4th": the week (given its Monday) belongs to the month its Thursday falls in, same rule as the plan's "11월 넷째 주"
@@ -110,7 +114,7 @@
       </button></div></header>` : `<header class="site-head"><div class="wrap">
       <a class="brand" href="${ROOT}">Hyeonwoo <em>Yang</em></a>
       <nav class="nav" aria-label="주 메뉴"><a href="${CFG.research}">Research</a><a href="${ROOT}training/">Training</a></nav></div></header>`));
-    document.body.append(el(`<footer class="foot"><div class="wrap">© 2026 Hyeonwoo Yang · KAIST</div></footer>`));
+    document.body.append(el(`<footer class="foot"><div class="wrap">© 2026 Hyeonwoo Yang. All rights reserved.</div></footer>`));
     // fetch the other tabs ahead of time, so the first visit to each is as quick as a return visit
     ['', 'plan.html', 'log.html', 'records.html'].forEach((f) => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = `${ROOT}training/${f}?v=${VERSION}`; document.head.append(l); });
     const here = $('.nav a.on'); if (here && here.scrollIntoView) here.scrollIntoView({ block: 'nearest', inline: 'center' });   // on a phone the menu scrolls sideways
@@ -412,7 +416,7 @@
     const day = plan.days[TODAY]; const rec = daily.find((r) => r.date === TODAY) || {};
     // One tap marks a session done; distance, time and notes can be added later from "자세히".
     const row = (it, i, d = TODAY) => { const m = /^(\d{1,2}:\d{2})\s*·?\s*(.*)$/.exec(it.d || ''); const de = doneEntry(it, d, log); let act = ''; const key = `${d}|${i}`;
-      if (de) act = `${it.k === 'core' && de.result ? `<span class="small num muted">${esc(de.result)}</span>` : ''}<a class="small" href="log.html#edit=${encodeURIComponent(de.id)}">자세히</a>${ckOn}`;
+      if (de) act = `${it.k === 'core' && de.result ? `<span class="small num muted">${esc(de.result)}</span>` : ''}${ckOn}`;
       else if (canWrite() && it.k === 'core') act = `<input class="in sm" data-reps inputmode="text" placeholder="12, 10, 8" aria-label="세트별 개수">${ckBtn(key)}`;
       else if (canWrite() && sessionFor(it, d)) act = ckBtn(key);
       return `<div class="todo${it.key ? ' key' : ''}"><span class="kind">${m ? `<b class="num">${m[1]}</b>` : ''}${KIND[it.k] || ''}</span><div class="b"><div class="t">${esc(it.t)}</div><div class="d">${esc(m ? m[2] : it.d || '')}</div></div><div class="act">${act}</div></div>`; };
@@ -420,7 +424,7 @@
     const extra = log.filter((e) => e.date === TODAY && kindOf(e) !== 'other' && !used.has(e.id));
     const extraRow = (e) => { const run = kindOf(e) === 'run';
       const facts = [run ? '' : e.format, e.minutes ? durText(e.minutes) : '', e.pace && `${e.pace}/km`, e.avg_hr && `Avg HR ${e.avg_hr}`].filter(Boolean).map((x) => `<span class="nb">${esc(x)}</span>`).join(' · ');
-      return `<div class="todo"><span class="kind">${KIND[kindOf(e)] || ''}</span><div class="b"><div class="t">${esc(run && e.km ? `러닝 ${e.km}km` : e.session)}</div><div class="d num">${facts}</div></div><div class="act"><a class="small" href="log.html#edit=${encodeURIComponent(e.id)}">자세히</a>${ckOn}</div></div>`; };
+      return `<div class="todo"><span class="kind">${KIND[kindOf(e)] || ''}</span><div class="b"><div class="t">${esc(run && e.km ? `러닝 ${e.km}km` : e.session)}</div><div class="d num">${facts}</div></div><div class="act">${ckOn}</div></div>`; };
     const planRows = day ? day.items.map((it, i) => (extra.length && (it.k === 'free' || it.k === 'rest') ? '' : row(it, i))).join('') : '';
     const items = planRows + extra.map(extraRow).join('') || '<p class="note">오늘은 정해진 계획이 없어요.</p>';
     // The last three days' planned sessions not checked yet, so a session logged the next day is still one tap (owner only).
@@ -428,17 +432,17 @@
     const back = canWrite() ? [1, 2, 3].map((n) => iso(addDays(parse(TODAY), -n))).map((d) => ({ d, rows: ((plan.days[d] || {}).items || [])
       .map((it, i) => (it.opt || it.k === 'free' || it.k === 'rest' || isDone(it, d, log) || !(it.k === 'core' || sessionFor(it, d)) ? '' : row(it, i, d))).join('') })).filter((x) => x.rows) : [];
     const past = back.length ? `<div class="past"><div class="past-h">아직 체크 안 한 지난 운동</div>${back.map((x) => { const dt = parse(x.d);
-      return `<div class="past-d num">${md(dt)} <span class="muted">${KO[dt.getDay()]}요일</span></div>${x.rows}`; }).join('')}</div>` : '';
+      return `<div class="past-d num">${md(dt)} <span class="muted">${WD[dt.getDay()]}</span></div>${x.rows}`; }).join('')}</div>` : '';
     const cell = (l, got, goal, unit) => `<div><div class="l">${l}</div><div class="v num">${n0(goal)}<small>${unit}</small></div><div class="s num">${got == null ? '아직 기록 전' : `기록 ${n0(got)}${unit}`}</div></div>`;
     const kv = day ? `<div class="kv">${cell('Calories', rec.kcal, day.kcal, 'kcal')}${cell('Carbs', rec.carb, day.carb, 'g')}${cell('Protein', rec.prot, day.prot, 'g')}${cell('Fat', rec.fat, day.fat, 'g')}</div>` : '';
     const slept = mins(rec.sleep);
     return `<div class="grid g2"><div class="plate today">
         <div class="chips">${day ? `<span class="chip a">${esc(day.week)}</span>` : ''}</div>
-        <h3 class="date">${NOW.getMonth() + 1}월 ${NOW.getDate()}일 <em>${KO[NOW.getDay()]}요일</em></h3>${items}${past}
+        <h3 class="date">${MONTHS[NOW.getMonth()]} ${NOW.getDate()} <em>${WDL[NOW.getDay()]}</em></h3>${items}${past}
         <div class="form-foot"><a class="pen-btn" href="log.html#new">${PEN_BTN}<span>${day && day.items.some((it) => doneEntry(it, TODAY, log)) ? '운동 추가 기록' : '운동 기록'}</span></a><a class="pen-btn" href="records.html#new">${PEN_BTN}<span>식단 · 체중 기록</span></a></div></div>
-      <div class="soft"><h3 style="font-size:.95rem;color:var(--ink);margin-bottom:12px">Today's Targets <span class="muted" style="font-weight:500">· 오늘 목표</span></h3>${kv}
-      <div class="kv" style="margin-top:8px;grid-template-columns:repeat(2,minmax(0,1fr))"><div><div class="l">Bedtime · 오늘 취침</div><div class="v num">${plan.targets.bed}</div><div class="s">기상 ${plan.targets.wake} · ${plan.targets.sleep} 수면</div></div>
-      <div><div class="l">Last night · 어젯밤 수면</div><div class="v num">${slept == null ? '–' : hmHtml(slept)}</div><div class="s num">${rec.bed ? `${rec.bed} → ${rec.wake || ''}` : '기록 없음'}</div></div></div></div></div>`;
+      <div class="soft"><h3 style="font-size:.95rem;color:var(--ink);margin-bottom:12px">Today's Targets</h3>${kv}
+      <div class="kv" style="margin-top:8px;grid-template-columns:repeat(2,minmax(0,1fr))"><div><div class="l">Bedtime</div><div class="v num">${plan.targets.bed}</div><div class="s">기상 ${plan.targets.wake} · ${plan.targets.sleep} 수면</div></div>
+      <div><div class="l">Last night</div><div class="v num">${slept == null ? '–' : hmHtml(slept)}</div><div class="s num">${rec.bed ? `${rec.bed} → ${rec.wake || ''}` : '기록 없음'}</div></div></div></div></div>`;
   }
   // This week, one card per day, one check per session. A day is tinted only when every planned session is logged;
   // "1/2" marks a day half done and "미기록" a past day with nothing logged. Bonus items and core work don't count.
@@ -455,7 +459,7 @@
       const its = lines.map((l) => `<div class="it${l.quiet ? ' optional' : ''}${l.ok ? ' did' : !l.quiet && d < TODAY ? ' missed' : ''}"><i class="dot${l.k ? ` k-${l.k}` : ' none'}${l.ok ? ' on' : ''}" aria-hidden="true"></i><span>${l.t}</span></div>`).join('');
       const state = need.length ? (got === need.length ? 'done' : got ? 'part' : d < TODAY ? 'miss' : '') : did.length ? 'done' : 'off';
       const st = state === 'part' ? `<i class="st part num" role="img" aria-label="계획 ${need.length}개 중 ${got}개 기록">${got}/${need.length}</i>` : state === 'miss' ? '<i class="st">미기록</i>' : '';
-      return `<div class="day${d === TODAY ? ' today' : ''}${d < TODAY ? ' past' : ''}${state ? ` ${state}` : ''}"><div class="dn"><span class="w">${KO[dt.getDay()]}</span><b class="num">${dt.getDate()}</b></div><div class="its">${its}</div>${st ? `<div class="sts">${st}</div>` : ''}</div>`; }).join('')}</div>
+      return `<div class="day${d === TODAY ? ' today' : ''}${d < TODAY ? ' past' : ''}${state ? ` ${state}` : ''}"><div class="dn"><span class="w">${WD[dt.getDay()]}</span><b class="num">${dt.getDate()}</b></div><div class="its">${its}</div>${st ? `<div class="sts">${st}</div>` : ''}</div>`; }).join('')}</div>
       <p class="note wk-key"><span><i class="dot k-run on"></i>기록한 운동</span><span><i class="dot k-run"></i>남은 운동</span><span><b class="num">1/2</b> 일부만 기록</span><span><b>미기록</b> 지난 날 기록 없음</span></p>`;
   }
 
@@ -465,7 +469,7 @@
     const wkNow = plan.weeks.find((w) => w.start === iso(monday(NOW)) && w.concept);
     $('#goals').innerHTML = `<div class="dday"><div class="count"><div class="t">${esc(plan.race.name)} · ${esc(plan.race.division)}</div><div class="n num">${ddayText(dday(plan)).replace('-', '<i class="dash"></i>')}</div>
       <div class="r"><span class="lbl">${wkNow ? '이번 주 목표' : '이번 달 테마'}</span><span class="th">${esc(wkNow ? wkNow.concept : cur.theme).split(' · ').map((x) => `<span class="nb">${x}</span>`).join('<span class="sep"> · </span>')}</span><span>${esc(plan.race.date_note)}</span></div></div>
-      <div class="grid g3">${plan.goals.map((g) => `<div class="goal"><div class="g">Goal · 목표</div><div class="l">${esc(g.label)}</div><div class="v num">${esc(g.value)}</div><div class="s">${esc(g.sub)}</div></div>`).join('')}</div></div>`;
+      <div class="grid g3">${plan.goals.map((g) => `<div class="goal"><div class="g">Goal</div><div class="l">${esc(g.label)}</div><div class="v num">${esc(g.value)}</div><div class="s">${esc(g.sub)}</div></div>`).join('')}</div></div>`;
     if ($('#goalsM')) $('#goalsM').innerHTML = `<div class="dday">${$('#goals .g3').outerHTML}</div>`;
     const mon = monday(NOW), m0 = iso(mon), mo = NOW.getMonth() + 1;
     const paint = () => {
@@ -599,7 +603,7 @@
           <div class="rm-m"><b>${esc(r.m)}</b><span class="num">${md(a)} – ${md(addDays(b, -1))}</span>${st === 'now' ? '<em>지금</em>' : ''}</div>
           <div class="rm-th">${esc(r.theme)}</div>${goalList(r.focus, 'rm-f')}</li>`; }).join('');
       const dd = dday(plan);
-      $('#road').innerHTML = `<ol class="rm">${ph}<li class="rm-race"><div class="rm-bar"><i></i></div><div class="rm-m"><b>Race</b><span class="num">${md(race)}(${KO[race.getDay()]})</span></div><div class="rm-th">${esc(plan.race.name)}</div><div class="rm-sub">${esc(plan.race.division)}${dd > 0 ? ` · <span class="num">D-${dd}</span>` : ''}</div></li></ol>`; }
+      $('#road').innerHTML = `<ol class="rm">${ph}<li class="rm-race"><div class="rm-bar"><i></i></div><div class="rm-m"><b>Race</b><span class="num">${md(race)} ${WD[race.getDay()]}</span></div><div class="rm-th">${esc(plan.race.name)}</div><div class="rm-sub">${esc(plan.race.division)}${dd > 0 ? ` · <span class="num">D-${dd}</span>` : ''}</div></li></ol>`; }
     // the weeks at a glance, under the roadmap: one small card per week (what it is for and its base running distance, with a bar
     // to compare weeks). The Wednesday session and the day-by-day detail are in the week's own plan below; a card opens it.
     $('#weekTable').innerHTML = `<div class="wk-grid">${plan.weeks.map((w, i) => { const mon = parse(w.start); const now = w.start === thisMon;
@@ -609,18 +613,17 @@
         ${w.start <= thisMon ? (() => { const got = runSum(log, w.start, iso(addDays(mon, 6))).km;
           return `<div class="km run"><span class="num"><b>${got.toFixed(1)}</b> / ${w.run_km}km${now ? '<small> · 진행 중</small>' : ''}</span><i title="계획의 ${Math.round(got / w.run_km * 100)}%"><s style="width:${Math.min(100, got / w.run_km * 100).toFixed(1)}%"></s></i></div>`; })()
           : `<div class="km"><span class="num"><b>${w.run_km}</b>km${w.bonus_km ? `<small> · 보너스 +${w.bonus_km}</small>` : ''}</span><i></i></div>`}</a>`; }).join('')}</div>`;
-    const raceMon = monday(parse(plan.race.date)); const totalWeeks = Math.round((raceMon - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
-    const nowNo = Math.round((monday(NOW) - parse(plan.weeks[0].start)) / (7 * 864e5)) + 1;
-    $('#weekTotal').textContent = `대회 주까지 총 ${totalWeeks}주${nowNo >= 1 && nowNo <= totalWeeks ? ` · 지금 ${nowNo}주차` : ''}`;
     $('#weeks').innerHTML = plan.weeks.map((w, wi) => { const mon = parse(w.start);
       const tone = (it) => (it.k === 'commute' ? 'run' : it.k);     // bullet colour: the same three kinds as the charts
-      const li = (it, d) => `<li class="${it.k === 'free' || it.k === 'rest' ? 'quiet' : `k-${tone(it)}`}"><b>${esc(it.t)}</b>${it.d ? ` <span class="why">(${esc(it.d)})</span>` : ''}${it.first ? ' <span class="chip w">첫 Hyrox Training</span>' : ''}${it.key ? ' <span class="chip a">핵심</span>' : ''}${isDone(it, d, log) ? ` ${doneChip}` : ''}</li>`;
+      const li = (it, d) => { const quiet = it.k === 'free' || it.k === 'rest'; const ok = !quiet && isDone(it, d, log);
+        const tags = [it.key && '<span class="tag a">핵심</span>', it.first && '<span class="tag w">첫 Hyrox Training</span>', ok && '<span class="tag g">완료</span>'].filter(Boolean).join('');
+        return `<li class="${quiet ? 'quiet' : `k-${tone(it)}`}${ok ? ' done' : ''}"><i class="dot${quiet ? ' none' : ` k-${tone(it)}`}${ok ? ' on' : ''}" aria-hidden="true"></i><div class="pb"><div class="pt"><b>${nbs(it.t)}</b>${tags}</div>${it.d ? `<div class="pd">${nbs(it.d)}</div>` : ''}</div></li>`; };
       const rows = [0, 1, 2, 3, 4, 5, 6].map((i) => { const dt = addDays(mon, i), d = iso(dt), day = plan.days[d];
-        return `<tr><td class="num dcol"><b>${KO[dt.getDay()]}</b> <span class="muted">${md(dt)}</span></td><td><ul class="plan-items">${day.items.map((it) => li(it, d)).join('')}</ul><div class="m-nut num">${n0(day.kcal)}kcal · 탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}</div></td><td class="r num d-only" style="white-space:nowrap">${n0(day.kcal)}kcal<br><span class="small muted">탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}</span></td></tr>`; }).join('');
-      return `<section class="plate plan-week${w.start === thisMon ? ' now' : ''}" id="w-${w.start}"><div class="hd"><h3>${esc(w.label)}</h3><span class="chip dark num">${wi + 1}주차</span><span class="muted small num">${md(mon)}–${md(addDays(mon, 6))}</span>${w.recovery ? '<span class="chip w">회복 주</span>' : ''}${w.start === thisMon ? '<span class="chip a">이번 주</span>' : ''}
-        <span class="small muted" style="margin-left:auto">러닝 기본 <b class="num" style="color:var(--ink)">${w.run_km}km</b> (${esc(w.run_note)})${w.bonus_km ? ` · 보너스 +${w.bonus_km}km` : ''}</span></div>
+        return `<tr><td class="dcol"><span class="dw">${WD[dt.getDay()]}</span><span class="dd num">${md(dt)}</span></td><td class="tr"><ul class="plan-items pi2">${day.items.map((it) => li(it, d)).join('')}</ul><div class="m-nut num">${nbs(`${n0(day.kcal)}kcal · 탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}`)}</div></td><td class="num d-only nut"><b>${n0(day.kcal)}</b>kcal<span>탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}</span></td></tr>`; }).join('');
+      return `<section class="plate plan-week${w.start === thisMon ? ' now' : ''}" id="w-${w.start}"><div class="hd"><div class="hd-t"><h3>${esc(w.label)}</h3><span class="wkno num">${wi + 1}주차</span><span class="num muted">${md(mon)}–${md(addDays(mon, 6))}</span>${w.recovery ? '<span class="tag w">회복 주</span>' : ''}${w.start === thisMon ? '<span class="tag a">이번 주</span>' : ''}</div>
+        <div class="hd-r">러닝 기본 <b class="num">${w.run_km}km</b><span class="sep"> · </span>${nbs(w.run_note, ' + ')}${w.bonus_km ? `<span class="sep"> · </span><span class="nb">보너스 +${w.bonus_km}km</span>` : ''}</div></div>
         ${w.concept ? goalList(w.concept, 'concept goals') : ''}
-        <div class="scroll-x"><table class="t"><thead><tr><th class="dcol">Day</th><th>Training</th><th class="r d-only" style="width:9.5rem">Nutrition</th></tr></thead><tbody>${rows}</tbody></table></div></section>`; }).join('');
+        <div class="scroll-x"><table class="t"><thead><tr><th class="dcol">Day</th><th>Training</th><th class="d-only nut">Nutrition</th></tr></thead><tbody>${rows}</tbody></table></div></section>`; }).join('');
     const now = document.getElementById(`w-${thisMon}`); if (now && location.hash === '#now') now.scrollIntoView();
     const jn = $('.jump a.now'); if (jn) { if (now) { const m0 = parse(thisMon), m6 = addDays(m0, 6); jn.href = `#w-${thisMon}`;
       jn.textContent = `이번 주 계획 · ${md(m0)}–${m0.getMonth() === m6.getMonth() ? m6.getDate() : md(m6)}`; } else jn.hidden = true; }      // the jump link goes to this week's own plan
@@ -631,14 +634,13 @@
     const clock = (v) => `${Math.floor(v / 60)}:${pad(Math.round(v) % 60)}`;
     const lap = (s) => s.split('–').map((x) => secs(x)).filter((v) => v != null).map((v) => clock(Math.round(v * 0.4))).join('–');
     const when = (d) => { const x = parse(d); return `${x.getFullYear()}.${x.getMonth() + 1}.${x.getDate()}`; };
-    const row = (name, v, lapv, how) => `<tr><td><b>${name}</b></td><td class="num">${esc(v)}${/초/.test(v) ? '' : ' /km'}</td><td class="num">${lapv || '–'}</td><td>${how}</td></tr>`;
-    $('#paceSide').textContent = `${when(cur.date)} 적용 · ${cur.basis}`;
-    $('#paces').innerHTML = `<div class="scroll-x"><table class="t"><thead><tr><th>구분</th><th>페이스</th><th>400m 한 바퀴</th><th>어떻게</th></tr></thead><tbody>
-      ${row('조깅 · 왕복 러닝', cur.easy, '', '심박 150 이하가 우선')}${row('템포 지속주', cur.tempo, lap(cur.tempo), '7km 안팎을 쉬지 않고, 끝까지 같은 페이스')}${row('역치 지속주', cur.threshold, lap(cur.threshold), '5–6km를 쉬지 않고 · 말이 한두 마디 나오는 강도')}
+    const row = (name, v, lapv, how) => `<tr><td><b>${name}</b></td><td class="num">${esc(v)}</td><td class="num">${lapv || '–'}</td><td>${nbs(how)}</td></tr>`;
+    $('#paces').innerHTML = `<div class="scroll-x"><table class="t"><thead><tr><th>구분</th><th>페이스 /km</th><th>400m</th><th>어떻게</th></tr></thead><tbody>
+      ${row('조깅', cur.easy, '', '심박 150 이하가 우선')}${row('템포 지속주', cur.tempo, lap(cur.tempo), '7km 안팎을 쉬지 않고, 끝까지 같은 페이스')}${row('역치 지속주', cur.threshold, lap(cur.threshold), '5–6km를 쉬지 않고 · 말이 한두 마디 나오는 강도')}
       ${row('1km 인터벌', cur.rep1k, lap(cur.rep1k), '세트 사이 400m 조깅')}${row('300m 인터벌', cur.rep300, '', '100m 조깅으로 이어가기')}${row('200m 빠르게', '44–46초', '', '전력 아님 · 사이는 걸어서 회복')}</tbody></table></div>
       <p class="note" style="margin-top:12px">끝까지 페이스를 지키고 여유가 있으면 다음 주에 km당 5초 빠르게, 못 지켰으면 5초 느리게. 쉬는 구간은 1km·300m 인터벌처럼 지속주로는 낼 수 없는 페이스에만 둬요.</p>
       <details class="more"><summary>이전 페이스와 변화 보기 <span class="muted num">· 기록 ${P.length}개</span></summary>
-        ${P.length > 1 ? '<h3 style="font-size:.95rem;color:var(--ink);margin-top:16px">Threshold · 역치 페이스 변화</h3><div class="chart" id="paceChart" style="max-width:560px"></div><p class="note">아래로 내려갈수록 빨라진 거예요.</p>' : '<p class="note" style="margin-top:12px">아직 첫 기록뿐이에요. 12월 첫째 주 5km 기록을 재고 나면 두 번째 줄이 생기고, 그때부터 변화 그래프가 보여요.</p>'}
+        ${P.length > 1 ? '<h3 style="font-size:.95rem;color:var(--ink);margin-top:16px">Threshold Pace</h3><div class="chart" id="paceChart" style="max-width:560px"></div><p class="note">아래로 내려갈수록 빨라진 거예요.</p>' : '<p class="note" style="margin-top:12px">아직 첫 기록뿐이에요. 12월 첫째 주 5km 기록을 재고 나면 두 번째 줄이 생기고, 그때부터 변화 그래프가 보여요.</p>'}
         <div class="scroll-x" style="margin-top:12px"><table class="t"><thead><tr><th>적용일</th><th>근거</th><th>조깅</th><th>템포</th><th>역치</th><th>1km</th><th>300m</th></tr></thead><tbody>
         ${[...P].reverse().map((p, i) => `<tr><td class="num" style="white-space:nowrap"><b>${when(p.date)}</b>${i === 0 ? ' <span class="chip a">지금</span>' : ''}</td><td>${esc(p.basis)}</td><td class="num">${esc(p.easy)}</td><td class="num">${esc(p.tempo)}</td><td class="num">${esc(p.threshold)}</td><td class="num">${esc(p.rep1k)}</td><td class="num">${esc(p.rep300)}</td></tr>`).join('')}</tbody></table></div></details>`;
     if (P.length > 1) lineChart($('#paceChart'), P.map((p) => ({ x: parse(p.date), y: secs(p.threshold) })).filter((p) => p.y != null), { label: '역치 페이스 변화', fmt: clock, unit: '/km' });
@@ -829,7 +831,7 @@
         out = out || `<p class="note" style="padding:24px 0">‘${esc(query)}’에 맞는 기록이 없어요.</p>`;
       } else {
         const inM = rows.filter((e) => e.date.slice(0, 7) === curYM);
-        out = cal(curYM, rows) + `<div class="plate chart-card run-wk"><h3>Running Mileage · 주간 러닝 거리 <span class="muted" style="font-weight:500">· 최근 12주</span></h3><div class="now num" id="nowR"></div><div class="chart" id="chR"></div>
+        out = cal(curYM, rows) + `<div class="plate chart-card run-wk"><h3>Weekly Mileage <span class="muted" style="font-weight:500">· Last 12 weeks</span></h3><div class="now num" id="nowR"></div><div class="chart" id="chR"></div>
           <p class="note coach" id="noteR"></p></div>` + (inM.length ? `<section class="mo-log" id="moLog"><h3 class="mo-log-h">${['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][+curYM.slice(5) - 1]} Training Log <span class="num">${inM.length} entries</span></h3><div class="mo-b">${days(inM, ws)}</div></section>`
           : `<p class="note" style="margin-top:16px">${+curYM.slice(5)}월에는 적힌 운동 기록이 없어요.</p>`);
       }
@@ -849,7 +851,7 @@
     render();
     document.querySelectorAll('#logFilter button').forEach((b) => { b.onclick = () => { filter = b.dataset.f; document.querySelectorAll('#logFilter button').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); }); render(); }; });
     let timer; search.oninput = () => { clearTimeout(timer); timer = setTimeout(() => { query = search.value.trim(); render(); }, 150); };
-    if (!canWrite()) { $('#logNew').hidden = true; $('#logHint').hidden = false; }
+    if (!canWrite()) { $('#logNew').hidden = true; const lt = $('.log-top'); if (lt) lt.style.display = 'none'; }
     if (LOCAL && !token()) $('#logPreview').hidden = false;
     $('#logNew').onclick = () => open(null); $('#logCancel').onclick = () => { $('#logFormWrap').hidden = true; };
     const change = async (mutate, message) => { try { all = await save('log', mutate, message); log = live(all); render(); } catch (e) { alert(e.message); } };

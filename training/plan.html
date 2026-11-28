@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&amp;family=Noto+Serif+KR:wght@600;700&amp;display=swap">
-<link rel="stylesheet" href="../assets/site.css?v=1129a">
+<link rel="stylesheet" href="../assets/site.css?v=1129b">
 </head>
 <body data-root="../" data-page="plan">
 <main>
@@ -22,94 +22,61 @@
     <section class="hero" style="padding-bottom:8px">
       <p class="eyebrow">Hyrox Plan · 2026.11 – 2027.05</p>
       <h1>Hyrox <em>Plan</em></h1>
-      <ul class="lead-list"><li>한 주의 핵심은 금요일 Hyrox Single과 수요일 러닝 포인트 훈련</li><li>조깅은 페이스보다 심박 150 이하를 지키기</li><li>주말과 공휴일은 휴식, 또는 LSD</li></ul>
     </section>
 
-    <nav class="jump" aria-label="이 페이지 안에서 이동">
-      <a class="now" href="#now">이번 주</a><a href="#p-road">로드맵</a><a href="#p-weeks">주차별 계획</a><a href="#p-paces">페이스</a><a href="#p-pro">프로 무게</a><a href="#p-str">웨이트 · 복근</a><a href="#p-nut">영양</a><a href="#p-sleep">수면</a>
-    </nav>
 
     <section class="sec" id="p-road">
-      <div class="sec-head"><span class="sec-no">01</span><h2>Roadmap</h2><span class="ko">대회까지 여섯 달</span></div>
+      <div class="sec-head"><span class="sec-no">01</span><h2>Roadmap</h2></div>
       <div id="road"></div>
-      <h3 class="wk-title">Weekly Goals <span class="muted">· 주차별 목표</span></h3>
+      <h3 class="wk-title">Weekly Goals</h3>
       <div id="weekTable"></div>
     </section>
 
     <section class="sec" id="p-weeks">
-      <div class="sec-head"><span class="sec-no">02</span><h2>Week by Week</h2><span class="ko">주차별 계획</span><span class="side num" id="weekTotal"></span></div>
-      <p class="note" style="margin:-4px 0 16px"><span class="chip a">핵심</span> 표시가 붙은 수요일 러닝과 금요일 Single은 꼭 지켜요. 체육관 왕복 러닝은 주 2회면 성공이고, 비 오는 날은 건너뛰고 보충하지 않아요.</p>
+      <div class="sec-head"><span class="sec-no">02</span><h2>Weekly Plans</h2></div>
       <div id="weeks"></div>
     </section>
 
     <section class="sec" id="p-paces">
-      <div class="sec-head"><span class="sec-no">03</span><h2>Paces</h2><span class="ko">러닝 페이스</span>
-        <span class="side num" id="paceSide"></span></div>
+      <div class="sec-head"><span class="sec-no">03</span><h2>Paces</h2></div>
       <div class="plate" id="paces"></div>
     </section>
 
-    <section class="sec" id="p-pro">
-      <div class="sec-head"><span class="sec-no">04</span><h2>Pro Weights</h2><span class="ko">프로 무게</span></div>
-      <div class="plate"><div class="scroll-x"><table class="t">
-        <thead><tr><th>종목</th><th>지금</th><th>프로 무게</th><th>진행</th></tr></thead>
-        <tbody>
-          <tr><td><b>Wall Ball</b></td><td class="num">6kg</td><td class="num">9kg</td><td>바로 9kg</td></tr>
-          <tr><td><b>Sandbag Lunge</b></td><td class="num">20kg</td><td class="num">30kg</td><td>30kg으로, 속도는 천천히</td></tr>
-          <tr><td><b>Farmers Carry</b></td><td class="num">24kg</td><td class="num">32kg × 2</td><td>28kg을 거치거나 바로 32kg</td></tr>
-          <tr><td><b>Sled Push · Pull</b></td><td>4장</td><td>대회 무게</td><td>2주마다 1장씩</td></tr>
-          <tr><td><b>Kettlebell · Thruster</b></td><td class="num">24kg</td><td>–</td><td>조금 버거운 무게로 올려가기</td></tr>
-        </tbody></table></div>
-        <p class="note" style="margin-top:12px">무게를 내리는 기준은 자세가 무너지거나 통증이 3/10을 넘을 때뿐.</p></div>
-    </section>
-
-    <section class="sec" id="p-str">
-      <div class="sec-head"><span class="sec-no">05</span><h2>Strength &amp; Core</h2><span class="ko">웨이트와 복근</span></div>
-      <div class="grid g2">
-        <div class="plate"><h3 style="font-size:1rem;color:var(--ink);margin-bottom:8px">상체 · 수요일 22:30 헬스장 45분</h3>
-          <p>벤치 3×5–8 · 풀업 3세트 · 로우 3×8–10 · 레터럴 레이즈 3×15 · 컬 2×12 · 케이블 크런치 3×12–15</p>
-          <p class="note" style="margin-top:8px">23:30까지 끝내기. 감량 중에 근육을 지키는 용도예요.</p></div>
-        <div class="plate"><h3 style="font-size:1rem;color:var(--ink);margin-bottom:8px">복근 · Hyrox Training 끝나고 행잉 레그레이즈</h3>
-          <p>행잉 니 레이즈 3×15 → 레그레이즈 3×10–12 → 높이 올리고 3초 내리기 → 토투바</p>
-          <p class="note" style="margin-top:8px">반동 없이, 골반을 말아 올리는 느낌으로.</p></div>
-      </div>
-    </section>
 
     <section class="sec" id="p-nut">
-      <div class="sec-head"><span class="sec-no">06</span><h2>Nutrition</h2><span class="ko">영양</span><span class="side">2월까지 완만한 감량 · 3월부터 퍼포먼스</span></div>
-      <div class="grid g2">
-        <div class="plate"><div class="scroll-x"><table class="t">
-          <thead><tr><th>날</th><th class="r">kcal</th><th class="r">탄</th><th class="r">단</th><th class="r">지</th></tr></thead>
-          <tbody>
-            <tr><td><b>왕복 러닝 하는 날 · 수요일</b></td><td class="r num">2,500</td><td class="r num">320</td><td class="r num">155</td><td class="r num">65</td></tr>
-            <tr><td><b>왕복 러닝 없는 Hyrox 날 · 주말 조깅 하는 날</b></td><td class="r num">2,300</td><td class="r num">270</td><td class="r num">155</td><td class="r num">65</td></tr>
-            <tr><td><b>그 밖의 주말 · 휴무</b></td><td class="r num">2,000</td><td class="r num">200</td><td class="r num">155</td><td class="r num">65</td></tr>
-          </tbody></table></div>
-          <p class="note" style="margin-top:12px">09:30 아침 · 13:00 점심 · 16:30 간식(바나나 + 떡) · 19:30 저녁 · 수요일만 23:45 단백질 간식</p></div>
-        <div class="plate"><div class="scroll-x"><table class="t">
-          <thead><tr><th>기간</th><th>단계</th><th>먹는 양</th></tr></thead>
-          <tbody>
-            <tr><td class="num">11/25–12/23</td><td><b>감량 1</b></td><td>왼쪽 표 (주간 평균 약 2,300)</td></tr>
-            <tr><td class="num">12/24–1/1</td><td><b>연말 유지</b></td><td>하루 +200kcal</td></tr>
-            <tr><td class="num">1/2–2/21</td><td><b>감량 2</b></td><td>왼쪽 표 · 67–68kg이면 일찍 종료</td></tr>
-            <tr><td class="num">2/22–2/28</td><td><b>전환</b></td><td>하루 200kcal씩 올리기</td></tr>
-            <tr><td class="num">3/1–대회</td><td><b>퍼포먼스</b></td><td>2,700–2,900kcal</td></tr>
-          </tbody></table></div>
-          <p class="note" style="margin-top:12px">2주마다 점검: 주 0.7kg 넘게 빠지거나 금요일 Single이 무너지면 +200kcal, 체중과 허리가 그대로면 −150kcal.</p></div>
+      <div class="sec-head"><span class="sec-no">04</span><h2>Nutrition</h2><span class="side">2월까지 완만한 감량 · 3월부터 퍼포먼스</span></div>
+      <div class="grid g2 nut-grid">
+        <div class="plate"><h3 class="mini">Daily Calories</h3>
+          <ul class="kc-list">
+            <li><span>왕복 러닝 하는 날 · 수요일</span><b class="num">2,500<small>kcal</small></b></li>
+            <li><span>Hyrox만 하는 날 · 주말 조깅 하는 날</span><b class="num">2,300<small>kcal</small></b></li>
+            <li><span>쉬는 주말 · 휴무</span><b class="num">2,000<small>kcal</small></b></li>
+          </ul>
+          <p class="note kc-foot">단백질은 매일 155g</p></div>
+        <div class="plate"><h3 class="mini">By Phase</h3>
+          <ol class="ph-list">
+            <li><span class="num">11/25 – 12/23</span><b>감량 1</b><em>하루 칼로리대로 · 주 평균 약 2,300kcal</em></li>
+            <li><span class="num">12/24 – 1/1</span><b>연말 유지</b><em>하루 +200kcal</em></li>
+            <li><span class="num">1/2 – 2/21</span><b>감량 2</b><em>하루 칼로리대로 · 67–68kg이면 일찍 끝내기</em></li>
+            <li><span class="num">2/22 – 2/28</span><b>전환</b><em>하루 200kcal씩 올리기</em></li>
+            <li><span class="num">3/1 – 대회</span><b>퍼포먼스</b><em>하루 2,700–2,900kcal</em></li>
+          </ol>
+          <ul class="goals kc-foot note"><li>2주마다 점검</li><li>주 0.7kg 넘게 빠지거나 금요일 Single이 무너지면 +200kcal</li><li>체중과 허리가 그대로면 −150kcal</li></ul></div>
       </div>
     </section>
 
     <section class="sec" id="p-sleep">
-      <div class="sec-head"><span class="sec-no">07</span><h2>Sleep &amp; Conditioning</h2><span class="ko">수면과 컨디션 관리</span></div>
-      <div class="plate rule-list">
-        <div><b>취침 · 기상</b><span>01:30 취침, 09:00 기상 (7시간 30분). 00:45에 화면 끄기.</span></div>
-        <div><b>6시간 미만 수면 · 무거운 다리</b><span>왕복 러닝 한 번을 자전거로, 수요일은 한 세트 줄이기.</span></div>
-        <div><b>통증 3/10 초과 · 감기</b><span>휴식. 정강이·아킬레스건·무릎 통증이 다음 날 아침까지 남으면 그 주 왕복 러닝 한 번을 자전거로.</span></div>
-        <div><b>영하 7도 아래 · 빙판 · 비</b><span>왕복 러닝은 건너뛰고 자전거나 대중교통. 보충하지 않아요.</span></div>
-        <div><b>일정이 꼬인 주</b><span>금요일 Single → 수요일 → 화요일 → 월요일 → 목요일 순으로 지키기. Hyrox Training 3번과 수요일만 해도 성공.</span></div>
-      </div>
+      <div class="sec-head"><span class="sec-no">05</span><h2>Sleep &amp; Conditioning</h2></div>
+      <div class="plate"><ul class="cond-list">
+        <li><b>잠</b><span>01:30 취침 · 09:00 기상 · 00:45에 화면 끄기</span></li>
+        <li><b>6시간 못 잔 날 · 다리가 무거운 날</b><span>왕복 러닝은 자전거로 · 수요일은 한 세트 줄이기</span></li>
+        <li><b>통증 3/10 초과 · 감기</b><span>쉬기 · 다음 날까지 아프면 그 주 왕복 러닝 하나는 자전거로</span></li>
+        <li><b>영하 7도 아래 · 빙판 · 비</b><span>왕복 러닝은 건너뛰고 보충 없음</span></li>
+        <li><b>일정이 꼬인 주</b><span>금요일 Single → 수요일 → 화 → 월 → 목 순으로 지키기</span></li>
+      </ul></div>
     </section>
   </div>
 </main>
-<script src="../assets/site.js?v=1129a"></script>
+<script src="../assets/site.js?v=1129b"></script>
 </body>
 </html>
