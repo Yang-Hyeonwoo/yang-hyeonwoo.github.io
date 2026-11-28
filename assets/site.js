@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1129m';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1129n';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -1040,8 +1040,8 @@
   }
 
   chrome();
-  // Pull down at the top of the page and let go to reload. Safari in a tab does this itself; a home-screen copy of the site does not.
-  if (window.navigator.standalone || matchMedia('(display-mode: standalone)').matches) {
+  // Pull down at the top of the page and let go to reload (on any touch screen: the page's sideways clip can stop Safari's own).
+  if (matchMedia('(pointer: coarse)').matches) {
     const ptr = el('<div class="ptr" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>');
     document.body.append(ptr); let y0 = null, dy = 0; const GO = 64;   // finger travel that triggers the reload
     window.addEventListener('touchstart', (e) => { y0 = window.scrollY <= 0 && e.touches.length === 1 ? e.touches[0].clientY : null; dy = 0; }, { passive: true });

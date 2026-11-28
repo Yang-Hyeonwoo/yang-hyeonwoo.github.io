@@ -1050,8 +1050,9 @@ table.days td:first-child b, table.days .dbtn b { text-align: left; }
 
 /* ======== 1129a ======== */
 /* phones: the page never pans sideways, it only scrolls up and down */
-/* (on body only: clipping the root too stops iPhone Safari's pull-to-refresh) */
-body { overflow-x: clip; }
+/* both html and body, or an iPhone still lets the page slide sideways; pull-to-refresh is done in site.js */
+html, body { overflow-x: clip; }
+@supports not (overflow: clip) { body { overflow-x: hidden; } }
 
 /* goals as short lines with a small dot */
 ul.goals, ul.rm-f, ul.lead-list { list-style: none; margin: 0; padding: 0; }
