@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1129c';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1129d';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -245,7 +245,7 @@
     for (let i = 11; i >= 0; i--) { const m = addDays(mon, -7 * i); const st = weekRun(m, plan, log);
       bars.push({ label: md(m), tipx: `${weekLabel(m)} (${md(m)}–${md(addDays(m, 6))})`, y: st.km, plan: st.meta ? st.meta.run_km : 0, cur: i === 0 }); }
     const done4 = bars.slice(-5, -1); const avg4 = done4.reduce((a, b) => a + b.y, 0) / done4.length; const cur = bars[bars.length - 1];
-    nowEl.innerHTML = `${cur.y.toFixed(1)}<small>km · 이번 주${cur.plan ? ` / 기본 계획 ${cur.plan}km` : ''}</small><span class="chip num">지난 4주 평균 ${avg4.toFixed(1)}km</span>`;
+    nowEl.innerHTML = `${cur.y.toFixed(1)}<small>km · 이번 주${cur.plan ? ` / 기본 계획 ${cur.plan}km` : ''}</small><span class="hd-d num"><b>${avg4.toFixed(1)}km</b><em>지난 4주 평균</em></span>`;
     barChart(chartEl, bars, { label: '주간 러닝 거리', labels: true, wide: true, h: 220, color: PAGE === 'log' ? '#3567cf' : KINDS[1].color, vfmt: (v) => (v >= 10 ? v.toFixed(0) : v.toFixed(1)),
       tip: (b) => `${b.tipx} · <b>${b.y.toFixed(1)}</b>km${b.plan ? ` (기본 계획 ${b.plan}km)` : ''}${b.cur ? ' · 진행 중' : ''}` });
     if (!noteEl) return;
@@ -339,8 +339,7 @@
       out += c.total ? `<text class="vl tot" x="${(x + bw / 2).toFixed(1)}" y="${(Y(c.total) - 5).toFixed(1)}" text-anchor="middle">${c.total}</text>` : '';
       return `${out}<rect data-i="${i}" x="${(L + i * gw).toFixed(1)}" y="0" width="${gw.toFixed(1)}" height="${H}" fill="transparent"/>`; }).join('');
     const xl = cats.map((c, i) => `<text class="ax" data-x="${i}" x="${(L + i * gw + gw / 2).toFixed(1)}" y="${H - 5}" text-anchor="middle">${c.label}</text>`).join('');
-    box.innerHTML = `<div class="legend">${KINDS.map((q) => `<span><i style="background:${q.color}"></i>${q.name}</span>`).join('')}</div>
-      <svg class="days-ch" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label)}">${grid}${marks}${xl}</svg><div class="tip"></div>`;
+    box.innerHTML = `      <svg class="days-ch" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label)}">${grid}${marks}${xl}</svg><div class="tip"></div>`;
     const tip = $('.tip', box), svg = $('svg', box);
     box.querySelectorAll('rect[data-i]').forEach((r) => { const i = +r.dataset.i, c = cats[i];
       const show = () => { tip.innerHTML = `${c.tip || c.label} · <b>${c.total}</b>일 운동 · ${KINDS.map((q, k) => `${q.name} ${c.v[k]}`).join(' · ')}`; tip.style.left = `${Math.min(72, Math.max(28, (L + (i + 0.5) * gw) / W * 100))}%`;
@@ -509,7 +508,7 @@
       // headline: the latest weekly average, and how far it moved over the period (green when it moved the way the plan wants)
       const head = (id, pts, fmtBig, fmtDelta, unit, want) => { const el = $(id); if (!pts.length) { el.innerHTML = '–'; return; }
         const d = pts[pts.length - 1].y - pts[0].y; const cls = !want || Math.abs(d) < 1e-9 ? '' : d * want > 0 ? ' g' : ' w';
-        el.innerHTML = `${fmtBig(pts[pts.length - 1].y)}${pts.length > 1 ? `<span class="chip${cls} num">${d > 0 ? '▲' : d < 0 ? '▼' : ''} ${fmtDelta(Math.abs(d))}${unit} · ${pts.length}주 사이</span>` : ''}`; };
+        el.innerHTML = `${fmtBig(pts[pts.length - 1].y)}${pts.length > 1 ? `<span class="hd-d${cls} num"><b>${d > 0 ? '+' : d < 0 ? '−' : '±'}${fmtDelta(Math.abs(d))}${unit}</b><em>지난 ${pts.length}주</em></span>` : ''}`; };
       const kcal = (v) => Math.round(v).toLocaleString('en-US'); const w = ser('w'), sl = ser('s'), kc = ser('k');
       const opt = { labels: true, area: true, h: 200, xfmt: weekLabel, domain: { start, n } };
       head('#nowW', w, (v) => `${v.toFixed(1)}<small>kg</small>`, (v) => v.toFixed(1), 'kg', -1);
@@ -530,7 +529,7 @@
       // running distance per month, same months as the chart beside it
       const mk = months.map((a) => { const [y, m] = a.ym.split('-').map(Number); return { label: `${m}월`, tip: `${y}년 ${m}월`, y: runSum(log, `${a.ym}-01`, iso(new Date(y, m, 0))).km, cur: a.ym === thisYm }; });
       const mPrev = mk.length > 1 ? mk[mk.length - 2] : null;
-      $('#nowRM').innerHTML = `${mk.length ? mk[mk.length - 1].y.toFixed(1) : '0'}<small>km · ${NOW.getMonth() + 1}월 러닝</small>${mPrev ? `<span class="chip num">${mPrev.label} ${mPrev.y.toFixed(1)}km</span>` : ''}`;
+      $('#nowRM').innerHTML = `${mk.length ? mk[mk.length - 1].y.toFixed(1) : '0'}<small>km · ${NOW.getMonth() + 1}월 러닝</small>${mPrev ? `<span class="hd-d num"><b>${mPrev.y.toFixed(1)}km</b><em>${mPrev.label}</em></span>` : ''}`;
       // what to focus on: the Hyrox season's monthly mix, and how far running has to grow
       const ymAt = (n) => { const d = new Date(NOW.getFullYear(), NOW.getMonth() + n, 1); return iso(d).slice(0, 7); };
       const pre = mk.filter((m) => { const ym = months[mk.indexOf(m)].ym; return ym < HYROX_START.slice(0, 7); }); const lastW = pre[pre.length - 1];
@@ -970,7 +969,7 @@
         const step = BX[k][2] === 3 ? 0.001 : BX[k][2] === 2 ? 0.01 : BX[k][2] === 0 ? 1 : 0.1; const d = Math.round((v - val(was, k)) / step) * step; const want = BX[k][3];
         const when = was !== prev ? ` <span class="muted">· ${md(parse(was.date))} 대비</span>` : '';
         if (Math.abs(d) < step / 2) return `직전과 같음${when}`;
-        return `<span class="${!want ? '' : d * want > 0 ? 'd-good' : 'd-bad'}">${d > 0 ? '▲' : '▼'} ${BX[k][2] === 0 ? Math.round(Math.abs(d)) : Math.abs(d).toFixed(BX[k][2])}${k === 'fat_pct' ? '%p' : BX[k][1]}</span>${when}`; };
+        return `<span class="${!want ? '' : d * want > 0 ? 'd-good' : 'd-bad'}">${d > 0 ? '+' : '−'}${BX[k][2] === 0 ? Math.round(Math.abs(d)) : Math.abs(d).toFixed(BX[k][2])}${k === 'fat_pct' ? '%p' : BX[k][1]}</span>${when}`; };
       const tile = (k) => `<div><div class="l">${BX[k][0]}</div><div class="v num">${fmt(k, val(cur, k))}<small>${BX[k][1]}</small></div><div class="s num">${delta(k)}</div></div>`;
       const more = ['score', 'vfa', 'bmi', 'bmr'].filter((k) => cur[k] != null);
       const SEG = [['la', '왼팔'], ['ra', '오른팔'], ['tr', '몸통'], ['ll', '왼다리'], ['rl', '오른다리']];
@@ -981,7 +980,7 @@
       const cmpKeys = ['weight', 'muscle', 'fat', 'fat_pct', 'score', 'vfa', 'bmi', 'bmr'].filter((k) => rows.some((r) => r[k] != null));
       const cmp = rows.length > 1 ? `<h4 class="body-hist">InBody 970 결과지 비교 <span class="muted num">· ${rows.length}회 · ${dot(rows[rows.length - 1].date)}부터</span></h4><div class="scroll-x body-cmp"><table class="t body-all"><thead><tr><th></th>${rows.map((r) => `<th class="r num">${md(parse(r.date))}<br><span class="muted">${r.date.slice(0, 4)}</span></th>`).join('')}</tr></thead><tbody>${cmpKeys.map((k) =>
         `<tr${['weight', 'muscle', 'fat', 'fat_pct'].includes(k) ? ' class="key"' : ''}><td>${BX[k][0]} <small>${BX[k][1]}</small></td>${rows.map((r) => `<td class="r num">${fmt(k, val(r, k))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : '';
-      $('#bodyTable').innerHTML = `<p class="body-h">최근 측정 <b class="num">${dot(cur.date)}</b>${cur.device ? ` <span class="chip num">InBody ${esc(cur.device)}</span>` : ''}${prev ? `<span class="num">화살표는 직전 측정(${dot(prev.date)}) 대비</span>` : ''}</p>
+      $('#bodyTable').innerHTML = `<p class="body-h">최근 측정 <b class="num">${dot(cur.date)}</b>${cur.device ? ` <span class="chip num">InBody ${esc(cur.device)}</span>` : ''}${prev ? `<span class="num">변화는 직전 측정(${dot(prev.date)}) 대비</span>` : ''}</p>
         <div class="kv body-now">${['weight', 'muscle', 'fat', 'fat_pct'].map(tile).join('')}</div>
         ${more.length ? `<div class="kv body-more">${more.map(tile).join('')}</div>` : ''}
         ${seg || side ? `<div class="body-two">${seg}${side}</div>` : ''}
