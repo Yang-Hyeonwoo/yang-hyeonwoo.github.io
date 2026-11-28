@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1129n';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1129o';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -100,7 +100,7 @@
     const t = (p) => (PAGE === p ? ' class="on" aria-current="page"' : '');
     const sub = PAGE !== 'hub';
     document.body.prepend(el(sub ? `<header class="site-head sub"><div class="wrap">
-      <a class="brand" href="${ROOT}training/"><em>Fitness</em></a>
+      <a class="brand" href="${ROOT}training/"><em>Fitness Tracker</em></a>
       <nav class="nav" aria-label="Training 메뉴">
         <a href="${ROOT}training/"${t('training')}>Home</a><a href="${ROOT}training/plan.html"${t('plan')}>Hyrox Plan</a>
         <a href="${ROOT}training/log.html"${t('log')}>Training Log</a><a href="${ROOT}training/records.html"${t('records')}>Daily Records</a>
@@ -113,7 +113,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2 20 3m-3 3 3 3m-6 0 2 2"/></svg>
       </button></div></header>` : `<header class="site-head"><div class="wrap">
       <a class="brand" href="${ROOT}">Hyeonwoo <em>Yang</em></a>
-      <nav class="nav" aria-label="주 메뉴"><a href="${CFG.research}">Research</a><a href="${ROOT}training/">Fitness</a></nav></div></header>`));
+      <nav class="nav" aria-label="주 메뉴"><a href="${CFG.research}">Research</a><a href="${ROOT}training/">Fitness Tracker</a></nav></div></header>`));
     document.body.append(el(`<footer class="foot"><div class="wrap">© 2026 Hyeonwoo Yang. All rights reserved.</div></footer>`));
     // fetch the other tabs ahead of time, so the first visit to each is as quick as a return visit
     ['', 'plan.html', 'log.html', 'records.html'].forEach((f) => { const l = document.createElement('link'); l.rel = 'prefetch'; l.href = `${ROOT}training/${f}?v=${VERSION}`; document.head.append(l); });
