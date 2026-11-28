@@ -1274,3 +1274,61 @@ ul.cond-list span { display: block; margin-top: 2px; font-size: 0.82rem; color: 
 /* the log: the write button alone, on the right with its label */
 .log-top { justify-content: flex-end; }
 @media (max-width: 640px) { .log-top .pen-btn span { display: inline; } .log-top .pen-btn { width: auto; padding: 0 16px; } }
+
+/* ======== 1129c ======== */
+/* Home: the week's name and dates sit under the This Week heading */
+.sec-head .side#weekSide { flex: 1 0 100%; margin: -8px 0 0; font-size: 0.8rem; text-align: left; }
+@media (max-width: 640px) {
+  .note.coach { font-size: 0.74rem; line-height: 1.6; padding: 10px 12px; }
+  .note.coach b { font-size: 0.8rem; }
+  .note.coach li { line-height: 1.6; }
+}
+
+/* Records: smaller numbers, the sleep time inside its bar */
+@media (max-width: 640px) {
+  table.days { font-size: 0.64rem; }
+  table.days thead tr:last-child th { font-size: 0.6rem; }
+  table.days td:first-child b { font-size: 0.68rem; }
+  table.days .wd { font-size: 0.58rem; }
+  table.days td.sl, table.days td.kc { padding-left: 2px; padding-right: 2px; }
+  table.days td.sl .cellbar, table.days td.kc .cellbar { font-size: 0.62rem; font-weight: 500; letter-spacing: -0.01em; }
+  table.days td.bw { font-size: 0.64rem; font-weight: 500; }
+  table.days td.clip { font-size: 0.64rem; }
+  table.days tr.month-row td { font-size: 0.64rem; }
+}
+
+/* the 2026 weight recap, compact */
+.recap { padding: 24px; }
+.recap h3 { font-size: clamp(1.2rem, 1.05rem + 0.6vw, 1.5rem); margin: 0 0 6px; }
+.recap .lead { font-size: 0.84rem; line-height: 1.6; margin-bottom: 16px; word-break: keep-all; }
+.recap h4 { font-size: 0.86rem; } .recap h4 .muted { font-weight: 500; }
+ul.wt-stats { list-style: none; margin: 0; padding: 14px 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px 18px; border-top: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); }
+ul.wt-stats li { min-width: 0; }
+ul.wt-stats .v { font-family: var(--display); font-size: 1.7rem; font-weight: 600; line-height: 1.15; color: var(--ink); }
+ul.wt-stats .v small { margin-left: 3px; font-family: var(--font); font-size: 0.72rem; font-weight: 500; color: var(--muted); }
+ul.wt-stats .l { margin-top: 2px; font-size: 0.78rem; font-weight: 600; color: var(--text); }
+ul.wt-stats .s { font-size: 0.72rem; color: var(--muted); }
+.sp-stack { display: flex; gap: 2px; height: 10px; margin: 6px 0 14px; border-radius: 5px; overflow: hidden; }
+.sp-stack i { display: block; min-width: 4px; }
+ul.sp-list { list-style: none; margin: 0; padding: 0; }
+ul.sp-list li { display: grid; grid-template-columns: 10px minmax(0, 1fr) 2.2rem 2.6rem; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line-soft); font-size: 0.82rem; }
+ul.sp-list li:last-child { border-bottom: 0; }
+ul.sp-list li > i { width: 8px; height: 8px; border-radius: 2px; }
+ul.sp-list li span { color: var(--text); }
+ul.sp-list li b { font-weight: 600; color: var(--ink); text-align: right; }
+ul.sp-list li em { font-style: normal; font-size: 0.74rem; color: var(--muted); text-align: right; }
+table.wt-str { font-size: 0.82rem; }
+table.wt-str th, table.wt-str td { text-align: center; vertical-align: middle; white-space: nowrap; }
+table.wt-str td b { font-weight: 600; }
+table.wt-str td.dlt { color: var(--muted); }
+table.wt-str td.dlt.up { color: var(--accent-strong); font-weight: 600; }
+@media (max-width: 860px) { ul.wt-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  .recap { padding: 18px; }
+  ul.wt-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 16px; }
+  ul.wt-stats .v { font-size: 1.45rem; }
+  table.wt-str { font-size: 0.72rem; }
+  table.wt-str th { font-size: 0.68rem; }
+  table.wt-str th, table.wt-str td { padding: 9px 4px; }
+  ul.sp-list li { font-size: 0.78rem; }
+}
