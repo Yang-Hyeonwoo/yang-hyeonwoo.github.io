@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1129i';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1129j';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -933,8 +933,8 @@
       const a = rowsFor(TODAY, HYROX_START, true), b = first <= end ? rowsFor(end, first, false) : { out: '', count: 0 };
       const dot = (d) => d.replace(/-/g, '.');
       $('#dayCount').textContent = canWrite() ? '날짜를 누르면 그날 기록을 고쳐요' : '';
-      $('#dayList').innerHTML = `<h3 class="dl-h">Hyrox Training <span class="num">${dot(HYROX_START)} –</span></h3>${tableOf(a.out, true)}`
-        + (b.count ? `<h3 class="dl-h second">Weight Training <span class="num">${dot(first)} – ${dot(end)}</span></h3>${tableOf(b.out, false)}` : '');
+      $('#dayList').innerHTML = `<h3 class="dl-h">Hyrox Training <span class="num">${dot(HYROX_START)} – ${dot(plan.race.date)}</span></h3>${tableOf(a.out, true)}`
+        + (b.count ? `<h3 class="dl-h second">Weight Training <span class="num">2026.01.01 – ${dot(end)}</span></h3>${tableOf(b.out, false)}` : '');
     }
     // The form remembers what it showed when it was filled. Saving writes only the fields changed since then, so a form left open
     // (or opened from an older copy) never blanks what another device saved in the meantime.
