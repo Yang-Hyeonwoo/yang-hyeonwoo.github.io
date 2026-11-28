@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1129k';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1129l';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -1040,6 +1040,17 @@
   }
 
   chrome();
+  // Pull down at the top of the page and let go to reload. Safari in a tab does this itself; a home-screen copy of the site does not.
+  if (window.navigator.standalone || matchMedia('(display-mode: standalone)').matches) {
+    const ptr = el('<div class="ptr" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>');
+    document.body.append(ptr); let y0 = null, dy = 0; const MAX = 90, GO = 70;
+    window.addEventListener('touchstart', (e) => { y0 = window.scrollY <= 0 && e.touches.length === 1 ? e.touches[0].clientY : null; dy = 0; }, { passive: true });
+    window.addEventListener('touchmove', (e) => { if (y0 == null) return; dy = Math.max(0, e.touches[0].clientY - y0); if (window.scrollY > 0) { y0 = null; dy = 0; }
+      const d = Math.min(MAX, dy * 0.5); ptr.style.opacity = String(Math.min(1, d / GO * 1.2)); ptr.style.transform = `translateY(${d - 40 + 16}px)`; ptr.classList.toggle('ready', d >= GO * 0.5 && dy >= GO); }, { passive: true });
+    window.addEventListener('touchend', () => { if (y0 == null) return; y0 = null;
+      if (dy >= GO * 2) { ptr.classList.remove('ready'); ptr.classList.add('spin'); ptr.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/></svg>'; location.reload(); }
+      else { ptr.style.opacity = '0'; ptr.style.transform = 'translateY(-40px)'; } }, { passive: true });
+  }
   try { const v = Number(sessionStorage.getItem('site.synced')); if (v) { sessionStorage.removeItem('site.synced'); if (Date.now() - v < 60000) syncMsg('가민 기록을 가져왔어요.', true); } } catch { /* ignore */ }
   const run = { hub, training, plan: planPage, log: logPage, records: recordsPage }[PAGE];
   const fail = (e) => { console.error(e); const m = $('main'); if (m) m.prepend(el(`<div class="wrap"><div class="banner" style="margin-top:16px">기록을 불러오지 못했어요. 잠시 뒤 새로고침해 주세요. (${esc(e.message)})</div></div>`)); };
