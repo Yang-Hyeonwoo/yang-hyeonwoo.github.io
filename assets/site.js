@@ -7,7 +7,7 @@
   const PAGE = document.body.dataset.page || '';
   const LOCAL = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
   const KEY = 'site.gh';
-  const VERSION = '1128f';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
+  const VERSION = '1129a';   // same value as version.txt and the ?v= on the pages; tools/bump.py changes all three
 
   // ---------- small helpers ----------
   const $ = (s, el = document) => el.querySelector(s);
@@ -388,6 +388,7 @@
 
   // durations: stored as minutes, typed as 37:54, shown as "37분 54초"; sleep shown as "6시간 47분"
   const hmHtml = (m) => { const t = Math.round(m); return `${Math.floor(t / 60)}<small>시간</small> ${t % 60}<small>분</small>`; };
+  const goalList = (t, cls = 'goals') => `<ul class="${cls}">${String(t || '').split(' · ').filter(Boolean).map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`;
   const durText = (min) => { const s = Math.round(min * 60); if (!(s % 60)) return `${s / 60} min`; const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
     return h ? `${h}:${pad(m)}:${pad(s % 60)}` : `${m}:${pad(s % 60)}`; };
   const durClock = (min) => { const s = Math.round(min * 60); return `${Math.floor(s / 60)}:${pad(s % 60)}`; };
@@ -415,7 +416,13 @@
       else if (canWrite() && it.k === 'core') act = `<input class="in sm" data-reps inputmode="text" placeholder="12, 10, 8" aria-label="세트별 개수">${ckBtn(key)}`;
       else if (canWrite() && sessionFor(it, d)) act = ckBtn(key);
       return `<div class="todo${it.key ? ' key' : ''}"><span class="kind">${m ? `<b class="num">${m[1]}</b>` : ''}${KIND[it.k] || ''}</span><div class="b"><div class="t">${esc(it.t)}</div><div class="d">${esc(m ? m[2] : it.d || '')}</div></div><div class="act">${act}</div></div>`; };
-    const items = day ? day.items.map((it, i) => row(it, i)).join('') : '<p class="note">오늘은 정해진 계획이 없어요.</p>';
+    const used = new Set(day ? day.items.map((it) => doneEntry(it, TODAY, log)).filter(Boolean).map((e) => e.id) : []);
+    const extra = log.filter((e) => e.date === TODAY && kindOf(e) !== 'other' && !used.has(e.id));
+    const extraRow = (e) => { const run = kindOf(e) === 'run';
+      const facts = [run ? '' : e.format, e.minutes ? durText(e.minutes) : '', e.pace && `${e.pace}/km`, e.avg_hr && `Avg HR ${e.avg_hr}`].filter(Boolean).map((x) => `<span class="nb">${esc(x)}</span>`).join(' · ');
+      return `<div class="todo"><span class="kind">${KIND[kindOf(e)] || ''}</span><div class="b"><div class="t">${esc(run && e.km ? `러닝 ${e.km}km` : e.session)}</div><div class="d num">${facts}</div></div><div class="act"><a class="small" href="log.html#edit=${encodeURIComponent(e.id)}">자세히</a>${ckOn}</div></div>`; };
+    const planRows = day ? day.items.map((it, i) => (extra.length && (it.k === 'free' || it.k === 'rest') ? '' : row(it, i))).join('') : '';
+    const items = planRows + extra.map(extraRow).join('') || '<p class="note">오늘은 정해진 계획이 없어요.</p>';
     // The last three days' planned sessions not checked yet, so a session logged the next day is still one tap (owner only).
     // Runs and classes the Garmin sync already filled count as done and don't show here.
     const back = canWrite() ? [1, 2, 3].map((n) => iso(addDays(parse(TODAY), -n))).map((d) => ({ d, rows: ((plan.days[d] || {}).items || [])
@@ -443,14 +450,13 @@
       const got = need.filter((it) => isDone(it, d, log)).length;
       const did = log.filter((e) => e.date === d && kindOf(e) !== 'other');
       const planned = new Set(items.map((it) => (it.k === 'commute' ? 'run' : it.k)));
-      const lines = items.filter((it) => !(idle(it) && did.length)).map((it) => ({ ok: !idle(it) && isDone(it, d, log), t: `${esc(it.t)}${it.opt && !idle(it) ? ' (보너스)' : ''}`, quiet: it.opt || idle(it) }))
-        .concat(did.filter((e) => !planned.has(kindOf(e))).map((e) => ({ ok: true, t: `${esc(e.session)}${e.km ? ` ${e.km}km` : ''}` })));   // logged, though not in the plan
-      const any = lines.some((l) => l.ok);
-      const its = lines.map((l) => `<div class="it${l.quiet ? ' optional' : ''}${l.ok ? ' did' : ''}">${l.ok ? doneMark : any ? '<span class="mk"></span>' : ''}<span>${l.t}</span></div>`).join('');
+      const lines = items.filter((it) => !(idle(it) && did.length)).map((it) => ({ ok: !idle(it) && isDone(it, d, log), k: idle(it) ? '' : it.k === 'commute' ? 'run' : it.k, t: `${esc(it.t)}${it.opt && !idle(it) ? ' (보너스)' : ''}`, quiet: it.opt || idle(it) }))
+        .concat(did.filter((e) => !planned.has(kindOf(e))).map((e) => ({ ok: true, k: kindOf(e), t: `${esc(kindOf(e) === 'run' && e.km ? `러닝 ${e.km}km` : e.session)}` })));   // logged, though not in the plan
+      const its = lines.map((l) => `<div class="it${l.quiet ? ' optional' : ''}${l.ok ? ' did' : !l.quiet && d < TODAY ? ' missed' : ''}"><i class="dot${l.k ? ` k-${l.k}` : ' none'}${l.ok ? ' on' : ''}" aria-hidden="true"></i><span>${l.t}</span></div>`).join('');
       const state = need.length ? (got === need.length ? 'done' : got ? 'part' : d < TODAY ? 'miss' : '') : did.length ? 'done' : 'off';
       const st = state === 'part' ? `<i class="st part num" role="img" aria-label="계획 ${need.length}개 중 ${got}개 기록">${got}/${need.length}</i>` : state === 'miss' ? '<i class="st">미기록</i>' : '';
-      return `<div class="day${d === TODAY ? ' today' : ''}${state ? ` ${state}` : ''}"><div class="dn"><span>${KO[dt.getDay()]}</span>${st}<b class="num">${dt.getDate()}</b></div><div class="its">${its}</div></div>`; }).join('')}</div>
-      <p class="note wk-key">체크 표시는 기록한 운동이에요. <b class="num">1/2</b>는 일부만 기록, <b>미기록</b>은 지난 날인데 기록이 없다는 뜻이에요.</p>`;
+      return `<div class="day${d === TODAY ? ' today' : ''}${d < TODAY ? ' past' : ''}${state ? ` ${state}` : ''}"><div class="dn"><span class="w">${KO[dt.getDay()]}</span><b class="num">${dt.getDate()}</b></div><div class="its">${its}</div>${st ? `<div class="sts">${st}</div>` : ''}</div>`; }).join('')}</div>
+      <p class="note wk-key"><span><i class="dot k-run on"></i>기록한 운동</span><span><i class="dot k-run"></i>남은 운동</span><span><b class="num">1/2</b> 일부만 기록</span><span><b>미기록</b> 지난 날 기록 없음</span></p>`;
   }
 
   async function training() {
@@ -578,20 +584,28 @@
     // races, newest first; the fastest result of each event gets a PB mark
     const secsOf = (t) => t.split(':').reduce((acc, v) => acc * 60 + Number(v), 0); const best = {};
     plan.races.forEach((r) => { const v = secsOf(r.result); if (best[r.event] == null || v < best[r.event]) best[r.event] = v; });
-    $('#races').innerHTML = `<div class="scroll-x"><table class="t races"><thead><tr><th>Date</th><th>Race</th><th class="dev">Event</th><th class="pb"></th><th class="r">Result</th></tr></thead><tbody>${plan.races.map((r) => `<tr><td class="num" style="white-space:nowrap">${esc(r.date)}</td><td><b>${esc(r.name)}</b><div class="mev">${esc(r.event || '')}</div></td><td class="dev">${esc(r.event || '')}</td><td class="pb">${secsOf(r.result) === best[r.event] ? '<span class="chip a">PB</span>' : ''}</td><td class="r num res"><b>${esc(r.result)}</b></td></tr>`).join('')}</tbody></table></div>`;
+    $('#races').innerHTML = `<div class="scroll-x"><table class="t races"><thead><tr><th>Date</th><th>Race</th><th class="dev">Event</th><th>Result</th></tr></thead><tbody>${plan.races.map((r) => `<tr><td class="num dt">${esc(r.date)}</td><td class="rn"><b>${esc(r.name)}</b><div class="mev">${esc(r.event || '')}</div></td><td class="dev">${esc(r.event || '')}</td><td class="num res"><b>${esc(r.result)}</b>${secsOf(r.result) === best[r.event] ? '<span class="pbm">PB</span>' : ''}</td></tr>`).join('')}</tbody></table></div>`;
   }
 
   async function planPage() {
     const [plan, log] = await Promise.all([load('plan'), load('log').then(done)]);
     const thisMon = iso(monday(NOW));
     const phase = [...plan.roadmap].reverse().find((r) => r.from <= TODAY) || plan.roadmap[0];
-    $('#road').innerHTML = `<div class="road" style="margin-top:0">${plan.roadmap.map((r) => `<div class="${r === phase ? 'now' : r.from < phase.from ? 'past' : ''}"><div class="m">${esc(r.m)}</div><div class="th">${esc(r.theme)}</div><div class="f">${esc(r.focus)}</div></div>`).join('')}</div>`;
+    { const R = plan.roadmap, race = parse(plan.race.date), t0 = parse(TODAY);
+      const span = (i) => [parse(R[i].from), i + 1 < R.length ? parse(R[i + 1].from) : addDays(race, 1)];
+      const ph = R.map((r, i) => { const [a, b] = span(i); const fill = Math.max(0, Math.min(1, (t0 - a) / (b - a)));
+        const st = r === phase ? 'now' : r.from < phase.from ? 'past' : 'next';
+        return `<li class="rm-p ${st}"><div class="rm-bar"><s style="--f:${(fill * 100).toFixed(1)}%"></s>${st === 'now' ? `<i class="rm-pin" style="--f:${(fill * 100).toFixed(1)}%"></i>` : ''}</div>
+          <div class="rm-m"><b>${esc(r.m)}</b><span class="num">${md(a)} – ${md(addDays(b, -1))}</span>${st === 'now' ? '<em>지금</em>' : ''}</div>
+          <div class="rm-th">${esc(r.theme)}</div>${goalList(r.focus, 'rm-f')}</li>`; }).join('');
+      const dd = dday(plan);
+      $('#road').innerHTML = `<ol class="rm">${ph}<li class="rm-race"><div class="rm-bar"><i></i></div><div class="rm-m"><b>Race</b><span class="num">${md(race)}(${KO[race.getDay()]})</span></div><div class="rm-th">${esc(plan.race.name)}</div><div class="rm-sub">${esc(plan.race.division)}${dd > 0 ? ` · <span class="num">D-${dd}</span>` : ''}</div></li></ol>`; }
     // the weeks at a glance, under the roadmap: one small card per week (what it is for and its base running distance, with a bar
     // to compare weeks). The Wednesday session and the day-by-day detail are in the week's own plan below; a card opens it.
     $('#weekTable').innerHTML = `<div class="wk-grid">${plan.weeks.map((w, i) => { const mon = parse(w.start); const now = w.start === thisMon;
       return `<a class="wkc${now ? ' now' : ''}${w.recovery ? ' rec' : ''}" href="#w-${w.start}"><div class="n"><b class="num">${i + 1}주차</b><span class="num">${md(mon)}–${md(addDays(mon, 6))}</span></div>
         <div class="t">${esc(w.label)}${now ? ' <span class="chip a">이번 주</span>' : ''}${w.recovery ? ' <span class="chip w">회복</span>' : ''}</div>
-        <div class="c">${esc(w.concept || '')}</div>
+        ${goalList(w.concept, 'c goals')}
         ${w.start <= thisMon ? (() => { const got = runSum(log, w.start, iso(addDays(mon, 6))).km;
           return `<div class="km run"><span class="num"><b>${got.toFixed(1)}</b> / ${w.run_km}km${now ? '<small> · 진행 중</small>' : ''}</span><i title="계획의 ${Math.round(got / w.run_km * 100)}%"><s style="width:${Math.min(100, got / w.run_km * 100).toFixed(1)}%"></s></i></div>`; })()
           : `<div class="km"><span class="num"><b>${w.run_km}</b>km${w.bonus_km ? `<small> · 보너스 +${w.bonus_km}</small>` : ''}</span><i></i></div>`}</a>`; }).join('')}</div>`;
@@ -605,7 +619,7 @@
         return `<tr><td class="num dcol"><b>${KO[dt.getDay()]}</b> <span class="muted">${md(dt)}</span></td><td><ul class="plan-items">${day.items.map((it) => li(it, d)).join('')}</ul><div class="m-nut num">${n0(day.kcal)}kcal · 탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}</div></td><td class="r num d-only" style="white-space:nowrap">${n0(day.kcal)}kcal<br><span class="small muted">탄 ${day.carb} · 단 ${day.prot} · 지 ${day.fat}</span></td></tr>`; }).join('');
       return `<section class="plate plan-week${w.start === thisMon ? ' now' : ''}" id="w-${w.start}"><div class="hd"><h3>${esc(w.label)}</h3><span class="chip dark num">${wi + 1}주차</span><span class="muted small num">${md(mon)}–${md(addDays(mon, 6))}</span>${w.recovery ? '<span class="chip w">회복 주</span>' : ''}${w.start === thisMon ? '<span class="chip a">이번 주</span>' : ''}
         <span class="small muted" style="margin-left:auto">러닝 기본 <b class="num" style="color:var(--ink)">${w.run_km}km</b> (${esc(w.run_note)})${w.bonus_km ? ` · 보너스 +${w.bonus_km}km` : ''}</span></div>
-        ${w.concept ? `<p class="concept">${esc(w.concept)}</p>` : ''}
+        ${w.concept ? goalList(w.concept, 'concept goals') : ''}
         <div class="scroll-x"><table class="t"><thead><tr><th class="dcol">Day</th><th>Training</th><th class="r d-only" style="width:9.5rem">Nutrition</th></tr></thead><tbody>${rows}</tbody></table></div></section>`; }).join('');
     const now = document.getElementById(`w-${thisMon}`); if (now && location.hash === '#now') now.scrollIntoView();
     const jn = $('.jump a.now'); if (jn) { if (now) { const m0 = parse(thisMon), m6 = addDays(m0, 6); jn.href = `#w-${thisMon}`;
